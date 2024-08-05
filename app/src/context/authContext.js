@@ -6,7 +6,7 @@ export const AuthContext = createContext({
 });
 
 export default function AuthProvider({ children }) {
-  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(true);
 
   return (
     <AuthContext.Provider value={{ isSignedIn, setIsSignedIn }}>

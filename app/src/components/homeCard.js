@@ -7,6 +7,7 @@ import {
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
 
 const Card = ({ card }) => {
+  
   const {
     author,
     content,
