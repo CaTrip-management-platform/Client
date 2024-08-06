@@ -12,6 +12,7 @@ import LoginScreen from "../screens/LoginScreen";
 import { NavigationContainer } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native-paper";
 import RightDrawerContent from "../components/rightDrawer";
+import ActivityScreen from "../screens/ActivityScreen";
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -59,6 +60,11 @@ const AppStack = () => (
       component={SettingsScreen}
       options={{ headerShown: false }}
     />
+    <Stack.Screen
+      name="Activity"
+      component={ActivityScreen}
+      options={{ headerShown: true }}
+    />
   </Stack.Navigator>
 );
 
@@ -93,12 +99,12 @@ const MainStack = () => {
         screenOptions={{
           drawerPosition: 'right',
           headerShown: false,
-          overlayStyle: { backgroundColor: 'rgba(0, 0, 0, 0.1)' }, 
+          overlayStyle: { backgroundColor: 'rgba(0, 0, 0, 0.1)' },
           drawerStyle: {
-            backgroundColor: 'rgba(0, 0, 0, 0.2)', 
+            backgroundColor: 'rgba(0, 0, 0, 0.2)',
           },
         }}
-        sceneContainerStyle={{ backgroundColor: 'transparent' }} 
+        sceneContainerStyle={{ backgroundColor: 'transparent' }}
       >
         {isSignedIn ? (
           <Drawer.Screen name="AppStack" component={AppStack} />
