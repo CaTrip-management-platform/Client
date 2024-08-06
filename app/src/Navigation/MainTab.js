@@ -15,7 +15,6 @@ import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../context/authContext";
 import { Icon } from "react-native-paper";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 const Tab = createBottomTabNavigator();
 

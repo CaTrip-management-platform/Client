@@ -1,28 +1,17 @@
 import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, ScrollView, Button, ImageBackground, Modal } from 'react-native';
-import { GET_ACTIVITY } from '../queries/activity';
+import { GET_Activity } from '../queries/getAllActivity';
 import { useQuery } from '@apollo/client';
 
-const activities = [
-    { id: '1', title: 'Pantai', description: 'A relaxing day at the beach.', price: 'Rp. 20.000,-', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Beach_at_Fort_Lauderdale.jpg/1200px-Beach_at_Fort_Lauderdale.jpg', rating: 4.5, reviews: [{ user: 'Alice', comment: 'Amazing experience!', rating: 5 }, { user: 'Bob', comment: 'Really enjoyed the day.', rating: 4 }] },
-    { id: '2', title: 'Hiking', description: 'A challenging hike up the mountains.', price: 'Rp. 30.000,-', image: 'https://i0.wp.com/images-prod.healthline.com/hlcmsresource/images/topic_centers/2019-8/couple-hiking-mountain-climbing-1296x728-header.jpg?w=1155&h=1528', rating: 4.8, reviews: [{ user: 'Alice', comment: 'Amazing experience!', rating: 5 }, { user: 'Bob', comment: 'Really enjoyed the day.', rating: 4 }] },
-    { id: '3', title: 'City Tour', description: 'Explore the city with a guided tour.', price: 'Rp. 50.000,-', image: 'https://independensi.com/wp-content/uploads/2017/08/170816-Bus-Wisata-Keliling-Ibukota-Jakarta-820x510.jpg', rating: 4.3, reviews: [{ user: 'Alice', comment: 'Amazing experience!', rating: 5 }, { user: 'Bob', comment: 'Really enjoyed the day.', rating: 4 }] },
-    { id: '4', title: 'Museum Visit', description: 'A day at the local museum.', price: 'Rp. 10.500,-', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRz0B0rqeiiqDVHeb6wg7WCfM533FKiGi4eaw&s', rating: 4.2, reviews: [{ user: 'Alice', comment: 'Amazing experience!', rating: 5 }, { user: 'Bob', comment: 'Really enjoyed the day.', rating: 4 }] },
-    { id: '5', title: 'Spa', description: 'Relax with a full day at the spa.', price: 'Rp. 10.000,-', image: 'https://asset.kompas.com/crops/QoXV0nlDiIKBtT6g9kO_Ka-uNQI=/31x11:1000x657/750x500/data/photo/2023/05/08/645845b8c578c.jpg', rating: 4.7, reviews: [{ user: 'Alice', comment: 'Amazing experience!', rating: 5 }, { user: 'Bob', comment: 'Really enjoyed the day.', rating: 4 }] },
-    { id: '6', title: 'Adventure Park', description: 'Fun activities at the adventure park.', price: 'Rp. 40.000,-', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCYLWItE-ABHS2YSwgoSQ7XvHLwcCpNBunBQ&s', rating: 4.6, reviews: [{ user: 'Alice', comment: 'Amazing experience!', rating: 5 }, { user: 'Bob', comment: 'Really enjoyed the day.', rating: 4 }] },
-    { id: '7', title: 'Fishing Trip', description: 'A relaxing fishing experience.', price: 'Rp. 20.500,-', image: 'https://fishthewahoo.com/wp-content/uploads/2021/04/Fishing-Trip-Essentials--1080x675.jpg', rating: 4.4, reviews: [{ user: 'Alice', comment: 'Amazing experience!', rating: 5 }, { user: 'Bob', comment: 'Really enjoyed the day.', rating: 4 }] },
-    { id: '8', title: 'Cooking Class', description: 'Learn to cook delicious dishes.', price: 'Rp. 30.500,-', image: 'https://mayaresorts.com/assets/images/ubud/experiences/cooking-class/gallery-full/cooking-class-full-1.jpg', rating: 4.7, reviews: [{ user: 'Alice', comment: 'Amazing experience!', rating: 5 }, { user: 'Bob', comment: 'Really enjoyed the day.', rating: 4 }] },
-    { id: '9', title: 'Wine Tasting', description: 'Taste the best wines in the region.', price: 'Rp. 60.000,-', image: 'https://media.cntraveler.com/photos/56e2d06e2c9cfa640d949071/master/pass/Wine-Tasting-Demetrius-Fordham.jpg', rating: 4.8, reviews: [{ user: 'Alice', comment: 'Amazing experience!', rating: 5 }, { user: 'Bob', comment: 'Really enjoyed the day.', rating: 4 }] },
-    { id: '10', title: 'Yoga', description: 'Relax and rejuvenate at the yoga retreat.', price: 'Rp. 80.000,-', image: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/03/83/7d/82/anamaya-resort-retreat.jpg?w=700&h=-1&s=1', rating: 4.9, reviews: [{ user: 'Alice', comment: 'Amazing experience!', rating: 5 }, { user: 'Bob', comment: 'Really enjoyed the day.', rating: 4 }] },
-];
+
 
 const ActivityScreen = () => {
     const [activeView, setActiveView] = useState('Recommendations');
     const [selectedActivity, setSelectedActivity] = useState(null);
     const [timeline, setTimeline] = useState([]);
 
-    const { loading, error, data } = useQuery(GET_ACTIVITY);
-    console.log(data, error)
+    const { loading, error, data } = useQuery(GET_Activity);
+    const activity = data.getAllActivity
     const handleAddToTimeline = () => {
         if (selectedActivity) {
             setTimeline([selectedActivity, ...timeline]);
@@ -46,12 +35,13 @@ const ActivityScreen = () => {
             style={styles.recommendationCard}
             onPress={() => setSelectedActivity(item)}
         >
-            {item.image ? (
-                <Image source={{ uri: item.image }} style={styles.recommendationImage} />
+            {console.log(item.getAllActivity, '<====================')}
+            {item.imgUrls ? (
+                <Image source={{ uri: item.imgUrls }} style={styles.recommendationImage} />
             ) : null}
             <View style={styles.recommendationDetails}>
-                <Text style={styles.recommendationTitle}>{item.title}</Text>
-                <Text style={styles.recommendationPrice}>{item.price}</Text>
+                {/* <Text style={styles.recommendationTitle}>{item.title}</Text> */}
+                <Text style={styles.recommendationPrice}>{item.description}</Text>
             </View>
         </TouchableOpacity>
     );
@@ -88,13 +78,13 @@ const ActivityScreen = () => {
                     <Text style={styles.header}>Available Activities</Text>
 
                     <FlatList
-                        data={chunkArray(activities, 2)}
+                        data={chunkArray(activity, 2)}
                         keyExtractor={(item, index) => index.toString()}
                         renderItem={({ item }) => (
                             <View style={styles.row}>
                                 {item.map(activity => (
                                     <View key={activity.id} style={styles.cardWrapper}>
-                                        {renderActivityCard({ item: data })}
+                                        {renderActivityCard({ item: activity })}
                                     </View>
                                 ))}
                             </View>
