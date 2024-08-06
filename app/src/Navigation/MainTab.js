@@ -22,14 +22,12 @@ const Tab = createBottomTabNavigator();
 export function LogoTitle() {
   return (
     <Image style={styles.logo} source={require("../../assets/logo.png")} />
-    <Image style={styles.logo} source={require("../../assets/logo.png")} />
   );
 }
 
 export default function MainTab() {
   const navigation = useNavigation();
   const { setIsSignedIn } = useContext(AuthContext);
-  const [text, setText] = useState("");
   const [text, setText] = useState("");
 
   return (
