@@ -12,7 +12,7 @@ function RegisterScreen() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [image, setImage] = useState('');
+  const [role, setRole] = useState('');
 
   const navigation = useNavigation()
 
@@ -26,7 +26,7 @@ function RegisterScreen() {
   const handleRegister = async () => {
     try {
       const { data } = await registerUser({
-        variables: { name, username, email, password, image },
+        variables: { name, username, email, password, role },
       });
 
     } catch (err) {
@@ -88,27 +88,41 @@ function RegisterScreen() {
           style={styles.inputText}
           placeholder="Image URL..."
           placeholderTextColor="#003f5c"
-          value={image}
-          onChangeText={setImage}
+          value={role}
+          onChangeText={setRole}
         />
       </View>
-      <TouchableOpacity style={styles.registerBtn} onPress={handleRegister}>
-        <Text style={styles.registerText}>Register</Text>
-      </TouchableOpacity>
-      <View style={styles.roadContainer}>
-        <View style={styles.road} />
-        <View style={styles.road} />
-        <View style={styles.road} />
-        <View style={styles.road} />
-        <View style={styles.road} />
+
+      {/* <View style={{
+        flexDirection: 'row'
+      }}>
+        <TouchableOpacity style={styles.role} >
+          <Text style={styles.roleText}>Register</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.role} >
+          <Text style={styles.roleText}>Register</Text>
+        </TouchableOpacity>
+      </View> */}
+      <View style={styles.btnContainer}>
+        <TouchableOpacity style={styles.registerBtn} onPress={handleRegister}>
+          <Text style={styles.registerText}>Register</Text>
+        </TouchableOpacity>
+        <Image style={styles.car} source={require('../../assets/car.png')} />
+        <View style={styles.roadContainer}>
+          <View style={styles.road} />
+          <View style={styles.road} />
+          <View style={styles.road} />
+          <View style={styles.road} />
+          <View style={styles.road} />
+        </View>
+        <TouchableOpacity style={styles.regis} onPress={handleRegister}>
+          <Text style={styles.registerText}
+            onPress={() => {
+              navigation.navigate("Login");
+            }}
+          >To Login</Text>
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.regis} onPress={handleRegister}>
-        <Text style={styles.registerText}
-          onPress={() => {
-            navigation.navigate("Login");
-          }}
-        >To Login</Text>
-      </TouchableOpacity>
     </ImageBackground>
   );
 }
@@ -156,7 +170,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 7,
   },
   registerBtn: {
-    width: '100%',
+    // width: '100%',
     backgroundColor: "#134B70",
     // borderRadius: 25,
     height: 50,
@@ -165,8 +179,22 @@ const styles = StyleSheet.create({
     marginTop: 40,
     // marginBottom: 10,
   },
+  role: {
+    width: '50%',
+    backgroundColor: "white",
+    borderRadius: 25,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 7
+    // marginTop: 40,
+    // marginBottom: 10,
+  },
+  roleText: {
+    color: 'black',
+  },
   regis: {
-    width: "100%",
+    // width: "100%",
     backgroundColor: "#134B70",
     height: 50,
     alignItems: "center",
@@ -177,6 +205,21 @@ const styles = StyleSheet.create({
   registerText: {
     color: 'white',
   },
+  car: {
+    position: 'absolute',
+    top: '30.5%',
+    left: '15%',
+    width: 130,
+    height: 65,
+    // transform: [{ rotate: '90deg' }],
+    zIndex: 1, // Make sure car is on top of other elements
+    marginLeft: -32.5, // Adjust position to center the car
+    marginTop: 10, // Adjust position to be on top of the button
+  },
+  btnContainer: {
+    // flex: 1
+    // backgroundColor: 'black'
+  }
 });
 
 export default RegisterScreen;

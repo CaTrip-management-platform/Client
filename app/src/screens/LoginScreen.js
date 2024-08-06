@@ -58,41 +58,43 @@ function LoginScreen({ navigation }) {
           onChangeText={setPassword}
         />
       </View>
+      <View style={styles.btnContainer}>
 
-      <TouchableOpacity
-        style={styles.loginBtn}
-        onPress={async () => {
-          const result = await loginFn({
-            variables: { email, password },
-          });
+        <TouchableOpacity
+          style={styles.loginBtn}
+          onPress={async () => {
+            const result = await loginFn({
+              variables: { email, password },
+            });
 
-          setIsSignedIn(true);
+            setIsSignedIn(true);
 
-          await SecureStore.setItemAsync(
-            "accessToken",
-            result.data.login.accessToken
-          );
-        }}
-      >
-        <Text style={styles.loginText}>Login</Text>
-      </TouchableOpacity>
+            await SecureStore.setItemAsync(
+              "accessToken",
+              result.data.login.accessToken
+            );
+          }}
+        >
+          <Text style={styles.loginText}>Login</Text>
+        </TouchableOpacity>
+        <Image style={styles.car} source={require('../../assets/car.png')} />
+        <View style={styles.roadContainer}>
+          <View style={styles.road} />
+          <View style={styles.road} />
+          <View style={styles.road} />
+          <View style={styles.road} />
+          <View style={styles.road} />
+        </View>
 
-      <View style={styles.roadContainer}>
-        <View style={styles.road} />
-        <View style={styles.road} />
-        <View style={styles.road} />
-        <View style={styles.road} />
-        <View style={styles.road} />
-      </View>
-
-      <TouchableOpacity
-        style={styles.regis}
-        onPress={() => {
-          navigation.navigate("Register");
-        }}
-      >
-        <Text style={styles.loginText}>To Register</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.regis}
+          onPress={() => {
+            navigation.navigate("Register");
+          }}
+        >
+          <Text style={styles.loginText}>To Register</Text>
+        </TouchableOpacity>
+      </View >
     </ImageBackground>
   );
 }
@@ -124,13 +126,13 @@ const styles = StyleSheet.create({
 
   },
   loginBtn: {
-    width: "100%",
+    // width: "10",
     backgroundColor: "#134B70",
     height: 50,
     alignItems: "center",
     justifyContent: "center",
     marginTop: 40,
-    // marginBottom: 2,
+    marginBottom: -1,
   },
   roadContainer: {
     flexDirection: 'row',
@@ -146,7 +148,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 7,
   },
   regis: {
-    width: "100%",
+    // width: "100%",
     backgroundColor: "#134B70",
     height: 50,
     alignItems: "center",
@@ -173,6 +175,20 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "red",
   },
+  car: {
+    position: 'absolute',
+    top: '30.5%',
+    left: '73%',
+    width: 130,
+    height: 65,
+    // transform: [{ rotate: '90deg' }],
+    zIndex: 1, // Make sure car is on top of other elements
+    marginLeft: -32.5, // Adjust position to center the car
+    marginTop: 10, // Adjust position to be on top of the button
+  },
+  btnContainer: {
+    // flex: 1
+  }
 });
 
 export default LoginScreen;
