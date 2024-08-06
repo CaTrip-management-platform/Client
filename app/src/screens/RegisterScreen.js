@@ -8,8 +8,8 @@ import { useNavigation } from '@react-navigation/native';
 
 
 function RegisterScreen() {
-  const [name, setName] = useState('');
   const [username, setUsername] = useState('');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('');
@@ -48,19 +48,19 @@ function RegisterScreen() {
       <View style={styles.inputView}>
         <TextInput
           style={styles.inputText}
-          placeholder="Name..."
+          placeholder="Username..."
           placeholderTextColor="#003f5c"
-          value={name}
-          onChangeText={setName}
+          value={username}
+          onChangeText={setUsername}
         />
       </View>
       <View style={styles.inputView}>
         <TextInput
           style={styles.inputText}
-          placeholder="Username..."
+          placeholder="PhoneNumber..."
           placeholderTextColor="#003f5c"
-          value={username}
-          onChangeText={setUsername}
+          value={phone}
+          onChangeText={setPhone}
         />
       </View>
       <View style={styles.inputView}>
