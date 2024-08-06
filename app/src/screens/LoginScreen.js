@@ -16,11 +16,10 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../context/authContext";
 
 function LoginScreen({ navigation }) {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { setIsSignedIn } = useContext(AuthContext);
   const [loginFn, { loading, error, data }] = useMutation(LOGIN_USER);
-
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -42,10 +41,9 @@ function LoginScreen({ navigation }) {
       <View style={styles.inputView}>
         <TextInput
           style={styles.inputText}
-          placeholder="Email..."
+          placeholder="Username..."
           placeholderTextColor="#003f5c"
-          keyboardType="email-address"
-          onChangeText={setEmail}
+          onChangeText={setUsername}
         />
       </View>
 
@@ -63,9 +61,11 @@ function LoginScreen({ navigation }) {
         <TouchableOpacity
           style={styles.loginBtn}
           onPress={async () => {
+            console.log(username, password, '<==')
             const result = await loginFn({
-              variables: { email, password },
+              variables: { password, username },
             });
+            console.log(result, '<==')
 
             setIsSignedIn(true);
 
@@ -95,7 +95,7 @@ function LoginScreen({ navigation }) {
           <Text style={styles.loginText}>To Register</Text>
         </TouchableOpacity>
       </View >
-    </ImageBackground>
+    </ImageBackground >
   );
 }
 

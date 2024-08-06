@@ -63,7 +63,7 @@ const AppStack = () => (
     <Stack.Screen
       name="Activity"
       component={ActivityScreen}
-      options={{ headerShown: true }}
+      options={{ headerShown: false }}
     />
   </Stack.Navigator>
 );
