@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { FontAwesome, AntDesign } from "@expo/vector-icons";
 import { useMutation } from "@apollo/client";
-import { COMMET_POST, GET_POST_BY_ID, LIKE_POST } from "../queries/posts";
+import { COMMET_POST, GET_POST_BY_ID, LIKE_POST } from "../queries/actvuty";
 import * as SecureStore from "expo-secure-store"
 import { jwtDecode } from "jwt-decode";
 

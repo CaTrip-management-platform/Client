@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-
 const popularPlaces = [
   {
     id: '1',
@@ -9,7 +8,7 @@ const popularPlaces = [
     rating: '4.5',
     location: 'Bali, Indonesia',
     price: 'RP.200,000,-',
-    image: 'https://lh7-us.googleusercontent.com/9vEhEHIfICi9YXdWt9gZiSlzIoKe0R-jZwc546RiLoBFf_8icGzSAC9UvIQCLSkqG2AOqmvHmZ13S795sqmRniTBrqIg_eVDKMsow-eicg0JXot4kHmr0xq4YFuR6fSslXX5ZAMvOfVuuYcRkZbAwFI', 
+    image: 'https://lh7-us.googleusercontent.com/9vEhEHIfICi9YXdWt9gZiSlzIoKe0R-jZwc546RiLoBFf_8icGzSAC9UvIQCLSkqG2AOqmvHmZ13S795sqmRniTBrqIg_eVDKMsow-eicg0JXot4kHmr0xq4YFuR6fSslXX5ZAMvOfVuuYcRkZbAwFI',
   },
   {
     id: '2',
@@ -32,8 +31,9 @@ const popularPlaces = [
 const HomeScreen = ({ navigation }) => {
   const [selectedCategory, setSelectedCategory] = useState('Pantai');
 
-  return (
-    <ScrollView style={styles.container}>
+
+  const ListHeader = () => (
+    <View style={styles.headerContainer}>
       {/* Recommendations Section */}
       <View style={styles.recommendationsContainer}>
         <Text style={styles.sectionTitle}>Rekomendasi Tempat</Text>
@@ -47,38 +47,43 @@ const HomeScreen = ({ navigation }) => {
           <Picker.Item label="Mountain" value="Mountain" />
         </Picker>
       </View>
-
       {/* Popular Places Section */}
-      <View style={styles.popularContainer}>
-        <Text style={styles.sectionTitle}>Populer</Text>
-        <FlatList
-          data={popularPlaces}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.card}
-              onPress={() => navigation.navigate('DetailsScreen', { item })}
-            >
-              <Image source={{ uri: item.image }} style={styles.cardImage} />
-              <View style={styles.cardDetails}>
-                <Text style={styles.cardTitle}>{item.name}</Text>
-                <Text style={styles.cardRating}>Rating: {item.rating}</Text>
-                <Text style={styles.cardLocation}>{item.location}</Text>
-                <Text style={styles.cardPrice}>{item.price}</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-          keyExtractor={(item) => item.id}
-        />
-      </View>
-    </ScrollView>
+      <Text style={styles.sectionTitle}>Populer</Text>
+    </View>
+  );
+
+  return (
+    <FlatList
+      data={popularPlaces}
+      renderItem={({ item }) => (
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => navigation.navigate('DetailsScreen', { item })}
+        >
+          <Image source={{ uri: item.image }} style={styles.cardImage} />
+          <View style={styles.cardDetails}>
+            <Text style={styles.cardTitle}>{item.name}</Text>
+            <Text style={styles.cardRating}>Rating: {item.rating}</Text>
+            <Text style={styles.cardLocation}>{item.location}</Text>
+            <Text style={styles.cardPrice}>{item.price}</Text>
+          </View>
+        </TouchableOpacity>
+      )}
+      keyExtractor={(item) => item.id}
+      ListHeaderComponent={ListHeader}
+      contentContainerStyle={styles.container}
+    />
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: '#f5f5f5',
-    padding: 16,
+    paddingHorizontal: 16,
+  },
+  headerContainer: {
+    marginBottom: 20,
   },
   recommendationsContainer: {
     marginBottom: 20,
@@ -92,15 +97,14 @@ const styles = StyleSheet.create({
     height: 50,
     width: '100%',
   },
-  popularContainer: {
-    marginBottom: 20,
-  },
   card: {
     backgroundColor: '#fff',
     borderRadius: 10,
     overflow: 'hidden',
     marginBottom: 10,
     elevation: 3,
+    width: '100%', 
+    alignSelf: 'center', 
   },
   cardImage: {
     width: '100%',

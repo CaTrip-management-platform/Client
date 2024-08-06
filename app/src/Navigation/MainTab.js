@@ -1,5 +1,11 @@
 import React, { useState, useContext } from "react";
-import { Image, View, TextInput, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  Image,
+  View,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FontAwesome, Feather } from "@expo/vector-icons";
 import HomeScreen from "../screens/HomeScreen";
@@ -7,24 +13,21 @@ import SearchScreen from "../screens/SearchScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../context/authContext";
-import * as SecureStore from "expo-secure-store";
 import { Icon } from "react-native-paper";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 const Tab = createBottomTabNavigator();
 
 export function LogoTitle() {
   return (
-    <Image
-      style={styles.logo}
-      source={require("../../assets/logo.png")}
-    />
+    <Image style={styles.logo} source={require("../../assets/logo.png")} />
   );
 }
 
 export default function MainTab() {
   const navigation = useNavigation();
   const { setIsSignedIn } = useContext(AuthContext);
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
 
   return (
     <Tab.Navigator>
@@ -53,12 +56,16 @@ export default function MainTab() {
           ),
           headerLeft: () => <LogoTitle />,
           headerRight: () => (
-            <Feather
-              name="menu"
-              size={27}
-              color={"black"}
-              onPress={() => navigation.getParent("RightDrawer").openDrawer()}
-            />
+            <View style={styles.headerRightContainer}>
+              <MaterialIcons name="luggage" size={25} color="black" />
+              <Feather
+                name="menu"
+                size={27}
+                color={"black"}
+                onPress={() => navigation.getParent("RightDrawer").openDrawer()}
+                style={styles.headerIcon}
+              />
+            </View>
           ),
           tabBarIcon: ({ focused, color, size }) => (
             <FontAwesome
@@ -114,29 +121,37 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: 250, 
+    flexDirection: "row",
+    alignItems: "center",
+    width: 250,
     height: 40,
     borderRadius: 20,
-    borderColor:"black",
-    backgroundColor: '#aaa',
-    shadowColor: '#000',
+    borderColor: "black",
+    backgroundColor: "#aaa",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
   },
   input: {
     flex: 1,
-    height: '100%',
+    height: "100%",
     borderRadius: 20,
     paddingHorizontal: 10,
   },
   iconWrapper: {
     padding: 10,
+  },
+  headerRightContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 10, // Adjust margin as needed
+  },
+  headerIcon: {
+    marginLeft: 15, // Space between icons
   },
 });

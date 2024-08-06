@@ -4,7 +4,7 @@ import { useQuery } from "@apollo/client";
 import { StatusBar } from "expo-status-bar";
 import { ActivityIndicator } from "react-native-paper";
 import Card from "../components/detailCard.js";
-import { GET_POST_BY_ID } from "../queries/posts.js";
+import { GET_POST_BY_ID } from "../queries/actvuty.js";
 
 function DetailsScreen({ route }) {
   const { loading, error, data } = useQuery(GET_POST_BY_ID, {

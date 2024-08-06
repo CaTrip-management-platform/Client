@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, TouchableOpacity, Text, FlatList, SafeAreaView } from 'react-native';
 import { useQuery } from '@apollo/client';
-import { GET_SEARCH } from '../queries/posts';
+import { GET_SEARCH } from '../queries/actvuty';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {
   useFonts,
