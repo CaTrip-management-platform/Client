@@ -1,8 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, ImageBackground } from 'react-native';
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
-import { REGISTER_USER } from '../queries/users.js'; 
+import { REGISTER_USER } from '../queries/users.js';
 import { useNavigation } from '@react-navigation/native';
 // import { GET_POST } from '../queries/posts.js';
 
@@ -13,36 +13,36 @@ function RegisterScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [image, setImage] = useState('');
-  
-const navigation = useNavigation()
 
-const [registerUser] = useMutation(REGISTER_USER, {
-  onCompleted: () => {
-    navigation.navigate('Login');
-  },
-// refetchQueries:[GET_POST]
-});
+  const navigation = useNavigation()
+
+  const [registerUser] = useMutation(REGISTER_USER, {
+    onCompleted: () => {
+      navigation.navigate('Login');
+    },
+    // refetchQueries:[GET_POST]
+  });
 
   const handleRegister = async () => {
     try {
       const { data } = await registerUser({
         variables: { name, username, email, password, image },
       });
-      
-      } catch (err) {
-    console.log(err)
+
+    } catch (err) {
+      console.log(err)
     }
   };
 
   return (
-    <View style={styles.container}>
+    <ImageBackground
+      src="https://marketplace.canva.com/EAGD_Vn7lkQ/1/0/900w/canva-blue-and-white-modern-watercolor-background-instagram-story-L-nceizV6kA.jpg"
+      style={styles.container}>
       <StatusBar style="dark" />
       <View style={styles.logoContainer}>
         <Image
           style={styles.logo}
-          source={{
-            uri: 'https://img.freepik.com/premium-vector/white-letter-r-black-background_853558-3686.jpg?w=740',
-          }}
+          source={require('../../assets/Catrip.png')}
         />
       </View>
       <View style={styles.inputView}>
@@ -95,14 +95,28 @@ const [registerUser] = useMutation(REGISTER_USER, {
       <TouchableOpacity style={styles.registerBtn} onPress={handleRegister}>
         <Text style={styles.registerText}>Register</Text>
       </TouchableOpacity>
-    </View>
+      <View style={styles.roadContainer}>
+        <View style={styles.road} />
+        <View style={styles.road} />
+        <View style={styles.road} />
+        <View style={styles.road} />
+        <View style={styles.road} />
+      </View>
+      <TouchableOpacity style={styles.regis} onPress={handleRegister}>
+        <Text style={styles.registerText}
+          onPress={() => {
+            navigation.navigate("Login");
+          }}
+        >To Login</Text>
+      </TouchableOpacity>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black',
+    backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -111,8 +125,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 200,
+    height: 200,
+    marginBottom: 5,
   },
   inputView: {
     width: '80%',
@@ -127,14 +142,36 @@ const styles = StyleSheet.create({
     height: 50,
     color: 'black',
   },
+  roadContainer: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
+    marginVertical: 0,
+    backgroundColor: "#134B70",
+  },
+  road: {
+    flex: 1,
+    backgroundColor: "white",
+    height: 7,
+    marginHorizontal: 7,
+  },
   registerBtn: {
-    width: '80%',
-    backgroundColor: '#0B60B0',
-    borderRadius: 25,
+    width: '100%',
+    backgroundColor: "#134B70",
+    // borderRadius: 25,
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 40,
+    // marginBottom: 10,
+  },
+  regis: {
+    width: "100%",
+    backgroundColor: "#134B70",
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    // marginTop: 3,
     marginBottom: 10,
   },
   registerText: {

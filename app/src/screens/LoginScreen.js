@@ -8,10 +8,11 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
+  ImageBackground,
 } from "react-native";
 import { LOGIN_USER } from "../queries/users";
 import { useContext, useState } from "react";
-import { ActivityIndicator } from "react-native-paper";
 import { AuthContext } from "../context/authContext";
 
 function LoginScreen({ navigation }) {
@@ -19,23 +20,6 @@ function LoginScreen({ navigation }) {
   const [password, setPassword] = useState("");
   const { setIsSignedIn } = useContext(AuthContext);
   const [loginFn, { loading, error, data }] = useMutation(LOGIN_USER);
-
-  // const handleLogin = async () => {
-  //   try {
-  //     const response = await login({
-  //       variables: {
-  //         username,
-  //         password,
-  //       },
-  //     });
-  //     // navigation.navigate('Navigation');
-  //     await SecureStore.setItemAsync("accessToken", data.login.access_token);
-  //     setIsSignedIn(true);
-  //     console.log(isSignedIn);
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
 
   if (loading) {
     return (
@@ -45,31 +29,15 @@ function LoginScreen({ navigation }) {
     );
   }
 
-  // if (error ) {
-  //   return (
-  //     <View style={styles.errorContainer}>
-  //       <Text style={styles.errorText}>Incorrect Username or Password!</Text>
-  //     </View>
-  //   );
-  // }
-
   return (
-    <View style={styles.container}>
+    <ImageBackground
+      src="https://marketplace.canva.com/EAGD_Vn7lkQ/1/0/900w/canva-blue-and-white-modern-watercolor-background-instagram-story-L-nceizV6kA.jpg"
+      style={styles.container}>
       <StatusBar style="dark" />
-      <Text
-        style={{
-          textAlign: "center",
-          width: 150,
-          height: 210,
-        }}
-      >
-        <Image
-          style={{ width: 100, height: 100 }}
-          source={{
-            uri: "https://img.freepik.com/premium-vector/white-letter-r-black-background_853558-3686.jpg?w=740",
-          }}
-        />
-      </Text>
+      <Image
+        style={styles.logo}
+        source={require('../../assets/Catrip.png')}
+      />
 
       <View style={styles.inputView}>
         <TextInput
@@ -108,7 +76,14 @@ function LoginScreen({ navigation }) {
       >
         <Text style={styles.loginText}>Login</Text>
       </TouchableOpacity>
-      <Text style={styles.loginText}>Don't Have an Account?</Text>
+
+      <View style={styles.roadContainer}>
+        <View style={styles.road} />
+        <View style={styles.road} />
+        <View style={styles.road} />
+        <View style={styles.road} />
+        <View style={styles.road} />
+      </View>
 
       <TouchableOpacity
         style={styles.regis}
@@ -116,23 +91,22 @@ function LoginScreen({ navigation }) {
           navigation.navigate("Register");
         }}
       >
-        <Text style={styles.loginText}>Register</Text>
+        <Text style={styles.loginText}>To Register</Text>
       </TouchableOpacity>
-    </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "black",
+    backgroundColor: "white",
     alignItems: "center",
     justifyContent: "center",
   },
   logo: {
-    fontWeight: "bold",
-    fontSize: 50,
-    color: "#1DA1F2",
+    width: 200,
+    height: 200,
     marginBottom: 40,
   },
   inputView: {
@@ -146,30 +120,43 @@ const styles = StyleSheet.create({
   },
   inputText: {
     height: 50,
-    color: "black",
+    color: "#134B70",
+
   },
   loginBtn: {
-    width: "80%",
-    backgroundColor: "#0B60B0",
-    borderRadius: 25,
+    width: "100%",
+    backgroundColor: "#134B70",
     height: 50,
     alignItems: "center",
     justifyContent: "center",
     marginTop: 40,
-    marginBottom: 10,
+    // marginBottom: 2,
+  },
+  roadContainer: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
+    marginVertical: 0,
+    backgroundColor: "#134B70",
+  },
+  road: {
+    flex: 1,
+    backgroundColor: "white",
+    height: 7,
+    marginHorizontal: 7,
   },
   regis: {
-    width: "80%",
-    backgroundColor: "#0B60B0",
-    borderRadius: 25,
+    width: "100%",
+    backgroundColor: "#134B70",
     height: 50,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 10,
+    // marginTop: 3,
     marginBottom: 10,
   },
   loginText: {
     color: "white",
+    fontSize: 17
   },
   loadingContainer: {
     flex: 1,

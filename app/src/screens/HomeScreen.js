@@ -12,7 +12,7 @@ import { useQuery, useMutation } from "@apollo/client";
 import { StatusBar } from "expo-status-bar";
 import { GET_POST } from "../queries/posts.js";
 import { ActivityIndicator } from "react-native-paper";
-import Card from "../components/homeCard.js";
+// import Card from "../components/homeCard.js";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { ADD_POST } from "../queries/posts.js";
 
@@ -69,19 +69,19 @@ const HomeScreen = ({ navigation }) => {
     );
   }
 
-  if (error) {
-    return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Something went wrong!</Text>
-      </View>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <View style={styles.errorContainer}>
+  //       <Text style={styles.errorText}>Something went wrong!</Text>
+  //     </View>
+  //   );
+  // }
 
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
       <ScrollView>
-        {posts.map((item, index) => (
+        {/* {posts.map((item, index) => (
           <TouchableOpacity
             key={index}
             onPress={() => {
@@ -92,7 +92,8 @@ const HomeScreen = ({ navigation }) => {
           >
             <Card card={item} />
           </TouchableOpacity>
-        ))}
+        ))} */}
+        <Text>Hello</Text>
       </ScrollView>
 
       <TouchableOpacity
@@ -154,7 +155,7 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "black",
+    backgroundColor: "white",
     padding: 10,
   },
   loadingContainer: {
