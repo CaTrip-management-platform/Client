@@ -83,26 +83,21 @@ function RegisterScreen() {
           onChangeText={setPassword}
         />
       </View>
-      <View style={styles.inputView}>
-        <TextInput
-          style={styles.inputText}
-          placeholder="Image URL..."
-          placeholderTextColor="#003f5c"
-          value={role}
-          onChangeText={setRole}
-        />
+
+      <View style={styles.roleContainer}>
+        <TouchableOpacity
+          style={[styles.roleButton, role === 'Seller' && styles.selectedRole]}
+          onPress={() => setRole('Seller')}>
+          <Text style={[styles.roleText, role === 'Seller' && styles.selectedRoleText]}>Seller</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.roleButton, role === 'Customer' && styles.selectedRole]}
+          onPress={() => setRole('Customer')}>
+          <Text style={[styles.roleText, role === 'Customer' && styles.selectedRoleText]}>Customer</Text>
+        </TouchableOpacity>
       </View>
 
-      {/* <View style={{
-        flexDirection: 'row'
-      }}>
-        <TouchableOpacity style={styles.role} >
-          <Text style={styles.roleText}>Register</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.role} >
-          <Text style={styles.roleText}>Register</Text>
-        </TouchableOpacity>
-      </View> */}
+
       <View style={styles.btnContainer}>
         <TouchableOpacity style={styles.registerBtn} onPress={handleRegister}>
           <Text style={styles.registerText}>Register</Text>
@@ -219,7 +214,32 @@ const styles = StyleSheet.create({
   btnContainer: {
     // flex: 1
     // backgroundColor: 'black'
-  }
+  },
+  roleContainer: {
+    flexDirection: 'row',
+    width: '80%',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  roleButton: {
+    flex: 1,
+    backgroundColor: '#f2f2f2',
+    borderRadius: 25,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 5,
+  },
+  selectedRole: {
+    backgroundColor: '#134B70',
+  },
+  roleText: {
+    color: '#003f5c',
+    fontSize: 16,
+  },
+  selectedRoleText: {
+    color: 'white',
+  },
 });
 
 export default RegisterScreen;
