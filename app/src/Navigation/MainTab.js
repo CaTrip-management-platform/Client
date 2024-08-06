@@ -9,11 +9,12 @@ import {
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FontAwesome, Feather } from "@expo/vector-icons";
 import HomeScreen from "../screens/HomeScreen";
-import SearchScreen from "../screens/SearchScreen";
+import AddScreen from "../screens/AddScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../context/authContext";
 import { Icon } from "react-native-paper";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 const Tab = createBottomTabNavigator();
@@ -21,12 +22,14 @@ const Tab = createBottomTabNavigator();
 export function LogoTitle() {
   return (
     <Image style={styles.logo} source={require("../../assets/logo.png")} />
+    <Image style={styles.logo} source={require("../../assets/logo.png")} />
   );
 }
 
 export default function MainTab() {
   const navigation = useNavigation();
   const { setIsSignedIn } = useContext(AuthContext);
+  const [text, setText] = useState("");
   const [text, setText] = useState("");
 
   return (
@@ -39,7 +42,7 @@ export default function MainTab() {
           headerStyle: { backgroundColor: "white" },
           headerTitleAlign: "center",
           headerTitle: () => (
-            <View style={styles.searchContainer}>
+            <View style={styles.addContainer}>
               <View style={styles.inputWrapper}>
                 <TextInput
                   placeholder="Cari"
@@ -79,8 +82,8 @@ export default function MainTab() {
         }}
       />
       <Tab.Screen
-        name="Search"
-        component={SearchScreen}
+        name="Add"
+        component={AddScreen}
         options={{
           tabBarStyle: { backgroundColor: "black" },
           headerStyle: { backgroundColor: "black" },
@@ -121,8 +124,10 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
   },
-  searchContainer: {
+  addContainer: {
     flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -130,8 +135,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     width: 250,
+    flexDirection: "row",
+    alignItems: "center",
+    width: 250,
     height: 40,
     borderRadius: 20,
+    borderColor: "black",
+    backgroundColor: "#aaa",
+    shadowColor: "#000",
     borderColor: "black",
     backgroundColor: "#aaa",
     shadowColor: "#000",
@@ -141,6 +152,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
+    height: "100%",
     height: "100%",
     borderRadius: 20,
     paddingHorizontal: 10,
