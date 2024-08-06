@@ -1,40 +1,48 @@
 import React, { useState } from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-const popularPlaces = [
-  {
-    id: '1',
-    name: 'Pantai Kuta',
-    rating: '4.5',
-    location: 'Bali, Indonesia',
-    price: 'RP.200,000,-',
-    image: 'https://lh7-us.googleusercontent.com/9vEhEHIfICi9YXdWt9gZiSlzIoKe0R-jZwc546RiLoBFf_8icGzSAC9UvIQCLSkqG2AOqmvHmZ13S795sqmRniTBrqIg_eVDKMsow-eicg0JXot4kHmr0xq4YFuR6fSslXX5ZAMvOfVuuYcRkZbAwFI',
-  },
-  {
-    id: '2',
-    name: 'Hotel Borobudur',
-    rating: '4.7',
-    location: 'Jakarta, Indonesia',
-    price: 'RP.350,000,-',
-    image: 'https://ik.imagekit.io/tvlk/apr-asset/dgXfoyh24ryQLRcGq00cIdKHRmotrWLNlvG-TxlcLxGkiDwaUSggleJNPRgIHCX6/hotel/asset/10000082-5e1fd5c643b68b0439323df2f2b5bd05.jpeg?tr=q-40,c-at_max,w-740,h-500&_src=imagekit',
-  },
-  {
-    id: '3',
-    name: 'Gunung Bromo',
-    rating: '4.9',
-    location: 'Malang, Indonesia',
-    price: 'RP.550,000',
-    image: 'https://ik.imagekit.io/tvlk/blog/2022/09/Wisata-Gunung-Bromo-Traveloka-Xperience-1.jpg?tr=dpr-2,w-675',
-  },
-];
+import { useQuery } from '@apollo/client';
+import { GET_Activity } from '../queries/getAllActivity.js';
+import { ActivityIndicator } from 'react-native-paper';
 
 const HomeScreen = ({ navigation }) => {
   const [selectedCategory, setSelectedCategory] = useState('Pantai');
+  
+  const { loading, error, data } = useQuery(GET_Activity);
 
+  if (loading) return (
+    <View style={styles.containerLoading}>
+      <ActivityIndicator size="large" />
+    </View>
+  );
+
+  if (error) return <Text>Error: {error.message}</Text>;
+
+  const formatPrice = (price) => {
+    return `Rp.${price.toLocaleString()}`;
+  };
+
+  const getPriceRange = (prices) => {
+    if (!prices || prices.length === 0) return 'N/A';
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    return `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`;
+  };
+
+  const activities = data.getAllActivity.map(activity => {
+    const prices = (activity.types && activity.types.map(type => type.price)) || [];
+    return {
+      id: activity._id,
+      name: activity.title,
+      rating: (activity.reviews && activity.reviews.length > 0) ? activity.reviews[0].rating : 'N/A',
+      location: activity.location || 'Unknown Location',
+      price: getPriceRange(prices),
+      image: (activity.imgUrls && activity.imgUrls.length > 0) ? activity.imgUrls[0] : 'https://via.placeholder.com/150',
+    };
+  });
 
   const ListHeader = () => (
     <View style={styles.headerContainer}>
-      {/* Recommendations Section */}
       <View style={styles.recommendationsContainer}>
         <Text style={styles.sectionTitle}>Rekomendasi Tempat</Text>
         <Picker
@@ -47,14 +55,13 @@ const HomeScreen = ({ navigation }) => {
           <Picker.Item label="Mountain" value="Mountain" />
         </Picker>
       </View>
-      {/* Popular Places Section */}
       <Text style={styles.sectionTitle}>Populer</Text>
     </View>
   );
 
   return (
     <FlatList
-      data={popularPlaces}
+      data={activities}
       renderItem={({ item }) => (
         <TouchableOpacity
           style={styles.card}
@@ -103,8 +110,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 10,
     elevation: 3,
-    width: '100%', 
-    alignSelf: 'center', 
+    width: '100%',
+    alignSelf: 'center',
   },
   cardImage: {
     width: '100%',
@@ -127,6 +134,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginTop: 5,
+  },
+  containerLoading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
   },
 });
 

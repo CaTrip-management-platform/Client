@@ -1,7 +1,7 @@
 // import { ApolloClient, InMemoryCache } from "@apollo/client";
 
 // const client = new ApolloClient({
-//   uri: "https://fcd0-103-18-34-247.ngrok-free.app",
+//   uri: "https://ea46-103-18-34-247.ngrok-free.app",
 //   cache: new InMemoryCache(),
 // });
 
@@ -11,7 +11,7 @@ import { setContext } from "@apollo/client/link/context";
 import * as SecureStore from "expo-secure-store";
 
 const httpLink = createHttpLink({
-  uri: "https://d072-103-18-34-247.ngrok-free.app",
+  uri: "https://ea46-103-18-34-247.ngrok-free.app",
 });
 
 const authLink = setContext(async (_, { headers }) => {
@@ -20,7 +20,7 @@ const authLink = setContext(async (_, { headers }) => {
   return {
     headers: {
       ...headers,
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YjFhYjFhMWY4YTUyMjI3MGE1OTlkMiIsInJvbGUiOiJzZWxsZXIiLCJpYXQiOjE3MjI5MzA0MjN9.isSoaIjspAOrvuqVE8fR0corHO2V32CaLY2kX0BnBS0`,
     },
   };
 });

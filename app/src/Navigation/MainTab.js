@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import {
   Image,
   View,
@@ -9,7 +9,7 @@ import {
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FontAwesome, Feather } from "@expo/vector-icons";
 import HomeScreen from "../screens/HomeScreen";
-import SearchScreen from "../screens/SearchScreen";
+import AddScreen from "../screens/AddScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../context/authContext";
@@ -39,7 +39,7 @@ export default function MainTab() {
           headerStyle: { backgroundColor: "white" },
           headerTitleAlign: "center",
           headerTitle: () => (
-            <View style={styles.searchContainer}>
+            <View style={styles.addContainer}>
               <View style={styles.inputWrapper}>
                 <TextInput
                   placeholder="Cari"
@@ -77,8 +77,8 @@ export default function MainTab() {
         }}
       />
       <Tab.Screen
-        name="Search"
-        component={SearchScreen}
+        name="Add"
+        component={AddScreen}
         options={{
           tabBarStyle: { backgroundColor: "black" },
           headerStyle: { backgroundColor: "black" },
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
   },
-  searchContainer: {
+  addContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
@@ -149,9 +149,9 @@ const styles = StyleSheet.create({
   headerRightContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginRight: 10, // Adjust margin as needed
+    marginRight: 10, 
   },
   headerIcon: {
-    marginLeft: 15, // Space between icons
+    marginLeft: 15, 
   },
 });
