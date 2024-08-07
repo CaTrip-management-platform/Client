@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, ScrollView, Button, ImageBackground, Modal } from 'react-native';
+import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, ImageBackground, Modal } from 'react-native';
 import { GET_Activity } from '../queries/getAllActivity';
 import { useQuery } from '@apollo/client';
-
-
 
 const ActivityScreen = () => {
     const [activeView, setActiveView] = useState('Recommendations');
     const [selectedActivity, setSelectedActivity] = useState(null);
     const [timeline, setTimeline] = useState([]);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const { loading, error, data } = useQuery(GET_Activity);
-    const activity = data.getAllActivity
+    const activities = data?.getAllActivity || []; 
+
     const handleAddToTimeline = () => {
         if (selectedActivity) {
             setTimeline([selectedActivity, ...timeline]);
@@ -22,12 +22,25 @@ const ActivityScreen = () => {
     };
 
     const handleDeleteActivity = (id) => {
-        const updatedTimeline = timeline.filter(item => item.id !== id);
+        const updatedTimeline = timeline.filter(item => item._id !== id);
         setTimeline(updatedTimeline);
     };
 
     const handleCloseDetails = () => {
         setSelectedActivity(null);
+        setCurrentImageIndex(0); 
+    };
+
+    const goToPreviousImage = () => {
+        if (selectedActivity && selectedActivity.imgUrls.length > 0) {
+            setCurrentImageIndex(prevIndex => (prevIndex > 0 ? prevIndex - 1 : selectedActivity.imgUrls.length - 1));
+        }
+    };
+
+    const goToNextImage = () => {
+        if (selectedActivity && selectedActivity.imgUrls.length > 0) {
+            setCurrentImageIndex(prevIndex => (prevIndex < selectedActivity.imgUrls.length - 1 ? prevIndex + 1 : 0));
+        }
     };
 
     const renderActivityCard = ({ item }) => (
@@ -35,13 +48,15 @@ const ActivityScreen = () => {
             style={styles.recommendationCard}
             onPress={() => setSelectedActivity(item)}
         >
-            {console.log(item.getAllActivity, '<====================')}
-            {item.imgUrls ? (
-                <Image source={{ uri: item.imgUrls }} style={styles.recommendationImage} />
-            ) : null}
+            {item.imgUrls && item.imgUrls.length > 0 ? (
+                <Image source={{ uri: item.imgUrls[0] }} style={styles.recommendationImage} />
+            ) : (
+                <View style={styles.placeholderImage}>
+                    <Text style={styles.placeholderText}>No Image</Text>
+                </View>
+            )}
             <View style={styles.recommendationDetails}>
-                {/* <Text style={styles.recommendationTitle}>{item.title}</Text> */}
-                <Text style={styles.recommendationPrice}>{item.description}</Text>
+                <Text style={styles.recommendationPrice}>{item.title}</Text>
             </View>
         </TouchableOpacity>
     );
@@ -57,7 +72,8 @@ const ActivityScreen = () => {
     return (
         <ImageBackground
             source={{ uri: "https://marketplace.canva.com/EAGD_Vn7lkQ/1/0/900w/canva-blue-and-white-modern-watercolor-background-instagram-story-L-nceizV6kA.jpg" }}
-            style={styles.container}>
+            style={styles.container}
+        >
             <View style={styles.roleContainer}>
                 <TouchableOpacity
                     style={[styles.roleButton, activeView === 'Recommendations' && styles.selectedRole]}
@@ -69,7 +85,7 @@ const ActivityScreen = () => {
                     style={[styles.roleButton, activeView === 'Timeline' && styles.selectedRole]}
                     onPress={() => setActiveView('Timeline')}
                 >
-                    <Text style={[styles.roleText, activeView === 'Timeline' && styles.selectedRoleText]}>Activities</Text>
+                    <Text style={[styles.roleText, activeView === 'Timeline' && styles.selectedRoleText]}>Timeline</Text>
                 </TouchableOpacity>
             </View>
 
@@ -78,12 +94,12 @@ const ActivityScreen = () => {
                     <Text style={styles.header}>Available Activities</Text>
 
                     <FlatList
-                        data={chunkArray(activity, 2)}
-                        keyExtractor={(item, index) => index.toString()}
+                        data={chunkArray(activities, 2)}
+                        keyExtractor={(item, index) => `chunk-${index}`}
                         renderItem={({ item }) => (
                             <View style={styles.row}>
                                 {item.map(activity => (
-                                    <View key={activity.id} style={styles.cardWrapper}>
+                                    <View key={activity._id} style={styles.cardWrapper}>
                                         {renderActivityCard({ item: activity })}
                                     </View>
                                 ))}
@@ -101,13 +117,35 @@ const ActivityScreen = () => {
                         >
                             <View style={styles.overlay}>
                                 <View style={styles.selectedActivityContainer}>
-                                    {selectedActivity.image ? (
-                                        <Image source={{ uri: selectedActivity.image }} style={styles.selectedActivityImage} />
-                                    ) : null}
+                                    <View style={styles.imageContainer}>
+                                        {selectedActivity.imgUrls && selectedActivity.imgUrls.length > 1 && (
+                                            <TouchableOpacity onPress={goToPreviousImage} style={styles.navButton}>
+                                                <Text style={styles.navButtonText}>{"<"}</Text>
+                                            </TouchableOpacity>
+                                        )}
+                                        {selectedActivity.imgUrls && selectedActivity.imgUrls.length > 0 ? (
+                                            <Image
+                                                source={{ uri: selectedActivity.imgUrls[currentImageIndex] }}
+                                                style={styles.selectedActivityImage}
+                                            />
+                                        ) : (
+                                            <View style={styles.placeholderImage}>
+                                                <Text style={styles.placeholderText}>No Image</Text>
+                                            </View>
+                                        )}
+                                        {selectedActivity.imgUrls && selectedActivity.imgUrls.length > 1 && (
+                                            <TouchableOpacity onPress={goToNextImage} style={styles.navButton}>
+                                                <Text style={styles.navButtonText}>{">"}</Text>
+                                            </TouchableOpacity>
+                                        )}
+                                    </View>
                                     <Text style={styles.selectedActivityTitle}>{selectedActivity.title}</Text>
                                     <Text style={styles.selectedActivityDescription}>{selectedActivity.description}</Text>
-                                    <Text style={styles.selectedActivityPrice}>{selectedActivity.price}</Text>
-                                    <Text style={styles.selectedActivityRating}>Rating: {selectedActivity.rating}</Text>
+                                    <Text>Type :</Text>
+                                    {selectedActivity.types.map((type, index) => (
+                                        <Text key={index}>{type.name} - {type.price}</Text>
+                                    ))}
+                                    <Text style={styles.selectedActivityRating}>Rating: {selectedActivity.reviews[0]?.rating || 'N/A'}</Text>
                                     <View style={styles.buttonContainer}>
                                         <TouchableOpacity style={styles.closeButton} onPress={handleCloseDetails}>
                                             <Text style={styles.closeButtonText}>Close</Text>
@@ -125,28 +163,32 @@ const ActivityScreen = () => {
 
             {activeView === 'Timeline' && (
                 <>
-                    <Text style={styles.timelineHeader}>List</Text>
+                    <Text style={styles.timelineHeader}>Timeline</Text>
 
                     <FlatList
                         data={timeline}
-                        keyExtractor={(item) => item.id}
+                        keyExtractor={(item) => item._id}
                         renderItem={({ item }) => (
                             <View style={styles.timelineItem}>
                                 <View style={styles.timelineDot} />
                                 <View style={styles.timelineContent}>
-                                    {item.image ? (
-                                        <Image source={{ uri: item.image }} style={styles.timelineImage} />
-                                    ) : null}
-                                    <Text style={styles.timelineTitle}>{item.title}</Text>
-                                    <Text style={styles.timelineDescription}>{item.description}</Text>
-                                    <Text style={styles.timelinePrice}>{item.price}</Text>
-                                    <Text style={styles.timelineRating}>Rating: {item.rating}</Text>
-                                    <TouchableOpacity
-                                        style={styles.deleteButton}
-                                        onPress={() => handleDeleteActivity(item.id)}
-                                    >
-                                        <Text style={styles.deleteButtonText}>Delete</Text>
-                                    </TouchableOpacity>
+                                    <View style={styles.timelineContainer}>
+                                        {item.imgUrls && item.imgUrls.length > 0 ? (
+                                            <Image source={{ uri: item.imgUrls[0] }} style={styles.timelineImage} />
+                                        ) : (
+                                            <View style={styles.placeholderImage}>
+                                                <Text style={styles.placeholderText}>No Image</Text>
+                                            </View>
+                                        )}
+                                        <Text style={styles.timelineTitle}>{item.title}</Text>
+                                        <Text style={styles.timelineRating}>Rating: {item.reviews[0]?.rating || 'N/A'}</Text>
+                                        <TouchableOpacity
+                                            style={styles.deleteButton}
+                                            onPress={() => handleDeleteActivity(item._id)}
+                                        >
+                                            <Text style={styles.deleteButtonText}>Delete</Text>
+                                        </TouchableOpacity>
+                                    </View>
                                 </View>
                             </View>
                         )}
@@ -190,7 +232,6 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
-        // color: '#03346E'
     },
     cardContainer: {
         justifyContent: 'space-between',
@@ -216,13 +257,20 @@ const styles = StyleSheet.create({
         height: 100,
         borderRadius: 10,
     },
+    placeholderImage: {
+        width: '100%',
+        height: 100,
+        backgroundColor: '#e0e0e0',
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    placeholderText: {
+        color: '#888',
+    },
     recommendationDetails: {
         padding: 10,
         alignItems: 'center',
-    },
-    recommendationTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
     },
     recommendationPrice: {
         fontSize: 16,
@@ -233,7 +281,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 10,
         overflow: 'hidden',
-        marginBottom: 20,
         padding: 10,
         elevation: 3,
         marginHorizontal: 20,
@@ -244,13 +291,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    selectedActivityContainer: {
-        backgroundColor: 'white',
-        padding: 20,
-        borderRadius: 10,
-        width: '80%',
-        maxWidth: 400,
     },
     buttonContainer: {
         flexDirection: 'row',
@@ -264,7 +304,7 @@ const styles = StyleSheet.create({
     },
     closeButtonText: {
         color: 'white',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
     },
     addButton: {
         padding: 10,
@@ -273,7 +313,7 @@ const styles = StyleSheet.create({
     },
     addButtonText: {
         color: 'white',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
     },
     selectedActivityTitle: {
         fontSize: 18,
@@ -289,11 +329,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginBottom: 10,
     },
-    selectedActivityPrice: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
     selectedActivityRating: {
         fontSize: 16,
         marginBottom: 10,
@@ -306,8 +341,7 @@ const styles = StyleSheet.create({
     timelineItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        // marginBottom: 20,
-        // padding: 5
+        marginBottom: 20,
     },
     timelineDot: {
         width: 10,
@@ -324,23 +358,17 @@ const styles = StyleSheet.create({
         borderLeftColor: '#134B70',
         position: 'relative',
     },
+    timelineContainer: {
+        backgroundColor: 'white',
+        padding: 10,
+    },
     timelineImage: {
         width: '100%',
         height: 100,
-        marginBottom: 10,
     },
     timelineTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-    },
-    timelineDescription: {
-        fontSize: 16,
-        marginBottom: 10,
-    },
-    timelinePrice: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginBottom: 10,
     },
     timelineRating: {
         fontSize: 16,
@@ -356,6 +384,21 @@ const styles = StyleSheet.create({
     },
     deleteButtonText: {
         color: '#fff',
+        fontWeight: 'bold',
+    },
+    imageContainer: {
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    navButton: {
+        padding: 5,
+        paddingHorizontal: 20,
+        backgroundColor: '#134B70',
+        borderRadius: 5,
+    },
+    navButtonText: {
+        color: 'white',
+        fontSize: 18,
         fontWeight: 'bold',
     },
 });
