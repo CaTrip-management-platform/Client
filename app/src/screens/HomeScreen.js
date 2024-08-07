@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Modal, Button, ImageBackground } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useQuery } from '@apollo/client';
-import { GET_Activity } from '../queries/getAllActivity.js';
+import { GET_Activity } from '../queries/getAllActivity';
 import { ActivityIndicator } from 'react-native-paper';
 
 const HomeScreen = ({ navigation }) => {
   const [selectedCategory, setSelectedCategory] = useState('Pantai');
-  
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState(null);
+
   const { loading, error, data } = useQuery(GET_Activity);
 
   if (loading) return (
@@ -18,9 +20,7 @@ const HomeScreen = ({ navigation }) => {
 
   if (error) return <Text>Error: {error.message}</Text>;
 
-  const formatPrice = (price) => {
-    return `Rp.${price.toLocaleString()}`;
-  };
+  const formatPrice = (price) => `Rp.${price.toLocaleString()}`;
 
   const getPriceRange = (prices) => {
     if (!prices || prices.length === 0) return 'N/A';
@@ -38,13 +38,22 @@ const HomeScreen = ({ navigation }) => {
       location: activity.location || 'Unknown Location',
       price: getPriceRange(prices),
       image: (activity.imgUrls && activity.imgUrls.length > 0) ? activity.imgUrls[0] : 'https://via.placeholder.com/150',
+      description: activity.description,
+      types: activity.types,
     };
   });
 
   const ListHeader = () => (
     <View style={styles.headerContainer}>
-      <View style={styles.recommendationsContainer}>
+      <View style={styles.headerContent}>
         <Text style={styles.sectionTitle}>Rekomendasi Tempat</Text>
+        <TouchableOpacity
+          onPress={() => setModalVisible(true)}
+          style={styles.showModalButton}>
+          <Text style={styles.aiButton}>AI</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.recommendationsContainer}>
         <Picker
           selectedValue={selectedCategory}
           style={styles.picker}
@@ -60,26 +69,65 @@ const HomeScreen = ({ navigation }) => {
   );
 
   return (
-    <FlatList
-      data={activities}
-      renderItem={({ item }) => (
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => navigation.navigate('DetailsScreen', { item })}
-        >
-          <Image source={{ uri: item.image }} style={styles.cardImage} />
-          <View style={styles.cardDetails}>
-            <Text style={styles.cardTitle}>{item.name}</Text>
-            <Text style={styles.cardRating}>Rating: {item.rating}</Text>
-            <Text style={styles.cardLocation}>{item.location}</Text>
-            <Text style={styles.cardPrice}>{item.price}</Text>
-          </View>
-        </TouchableOpacity>
-      )}
-      keyExtractor={(item) => item.id}
-      ListHeaderComponent={ListHeader}
-      contentContainerStyle={styles.container}
-    />
+    <ImageBackground
+      source={{ uri: "https://marketplace.canva.com/EAGD_Vn7lkQ/1/0/900w/canva-blue-and-white-modern-watercolor-background-instagram-story-L-nceizV6kA.jpg" }}
+      style={styles.container}
+    >
+      <View style={styles.container}>
+        <FlatList
+          data={activities}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() => {
+                setSelectedActivity(item);
+                setModalVisible(true);
+              }}
+            >
+              <Image source={{ uri: item.image }} style={styles.cardImage} />
+              <View style={styles.cardDetails}>
+                <Text style={styles.cardTitle}>{item.name}</Text>
+                <Text style={styles.cardRating}>Rating: {item.rating}</Text>
+                <Text style={styles.cardLocation}>{item.location}</Text>
+                <Text style={styles.cardPrice}>{item.price}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item) => item.id}
+          ListHeaderComponent={ListHeader}
+          contentContainerStyle={styles.container}
+        />
+        {selectedActivity && (
+          <Modal
+            visible={modalVisible}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Image
+                  source={{ uri: selectedActivity.image }}
+                  style={styles.selectedActivityImage}
+                />
+                <Text style={styles.selectedActivityTitle}>{selectedActivity.name}</Text>
+                <Text style={styles.selectedActivityDescription}>{selectedActivity.description || 'No Description'}</Text>
+                <Text>Type :</Text>
+                {selectedActivity.types?.map((type, index) => (
+                  <Text key={index}>{type.name} - {formatPrice(type.price)}</Text>
+                ))}
+                <Text style={styles.selectedActivityRating}>Rating: {selectedActivity.rating}</Text>
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+                    <Text style={styles.closeButtonText}>Close</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
+      </View>
+    </ImageBackground>
   );
 };
 
@@ -92,13 +140,23 @@ const styles = StyleSheet.create({
   headerContainer: {
     marginBottom: 20,
   },
-  recommendationsContainer: {
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
+  },
+  showModalButton: {
+    borderRadius: 9,
+    width: 40,
+    backgroundColor: '#5B99C2',
+  },
+  recommendationsContainer: {
+    marginBottom: 20,
   },
   picker: {
     height: 50,
@@ -141,6 +199,56 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#f5f5f5',
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  selectedActivityImage: {
+    width: '100%',
+    height: 200,
+    marginBottom: 10,
+  },
+  selectedActivityTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  selectedActivityDescription: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  selectedActivityRating: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 15,
+  },
+  closeButton: {
+    padding: 10,
+    backgroundColor: '#E4003A',
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  aiButton: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center'
+  }
 });
 
 export default HomeScreen;
