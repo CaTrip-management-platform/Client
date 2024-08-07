@@ -10,7 +10,8 @@ const ActivityScreen = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const { loading, error, data } = useQuery(GET_Activity);
-    const activities = data?.getAllActivity || []; 
+    const activities = data?.getAllActivity || [];
+    console.log(JSON.stringify(activities, null, 2));
 
     const handleAddToTimeline = () => {
         if (selectedActivity) {
@@ -28,17 +29,17 @@ const ActivityScreen = () => {
 
     const handleCloseDetails = () => {
         setSelectedActivity(null);
-        setCurrentImageIndex(0); 
+        setCurrentImageIndex(0);
     };
 
     const goToPreviousImage = () => {
-        if (selectedActivity && selectedActivity.imgUrls.length > 0) {
+        if (selectedActivity?.imgUrls?.length > 0) {
             setCurrentImageIndex(prevIndex => (prevIndex > 0 ? prevIndex - 1 : selectedActivity.imgUrls.length - 1));
         }
     };
 
     const goToNextImage = () => {
-        if (selectedActivity && selectedActivity.imgUrls.length > 0) {
+        if (selectedActivity?.imgUrls?.length > 0) {
             setCurrentImageIndex(prevIndex => (prevIndex < selectedActivity.imgUrls.length - 1 ? prevIndex + 1 : 0));
         }
     };
@@ -118,11 +119,11 @@ const ActivityScreen = () => {
                             <View style={styles.overlay}>
                                 <View style={styles.selectedActivityContainer}>
                                     <View style={styles.imageContainer}>
-                                        {selectedActivity.imgUrls && selectedActivity.imgUrls.length > 1 && (
+                                        {/* {selectedActivity.imgUrls && selectedActivity.imgUrls.length > 1 && (
                                             <TouchableOpacity onPress={goToPreviousImage} style={styles.navButton}>
                                                 <Text style={styles.navButtonText}>{"<"}</Text>
                                             </TouchableOpacity>
-                                        )}
+                                        )} */}
                                         {selectedActivity.imgUrls && selectedActivity.imgUrls.length > 0 ? (
                                             <Image
                                                 source={{ uri: selectedActivity.imgUrls[currentImageIndex] }}
@@ -140,12 +141,12 @@ const ActivityScreen = () => {
                                         )}
                                     </View>
                                     <Text style={styles.selectedActivityTitle}>{selectedActivity.title}</Text>
-                                    <Text style={styles.selectedActivityDescription}>{selectedActivity.description}</Text>
+                                    <Text style={styles.selectedActivityDescription}>{selectedActivity.description || 'No Description'}</Text>
                                     <Text>Type :</Text>
-                                    {selectedActivity.types.map((type, index) => (
+                                    {selectedActivity.types?.map((type, index) => (
                                         <Text key={index}>{type.name} - {type.price}</Text>
                                     ))}
-                                    <Text style={styles.selectedActivityRating}>Rating: {selectedActivity.reviews[0]?.rating || 'N/A'}</Text>
+                                    <Text style={styles.selectedActivityRating}>Rating: {selectedActivity.reviews?.[0]?.rating || 'N/A'}</Text>
                                     <View style={styles.buttonContainer}>
                                         <TouchableOpacity style={styles.closeButton} onPress={handleCloseDetails}>
                                             <Text style={styles.closeButtonText}>Close</Text>
@@ -181,7 +182,7 @@ const ActivityScreen = () => {
                                             </View>
                                         )}
                                         <Text style={styles.timelineTitle}>{item.title}</Text>
-                                        <Text style={styles.timelineRating}>Rating: {item.reviews[0]?.rating || 'N/A'}</Text>
+                                        <Text style={styles.timelineRating}>Rating: {item.reviews?.[0]?.rating || 'N/A'}</Text>
                                         <TouchableOpacity
                                             style={styles.deleteButton}
                                             onPress={() => handleDeleteActivity(item._id)}
