@@ -10,7 +10,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FontAwesome, Feather } from "@expo/vector-icons";
 import HomeScreen from "../screens/HomeScreen";
 import AddScreen from "../screens/AddScreen";
-import SettingsScreen from "../screens/SettingsScreen";
+import SettingsScreen from "../screens/ActivityHistoryScreen";
 import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../context/authContext";
 import { Icon } from "react-native-paper";

@@ -6,7 +6,7 @@ import { AuthContext } from "../context/authContext";
 import * as SecureStore from "expo-secure-store";
 import MainTab from "./MainTab";
 import DetailsScreen from "../screens/DetailsScreen";
-import SettingsScreen from "../screens/SettingsScreen";
+import SettingsScreen from "../screens/ActivityHistoryScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 import LoginScreen from "../screens/LoginScreen";
 import { NavigationContainer } from "@react-navigation/native";
