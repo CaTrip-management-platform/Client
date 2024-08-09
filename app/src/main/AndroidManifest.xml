@@ -1,0 +1,10 @@
+<manifest>
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<application>
+   <!-- You will only need to add this meta-data tag, but make sure it's a child of application -->
+   <meta-data
+     android:name="com.google.android.geo.API_KEY"
+     android:value="AIzaSyAnEU34u_1aoWcg5hsNQ-e312z-EIWvXF4"/>
+</application>
+</manifest>
