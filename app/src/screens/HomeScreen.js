@@ -1,14 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Modal, ImageBackground, TextInput, ScrollView } from 'react-native';
-import { useQuery, useApolloClient, gql } from '@apollo/client';
-import { GET_Activity } from '../queries/getAllActivity';
-import { ActivityIndicator } from 'react-native-paper';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  Modal,
+  ImageBackground,
+  TextInput,
+  ScrollView,
+} from "react-native";
+import { useQuery, useApolloClient, gql } from "@apollo/client";
+import { GET_Activity } from "../queries/getAllActivity";
+import { ActivityIndicator } from "react-native-paper";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const HomeScreen = ({ searchResults }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [activityModalVisible, setActivityModalVisible] = useState(false);
-  const [userMessage, setUserMessage] = useState('');
+  const [userMessage, setUserMessage] = useState("");
   const [aiMessages, setAiMessages] = useState([]);
   const [selectedActivity, setSelectedActivity] = useState(null);
 
@@ -27,55 +38,61 @@ const HomeScreen = ({ searchResults }) => {
         `,
         variables: { message: userMessage },
       });
-      setAiMessages([...aiMessages, { type: 'user', text: userMessage }, { type: 'ai', text: data.getTravelSupport.message }]);
-      setUserMessage('');
+      setAiMessages([
+        ...aiMessages,
+        { type: "user", text: userMessage },
+        { type: "ai", text: data.getTravelSupport.message },
+      ]);
+      setUserMessage("");
     } catch (error) {
       console.error(error);
     }
   };
 
-  if (loading) return (
-    <View style={styles.containerLoading}>
-      <ActivityIndicator size="large" />
-    </View>
-  );
+  if (loading)
+    return (
+      <View style={styles.containerLoading}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
 
-  if (error) return <Text style={styles.errorText}>Error: {error.message}</Text>;
+  if (error)
+    return <Text style={styles.errorText}>Error: {error.message}</Text>;
 
-  const formatPrice = (price) => `Rp.${price.toLocaleString('id-ID')}`;
+  const formatPrice = (price) => `Rp.${price.toLocaleString("id-ID")},-`;
 
-  const getPriceRange = (prices) => {
-    if (!prices || prices.length === 0) return 'N/A';
-    const minPrice = Math.min(...prices);
-    const maxPrice = Math.max(...prices);
-    return `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`;
-  };
-
-  const activities = searchResults.length > 0 ? searchResults.map(activity => {
-    const prices = (activity.types && activity.types.map(type => type.price)) || [];
-    return {
-      id: activity._id,
-      name: activity.title,
-      rating: (activity.reviews && activity.reviews.length > 0) ? activity.reviews[0].rating : 'N/A',
-      location: activity.location || 'Unknown Location',
-      price: getPriceRange(prices),
-      image: (activity.imgUrls && activity.imgUrls.length > 0) ? activity.imgUrls[0] : 'https://via.placeholder.com/150',
-      description: activity.description,
-      types: activity.types,
-    };
-  }) : data.getAllActivity.map(activity => {
-    const prices = (activity.types && activity.types.map(type => type.price)) || [];
-    return {
-      id: activity._id,
-      name: activity.title,
-      rating: (activity.reviews && activity.reviews.length > 0) ? activity.reviews[0].rating : 'N/A',
-      location: activity.location || 'Unknown Location',
-      price: getPriceRange(prices),
-      image: (activity.imgUrls && activity.imgUrls.length > 0) ? activity.imgUrls[0] : 'https://via.placeholder.com/150',
-      description: activity.description,
-      types: activity.types,
-    };
-  });
+  const activities =
+    searchResults.length > 0
+      ? searchResults.map((activity) => ({
+          id: activity._id,
+          name: activity.title,
+          rating:
+            activity.reviews && activity.reviews.length > 0
+              ? activity.reviews[0].rating
+              : "N/A",
+          location: activity.location || "Unknown Location",
+          price: formatPrice(activity.price),
+          image:
+            activity.imgUrls && activity.imgUrls.length > 0
+              ? activity.imgUrls[0]
+              : "https://via.placeholder.com/150",
+          description: activity.description,
+        }))
+      : data.getAllActivity.map((activity) => ({
+          id: activity._id,
+          name: activity.title,
+          rating:
+            activity.reviews && activity.reviews.length > 0
+              ? activity.reviews[0].rating
+              : "N/A",
+          location: activity.location || "Unknown Location",
+          price: formatPrice(activity.price),
+          image:
+            activity.imgUrls && activity.imgUrls.length > 0
+              ? activity.imgUrls[0]
+              : "https://via.placeholder.com/150",
+          description: activity.description,
+        }));
 
   const ListHeader = () => (
     <View style={styles.headerContainer}>
@@ -88,7 +105,9 @@ const HomeScreen = ({ searchResults }) => {
 
   return (
     <ImageBackground
-      source={{ uri: "https://marketplace.canva.com/EAGD_Vn7lkQ/1/0/900w/canva-blue-and-white-modern-watercolor-background-instagram-story-L-nceizV6kA.jpg" }}
+      source={{
+        uri: "https://marketplace.canva.com/EAGD_Vn7lkQ/1/0/900w/canva-blue-and-white-modern-watercolor-background-instagram-story-L-nceizV6kA.jpg",
+      }}
       style={styles.backgroundImage}
     >
       <FlatList
@@ -130,17 +149,24 @@ const HomeScreen = ({ searchResults }) => {
                   source={{ uri: selectedActivity.image }}
                   style={styles.selectedActivityImage}
                 />
-                <Text style={styles.selectedActivityTitle}>{selectedActivity.name}</Text>
-                <Text style={styles.selectedActivityDescription}>{selectedActivity.description || 'No Description'}</Text>
-                <Text style={styles.modalLabel}>Type :</Text>
-                {selectedActivity.types?.map((type, index) => (
-                  <Text key={index} style={styles.activityType}>
-                    {type.name} - {formatPrice(type.price)}
-                  </Text>
-                ))}
-                <Text style={styles.selectedActivityRating}>Rating: {selectedActivity.rating}</Text>
+                <Text style={styles.selectedActivityTitle}>
+                  {selectedActivity.name}
+                </Text>
+                <Text style={styles.selectedActivityDescription}>
+                  {selectedActivity.description || "No Description"}
+                </Text>
+                <Text style={styles.selectedActivityRating}>
+                  Rating: {selectedActivity.rating}
+                </Text>
+                <Text style={styles.modalLabel}>Price:</Text>
+                <Text style={styles.activityPrice}>
+                  {selectedActivity.price}
+                </Text>
                 <View style={styles.buttonContainer}>
-                  <TouchableOpacity style={styles.closeButton} onPress={() => setActivityModalVisible(false)}>
+                  <TouchableOpacity
+                    style={styles.closeButton}
+                    onPress={() => setActivityModalVisible(false)}
+                  >
                     <Text style={styles.closeButtonText}>Close</Text>
                   </TouchableOpacity>
                 </View>
@@ -164,7 +190,13 @@ const HomeScreen = ({ searchResults }) => {
                 <FlatList
                   data={aiMessages}
                   renderItem={({ item }) => (
-                    <View style={item.type === 'ai' ? styles.aiMessage : styles.userMessage}>
+                    <View
+                      style={
+                        item.type === "ai"
+                          ? styles.aiMessage
+                          : styles.userMessage
+                      }
+                    >
                       <Text>{item.text}</Text>
                     </View>
                   )}
@@ -179,12 +211,18 @@ const HomeScreen = ({ searchResults }) => {
                   onChangeText={setUserMessage}
                   placeholder="Type your message"
                 />
-                <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
+                <TouchableOpacity
+                  onPress={sendMessage}
+                  style={styles.sendButton}
+                >
                   <Text style={styles.sendButtonText}>Send</Text>
                 </TouchableOpacity>
               </View>
               <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={() => setModalVisible(false)}
+                >
                   <Text style={styles.closeButtonText}>Close</Text>
                 </TouchableOpacity>
               </View>
@@ -196,7 +234,9 @@ const HomeScreen = ({ searchResults }) => {
         style={styles.floatingButton}
         onPress={() => setModalVisible(true)}
       >
-        <Text style={styles.floatingButtonText}><Ionicons name="logo-octocat" size={30} color="black" /></Text>
+        <Text style={styles.floatingButtonText}>
+          <Ionicons name="logo-octocat" size={30} color="black" />
+        </Text>
       </TouchableOpacity>
     </ImageBackground>
   );
@@ -205,17 +245,17 @@ const HomeScreen = ({ searchResults }) => {
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
-    resizeMode: 'cover',
+    resizeMode: "cover",
   },
   containerLoading: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
   },
   errorText: {
-    color: 'red',
-    textAlign: 'center',
+    color: "red",
+    textAlign: "center",
     marginTop: 20,
   },
   headerContainer: {
@@ -223,26 +263,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginBottom: 10,
     elevation: 3,
-    width: '100%',
-    alignSelf: 'center',
+    width: "100%",
+    alignSelf: "center",
   },
   cardImage: {
-    width: '100%',
+    width: "100%",
     height: 150,
   },
   cardDetails: {
@@ -250,17 +290,17 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   cardRating: {
-    color: '#888',
+    color: "#888",
   },
   cardLocation: {
-    color: '#888',
+    color: "#888",
   },
   cardPrice: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 5,
   },
   listContent: {
@@ -268,98 +308,98 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    width: '80%',
-    backgroundColor: '#fff',
+    width: "80%",
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 20,
-    alignItems: 'center',
-    height: '80%',
-    justifyContent: 'space-between',
+    alignItems: "center",
+    height: "80%",
+    justifyContent: "space-between",
   },
   chatContainer: {
     flex: 1,
-    width: '100%',
+    width: "100%",
     padding: 10,
   },
   messagesList: {
     flex: 1,
   },
   aiMessage: {
-    backgroundColor: '#e1e1e1',
+    backgroundColor: "#e1e1e1",
     borderRadius: 10,
     padding: 10,
     marginBottom: 5,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   userMessage: {
-    backgroundColor: '#007bff',
-    color: '#fff',
+    backgroundColor: "#007bff",
+    color: "#fff",
     borderRadius: 10,
     padding: 10,
     marginBottom: 5,
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
   },
   inputContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   textInput: {
     flex: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 5,
     padding: 10,
     marginRight: 10,
   },
   sendButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: "#007bff",
     padding: 10,
     borderRadius: 5,
   },
   sendButtonText: {
-    color: '#fff',
+    color: "#fff",
   },
   buttonContainer: {
     marginTop: 15,
   },
   closeButton: {
     padding: 10,
-    backgroundColor: '#E4003A',
+    backgroundColor: "#E4003A",
     borderRadius: 5,
   },
   closeButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
   },
   floatingButton: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 20,
     right: 20,
-    backgroundColor: '#007bff',
+    backgroundColor: "#007bff",
     borderRadius: 50,
     padding: 15,
     elevation: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   floatingButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
   },
   selectedActivityImage: {
-    width: '100%',
+    width: "100%",
     height: 150,
     borderRadius: 10,
   },
   selectedActivityTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginVertical: 10,
   },
   selectedActivityDescription: {
@@ -368,8 +408,13 @@ const styles = StyleSheet.create({
   },
   modalLabel: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 10,
+  },
+  activityPrice: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginTop: 5,
   },
 });
 
