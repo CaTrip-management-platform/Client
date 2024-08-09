@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Modal, ImageBackground, TextInput, ScrollView } from 'react-native';
 import { useQuery, useApolloClient, gql } from '@apollo/client';
 import { GET_Activity } from '../queries/getAllActivity';
 import { ActivityIndicator } from 'react-native-paper';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-
-const HomeScreen = () => {
+const HomeScreen = ({ searchResults }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [activityModalVisible, setActivityModalVisible] = useState(false);
   const [userMessage, setUserMessage] = useState('');
@@ -31,7 +30,7 @@ const HomeScreen = () => {
       setAiMessages([...aiMessages, { type: 'user', text: userMessage }, { type: 'ai', text: data.getTravelSupport.message }]);
       setUserMessage('');
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.error(error);
     }
   };
 
@@ -52,7 +51,19 @@ const HomeScreen = () => {
     return `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`;
   };
 
-  const activities = data.getAllActivity.map(activity => {
+  const activities = searchResults.length > 0 ? searchResults.map(activity => {
+    const prices = (activity.types && activity.types.map(type => type.price)) || [];
+    return {
+      id: activity._id,
+      name: activity.title,
+      rating: (activity.reviews && activity.reviews.length > 0) ? activity.reviews[0].rating : 'N/A',
+      location: activity.location || 'Unknown Location',
+      price: getPriceRange(prices),
+      image: (activity.imgUrls && activity.imgUrls.length > 0) ? activity.imgUrls[0] : 'https://via.placeholder.com/150',
+      description: activity.description,
+      types: activity.types,
+    };
+  }) : data.getAllActivity.map(activity => {
     const prices = (activity.types && activity.types.map(type => type.price)) || [];
     return {
       id: activity._id,
