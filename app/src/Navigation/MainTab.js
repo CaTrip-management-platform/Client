@@ -14,7 +14,8 @@ import SettingsScreen from "../screens/ActivityHistoryScreen";
 import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../context/authContext";
 import { Icon } from "react-native-paper";
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Map from "../googleMap/Map";
 
 const Tab = createBottomTabNavigator();
 
@@ -57,8 +58,11 @@ export default function MainTab() {
           headerLeft: () => <LogoTitle />,
           headerRight: () => (
             <View style={styles.headerRightContainer}>
-              <MaterialIcons name="luggage" size={25} color="black"
-                onPress={() => navigation.navigate('Activity')}
+              <MaterialIcons
+                name="luggage"
+                size={25}
+                color="black"
+                onPress={() => navigation.navigate("Activity")}
               />
               <Feather
                 name="menu"
@@ -81,6 +85,23 @@ export default function MainTab() {
       <Tab.Screen
         name="Add"
         component={AddScreen}
+        options={{
+          tabBarStyle: { backgroundColor: "black" },
+          headerStyle: { backgroundColor: "black" },
+          headerTitleAlign: "center",
+          headerTitle: () => <LogoTitle />,
+          tabBarIcon: ({ focused, color, size }) => (
+            <FontAwesome
+              name={focused ? "search" : "globe"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Map"
+        component={Map}
         options={{
           tabBarStyle: { backgroundColor: "black" },
           headerStyle: { backgroundColor: "black" },
