@@ -17,8 +17,7 @@ import { Icon } from "react-native-paper";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useQuery } from "@apollo/client";
 import { SEARCH_ACTIVITY } from "../queries/searchActivity.js";
-import Map from "../googleMap/Map";
-
+import Map from "../googleMap/Map.js";
 const Tab = createBottomTabNavigator();
 
 export function LogoTitle() {
@@ -124,6 +123,7 @@ export default function MainTab() {
         name="Map"
         component={Map}
         options={{
+          tabBarLabel: () => null,
           tabBarStyle: { backgroundColor: "black" },
           headerStyle: { backgroundColor: "black" },
           headerTitleAlign: "center",

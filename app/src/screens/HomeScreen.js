@@ -1,9 +1,20 @@
-import React, { useState } from 'react';
-import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Modal, ImageBackground, TextInput, ScrollView } from 'react-native';
-import { useQuery, useApolloClient, gql } from '@apollo/client';
-import { GET_Activity } from '../queries/getAllActivity';
-import { ActivityIndicator } from 'react-native-paper';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  Modal,
+  ImageBackground,
+  TextInput,
+  ScrollView,
+} from "react-native";
+import { useQuery, useApolloClient, gql } from "@apollo/client";
+import { GET_Activity } from "../queries/getAllActivity";
+import { ActivityIndicator } from "react-native-paper";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 import ImageViewer from 'react-native-image-zoom-viewer';
 
@@ -11,10 +22,9 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 
 
 const HomeScreen = ({ searchResults }) => {
-
   const [modalVisible, setModalVisible] = useState(false);
   const [activityModalVisible, setActivityModalVisible] = useState(false);
-  const [userMessage, setUserMessage] = useState('');
+  const [userMessage, setUserMessage] = useState("");
   const [aiMessages, setAiMessages] = useState([]);
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -35,20 +45,26 @@ const HomeScreen = ({ searchResults }) => {
         `,
         variables: { message: userMessage },
       });
-      setAiMessages([...aiMessages, { type: 'user', text: userMessage }, { type: 'ai', text: data.getTravelSupport.message }]);
-      setUserMessage('');
+      setAiMessages([
+        ...aiMessages,
+        { type: "user", text: userMessage },
+        { type: "ai", text: data.getTravelSupport.message },
+      ]);
+      setUserMessage("");
     } catch (error) {
       console.error(error);
     }
   };
 
-  if (loading) return (
-    <View style={styles.containerLoading}>
-      <ActivityIndicator size="large" />
-    </View>
-  );
+  if (loading)
+    return (
+      <View style={styles.containerLoading}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
 
-  if (error) return <Text style={styles.errorText}>Error: {error.message}</Text>;
+  if (error)
+    return <Text style={styles.errorText}>Error: {error.message}</Text>;
 
   const formatPrice = (price) => `Rp.${price},-`;
 
@@ -80,6 +96,7 @@ const HomeScreen = ({ searchResults }) => {
   });
 
 
+  // >>>>>>> e3b79304eb97485185eda9a347a6a0d420297d46
 
   const ListHeader = () => (
     <View style={styles.headerContainer}>
@@ -91,16 +108,22 @@ const HomeScreen = ({ searchResults }) => {
   );
 
   const handlePrevImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : selectedActivity.imgUrls.length - 1));
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex > 0 ? prevIndex - 1 : selectedActivity.imgUrls.length - 1
+    );
   };
 
   const handleNextImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex < selectedActivity.imgUrls.length - 1 ? prevIndex + 1 : 0));
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex < selectedActivity.imgUrls.length - 1 ? prevIndex + 1 : 0
+    );
   };
 
   return (
     <ImageBackground
-      source={{ uri: "https://marketplace.canva.com/EAGD_Vn7lkQ/1/0/900w/canva-blue-and-white-modern-watercolor-background-instagram-story-L-nceizV6kA.jpg" }}
+      source={{
+        uri: "https://marketplace.canva.com/EAGD_Vn7lkQ/1/0/900w/canva-blue-and-white-modern-watercolor-background-instagram-story-L-nceizV6kA.jpg",
+      }}
       style={styles.backgroundImage}
     >
       <FlatList
@@ -139,27 +162,66 @@ const HomeScreen = ({ searchResults }) => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <ScrollView contentContainerStyle={styles.scrollViewContent}>
+                {/* <<<<<<< HEAD */}
+                {/* <Image
+                  source={{ uri: selectedActivity.image }}
+                  style={styles.selectedActivityImage}
+                />
+                <Text style={styles.selectedActivityTitle}>
+                  {selectedActivity.name}
+                </Text>
+                <Text style={styles.selectedActivityDescription}>
+                  {selectedActivity.description || "No Description"}
+                </Text>
+                <Text style={styles.selectedActivityRating}>
+                  Rating: {selectedActivity.rating}
+                </Text>
+                <Text style={styles.modalLabel}>Price:</Text>
+                <Text style={styles.activityPrice}>
+                  {selectedActivity.price}
+                </Text> */}
+                {/* ======= */}
                 <TouchableOpacity onPress={() => setShowImageViewer(true)}>
                   <Image
-                    source={{ uri: selectedActivity.imgUrls[currentImageIndex] }}
+                    source={{
+                      uri: selectedActivity.imgUrls[currentImageIndex],
+                    }}
                     style={styles.selectedActivityImage}
                   />
                 </TouchableOpacity>
                 <View style={styles.imageNavigationContainer}>
-                  <TouchableOpacity onPress={handlePrevImage} style={styles.navButton}>
+                  <TouchableOpacity
+                    onPress={handlePrevImage}
+                    style={styles.navButton}
+                  >
                     <Text style={styles.navButtonText}>&lt;</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={handleNextImage} style={styles.navButton}>
+                  <TouchableOpacity
+                    onPress={handleNextImage}
+                    style={styles.navButton}
+                  >
                     <Text style={styles.navButtonText}>&gt;</Text>
                   </TouchableOpacity>
                 </View>
-                <Text style={styles.selectedActivityTitle}>{selectedActivity.name}</Text>
-                <Text style={styles.selectedActivityDescription}>{selectedActivity.description || 'No Description'}</Text>
-                <Text style={styles.selectedActivityRating}>Rating: {selectedActivity.rating}</Text>
+                <Text style={styles.selectedActivityTitle}>
+                  {selectedActivity.name}
+                </Text>
+                <Text style={styles.selectedActivityDescription}>
+                  {selectedActivity.description || "No Description"}
+                </Text>
+                <Text style={styles.selectedActivityRating}>
+                  Rating: {selectedActivity.rating}
+                </Text>
                 <Text style={styles.modalLabel}>Price:</Text>
-                <Text style={styles.activityPrice}>{selectedActivity.price}</Text>
+                <Text style={styles.activityPrice}>
+                  {selectedActivity.price}
+                </Text>
+                {/* >>>>>>> e3b79304eb97485185eda9a347a6a0d420297d46 */}
                 <View style={styles.buttonContainer}>
-                  <TouchableOpacity style={styles.closeButton} onPress={() => setActivityModalVisible(false)}>
+                  <TouchableOpacity
+                    style={styles.closeButton}
+                    onPress={() => setActivityModalVisible(false)}
+                  >
                     <Text style={styles.closeButtonText}>Close</Text>
                   </TouchableOpacity>
                 </View>
@@ -176,7 +238,7 @@ const HomeScreen = ({ searchResults }) => {
             >
               <View style={styles.imageViewerContainer}>
                 <ImageViewer
-                  imageUrls={selectedActivity.imgUrls.map(url => ({ url }))}
+                  imageUrls={selectedActivity.imgUrls.map((url) => ({ url }))}
                   enableImageZoom={true}
                   enableSwipeDown={true}
                   onSwipeDown={() => setShowImageViewer(false)}
@@ -196,11 +258,58 @@ const HomeScreen = ({ searchResults }) => {
           onRequestClose={() => setModalVisible(false)}
         >
           <View style={styles.modalContainer}>
+            {/* <<<<<<< HEAD
+            <View style={styles.modalContent}>
+              <View style={styles.chatContainer}>
+                <FlatList
+                  data={aiMessages}
+                  renderItem={({ item }) => (
+                    <View
+                      style={
+                        item.type === "ai"
+                          ? styles.aiMessage
+                          : styles.userMessage
+                      }
+                    >
+                      <Text>{item.text}</Text>
+                    </View>
+                  )}
+                  keyExtractor={(item, index) => index.toString()}
+                  style={styles.messagesList}
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.textInput}
+                  value={userMessage}
+                  onChangeText={setUserMessage}
+                  placeholder="Type your message"
+                />
+                <TouchableOpacity
+                  onPress={sendMessage}
+                  style={styles.sendButton}
+                >
+                  <Text style={styles.sendButtonText}>Send</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={styles.closeButtonText}>Close</Text>
+                </TouchableOpacity>
+              </View>
+======= */}
             <View style={styles.chatContainer}>
               <FlatList
                 data={aiMessages}
                 renderItem={({ item }) => (
-                  <View style={item.type === 'ai' ? styles.aiMessage : styles.userMessage}>
+                  <View
+                    style={
+                      item.type === "ai" ? styles.aiMessage : styles.userMessage
+                    }
+                  >
                     <Text>{item.text}</Text>
                   </View>
                 )}
@@ -220,9 +329,13 @@ const HomeScreen = ({ searchResults }) => {
               </TouchableOpacity>
             </View>
             <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+              >
                 <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>
+              {/* >>>>>>> e3b79304eb97485185eda9a347a6a0d420297d46 */}
             </View>
           </View>
         </Modal>
@@ -231,7 +344,9 @@ const HomeScreen = ({ searchResults }) => {
         style={styles.floatingButton}
         onPress={() => setModalVisible(true)}
       >
-        <Text style={styles.floatingButtonText}><Ionicons name="logo-octocat" size={30} color="black" /></Text>
+        <Text style={styles.floatingButtonText}>
+          <Ionicons name="logo-octocat" size={30} color="black" />
+        </Text>
       </TouchableOpacity>
     </ImageBackground>
   );
@@ -240,28 +355,41 @@ const HomeScreen = ({ searchResults }) => {
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
-    resizeMode: 'cover',
+    resizeMode: "cover",
   },
   containerLoading: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
   },
   errorText: {
-    color: 'red',
-    textAlign: 'center',
+    color: "red",
+    textAlign: "center",
     marginTop: 20,
   },
+  headerContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+
+  // =======
   card: {
     margin: 10,
     borderRadius: 10,
-    overflow: 'hidden',
-    backgroundColor: 'white',
+    overflow: "hidden",
+    backgroundColor: "white",
     elevation: 2,
+    // >>>>>>> e3b79304eb97485185eda9a347a6a0d420297d46
   },
   cardImage: {
-    width: '100%',
+    width: "100%",
     height: 150,
   },
   cardDetails: {
@@ -269,83 +397,118 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   cardRating: {
+    color: "#888",
     fontSize: 14,
-    color: 'gray',
+    color: "gray",
   },
+
   cardLocation: {
     fontSize: 14,
-    color: 'gray',
+    color: "gray",
   },
   cardPrice: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   listContent: {
     paddingBottom: 20,
   },
   headerContainer: {
     padding: 15,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    borderBottomColor: "#ddd",
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    width: '80%',
-    backgroundColor: '#fff',
+    width: "80%",
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 20,
-    alignItems: 'center',
-    height: '80%',
-    justifyContent: 'space-between',
+    alignItems: "center",
+    height: "80%",
+    justifyContent: "space-between",
+  },
+  chatContainer: {
+    flex: 1,
+    width: "100%",
+    padding: 10,
   },
   scrollViewContent: {
-    width: '100%',
-    backgroundColor: 'white',
+    width: "100%",
+    backgroundColor: "white",
     borderRadius: 10,
-    // padding: 20,
+    padding: 20,
   },
   selectedActivityImage: {
-    width: '100%',
+    width: "100%",
     height: 200,
     borderRadius: 10,
   },
   imageViewerContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
   },
+  aiMessage: {
+    backgroundColor: "#e1e1e1",
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 5,
+    alignSelf: "flex-start",
+  },
+  userMessage: {
+    backgroundColor: "#007bff",
+    color: "#fff",
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 5,
+    alignSelf: "flex-end",
+  },
+
+  textInput: {
+    flex: 1,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
+    marginRight: 10,
+  },
+  sendButton: {
+    backgroundColor: "#007bff",
+  },
+
   imageNavigationContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     padding: 10,
   },
   navButton: {
     padding: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    backgroundColor: "rgba(255, 255, 255, 0.7)",
     borderRadius: 5,
   },
+  sendButtonText: {
+    color: "#fff",
+  },
+
   navButtonText: {
     fontSize: 20,
   },
+  closeButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
   selectedActivityTitle: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginVertical: 10,
   },
   selectedActivityDescription: {
@@ -354,7 +517,7 @@ const styles = StyleSheet.create({
   },
   modalLabel: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginVertical: 10,
   },
   activityType: {
@@ -370,13 +533,13 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: 10,
-    backgroundColor: '#E4003A',
-    alignSelf: 'center',
+    backgroundColor: "#E4003A",
+    alignSelf: "center",
     borderRadius: 5,
   },
   closeButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
   },
   chatContainer: {
     flex: 1,
@@ -385,59 +548,87 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   aiMessage: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: "#e0e0e0",
     padding: 10,
     borderRadius: 10,
     marginVertical: 5,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   userMessage: {
-    backgroundColor: '#007bff',
+    backgroundColor: "#007bff",
     padding: 10,
     borderRadius: 10,
     marginVertical: 5,
-    alignSelf: 'flex-end',
-    color: 'white',
+    alignSelf: "flex-end",
+    color: "white",
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 10,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderTopWidth: 1,
-    borderTopColor: '#ddd',
+    borderTopColor: "#ddd",
   },
   textInput: {
     flex: 1,
     borderRadius: 5,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderWidth: 1,
     padding: 10,
   },
   sendButton: {
     marginLeft: 10,
     padding: 10,
-    backgroundColor: '#007bff',
+    backgroundColor: "#007bff",
     borderRadius: 5,
   },
   sendButtonText: {
-    color: 'white',
+    color: "white",
   },
   floatingButton: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 20,
     right: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 50,
     padding: 10,
     elevation: 5,
+    // <<<<<<< HEAD
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  floatingButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  selectedActivityImage: {
+    width: "100%",
+    height: 150,
+    borderRadius: 10,
+  },
+  selectedActivityTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginVertical: 10,
+  },
+  selectedActivityDescription: {
+    fontSize: 14,
+    marginVertical: 10,
+  },
+  modalLabel: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginTop: 10,
+    // =======
   },
   floatingButtonText: {
     fontSize: 24,
   },
+
   activityPrice: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 5,
   },
 });
