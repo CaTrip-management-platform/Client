@@ -31,12 +31,10 @@ function LoginScreen({ navigation }) {
   return (
     <ImageBackground
       src="https://marketplace.canva.com/EAGD_Vn7lkQ/1/0/900w/canva-blue-and-white-modern-watercolor-background-instagram-story-L-nceizV6kA.jpg"
-      style={styles.container}>
+      style={styles.container}
+    >
       <StatusBar style="dark" />
-      <Image
-        style={styles.logo}
-        source={require('../../assets/Catrip.png')}
-      />
+      <Image style={styles.logo} source={require("../../assets/Catrip.png")} />
 
       <View style={styles.inputView}>
         <TextInput
@@ -57,15 +55,14 @@ function LoginScreen({ navigation }) {
         />
       </View>
       <View style={styles.btnContainer}>
-
         <TouchableOpacity
           style={styles.loginBtn}
           onPress={async () => {
-            console.log(username, password, '<==')
+            // console.log(username, password, '<==')
             const result = await loginFn({
               variables: { password, username },
             });
-            console.log(result, '<==')
+            console.log(result, "<==");
 
             setIsSignedIn(true);
 
@@ -77,7 +74,7 @@ function LoginScreen({ navigation }) {
         >
           <Text style={styles.loginText}>Login</Text>
         </TouchableOpacity>
-        <Image style={styles.car} source={require('../../assets/car.png')} />
+        <Image style={styles.car} source={require("../../assets/car.png")} />
         <View style={styles.roadContainer}>
           <View style={styles.road} />
           <View style={styles.road} />
@@ -94,8 +91,8 @@ function LoginScreen({ navigation }) {
         >
           <Text style={styles.loginText}>To Register</Text>
         </TouchableOpacity>
-      </View >
-    </ImageBackground >
+      </View>
+    </ImageBackground>
   );
 }
 
@@ -123,7 +120,6 @@ const styles = StyleSheet.create({
   inputText: {
     height: 50,
     color: "#134B70",
-
   },
   loginBtn: {
     // width: "10",
@@ -135,9 +131,9 @@ const styles = StyleSheet.create({
     marginBottom: -1,
   },
   roadContainer: {
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "space-between",
     marginVertical: 0,
     backgroundColor: "#134B70",
   },
@@ -158,7 +154,7 @@ const styles = StyleSheet.create({
   },
   loginText: {
     color: "white",
-    fontSize: 17
+    fontSize: 17,
   },
   loadingContainer: {
     flex: 1,
@@ -176,9 +172,9 @@ const styles = StyleSheet.create({
     color: "red",
   },
   car: {
-    position: 'absolute',
-    top: '30.5%',
-    left: '73%',
+    position: "absolute",
+    top: "30.5%",
+    left: "73%",
     width: 130,
     height: 65,
     // transform: [{ rotate: '90deg' }],
@@ -188,7 +184,7 @@ const styles = StyleSheet.create({
   },
   btnContainer: {
     // flex: 1
-  }
+  },
 });
 
 export default LoginScreen;

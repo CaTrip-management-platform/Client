@@ -1,21 +1,33 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
-import { useMutation } from '@apollo/client';
-import { ADD_Activity } from '../queries/activity.js';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  Alert,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
+import { useMutation } from "@apollo/client";
+import { ADD_Activity } from "../queries/activity.js";
 
 const AddActivityScreen = ({ navigation }) => {
-  const [title, setTitle] = useState('');
-  const [types, setTypes] = useState([{ name: '', price: '' }]);
-  const [imgurls, setImgurls] = useState(['']);
-  const [description, setDescription] = useState('');
-  const [tags, setTags] = useState(['']);
-  const [reviews, setReviews] = useState([{ content: '', imageUrl: '', rating: '' }]);
-  const [location, setLocation] = useState('');
+  const [title, setTitle] = useState("");
+  const [types, setTypes] = useState([{ name: "", price: "" }]);
+  const [imgurls, setImgurls] = useState([""]);
+  const [description, setDescription] = useState("");
+  const [tags, setTags] = useState([""]);
+  const [reviews, setReviews] = useState([
+    { content: "", imageUrl: "", rating: "" },
+  ]);
+  const [location, setLocation] = useState("");
 
   const [addActivity] = useMutation(ADD_Activity);
 
-  const handleAddType = () => setTypes([...types, { name: '', price: '' }]);
-  const handleRemoveType = (index) => setTypes(types.filter((_, i) => i !== index));
+  const handleAddType = () => setTypes([...types, { name: "", price: "" }]);
+  const handleRemoveType = (index) =>
+    setTypes(types.filter((_, i) => i !== index));
 
   const handleTypeChange = (index, field, value) => {
     const newTypes = [...types];
@@ -23,8 +35,9 @@ const AddActivityScreen = ({ navigation }) => {
     setTypes(newTypes);
   };
 
-  const handleAddImageUrl = () => setImgurls([...imgurls, '']);
-  const handleRemoveImageUrl = (index) => setImgurls(imgurls.filter((_, i) => i !== index));
+  const handleAddImageUrl = () => setImgurls([...imgurls, ""]);
+  const handleRemoveImageUrl = (index) =>
+    setImgurls(imgurls.filter((_, i) => i !== index));
 
   const handleImageUrlChange = (index, value) => {
     const newImgurls = [...imgurls];
@@ -32,8 +45,9 @@ const AddActivityScreen = ({ navigation }) => {
     setImgurls(newImgurls);
   };
 
-  const handleAddTag = () => setTags([...tags, '']);
-  const handleRemoveTag = (index) => setTags(tags.filter((_, i) => i !== index));
+  const handleAddTag = () => setTags([...tags, ""]);
+  const handleRemoveTag = (index) =>
+    setTags(tags.filter((_, i) => i !== index));
 
   const handleTagChange = (index, value) => {
     const newTags = [...tags];
@@ -41,8 +55,10 @@ const AddActivityScreen = ({ navigation }) => {
     setTags(newTags);
   };
 
-  const handleAddReview = () => setReviews([...reviews, { content: '', imageUrl: '', rating: '' }]);
-  const handleRemoveReview = (index) => setReviews(reviews.filter((_, i) => i !== index));
+  const handleAddReview = () =>
+    setReviews([...reviews, { content: "", imageUrl: "", rating: "" }]);
+  const handleRemoveReview = (index) =>
+    setReviews(reviews.filter((_, i) => i !== index));
 
   const handleReviewChange = (index, field, value) => {
     const newReviews = [...reviews];
@@ -52,16 +68,16 @@ const AddActivityScreen = ({ navigation }) => {
 
   const handleAddActivity = async () => {
     try {
-      const parsedTypes = types.map(type => ({
+      const parsedTypes = types.map((type) => ({
         name: type.name,
         price: parseInt(type.price, 10) || 0,
       }));
-      const parsedReviews = reviews.map(review => ({
+      const parsedReviews = reviews.map((review) => ({
         content: review.content,
         imageUrl: review.imageUrl,
         rating: parseInt(review.rating, 10) || 0,
       }));
-      
+
       await addActivity({
         variables: {
           title,
@@ -73,11 +89,14 @@ const AddActivityScreen = ({ navigation }) => {
           location,
         },
       });
-      Alert.alert('Success', 'Activity added successfully!');
+      Alert.alert("Success", "Activity added successfully!");
       navigation.goBack();
     } catch (error) {
-      console.log(error,`<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<`)
-      Alert.alert('Error', 'Something went wrong!');
+      console.log(
+        error,
+        `<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<`
+      );
+      Alert.alert("Error", "Something went wrong!");
     }
   };
 
@@ -93,25 +112,28 @@ const AddActivityScreen = ({ navigation }) => {
           placeholder="Hiking Adventure"
         />
       </View>
-      
+
       {types.map((type, index) => (
         <View key={index} style={styles.inputContainer}>
           <Text style={styles.label}>Type Name</Text>
           <TextInput
             style={styles.input}
             value={type.name}
-            onChangeText={(value) => handleTypeChange(index, 'name', value)}
+            onChangeText={(value) => handleTypeChange(index, "name", value)}
             placeholder="Premium"
           />
           <Text style={styles.label}>Type Price</Text>
           <TextInput
             style={styles.input}
             value={type.price}
-            onChangeText={(value) => handleTypeChange(index, 'price', value)}
+            onChangeText={(value) => handleTypeChange(index, "price", value)}
             placeholder="500000"
             keyboardType="numeric"
           />
-          <TouchableOpacity onPress={() => handleRemoveType(index)} style={styles.removeButton}>
+          <TouchableOpacity
+            onPress={() => handleRemoveType(index)}
+            style={styles.removeButton}
+          >
             <Text style={styles.removeButtonText}>Remove Type</Text>
           </TouchableOpacity>
         </View>
@@ -127,12 +149,19 @@ const AddActivityScreen = ({ navigation }) => {
             onChangeText={(value) => handleImageUrlChange(index, value)}
             placeholder="https://example.com/image.jpg"
           />
-          <TouchableOpacity onPress={() => handleRemoveImageUrl(index)} style={styles.removeButton}>
+          <TouchableOpacity
+            onPress={() => handleRemoveImageUrl(index)}
+            style={styles.removeButton}
+          >
             <Text style={styles.removeButtonText}>Remove Image</Text>
           </TouchableOpacity>
         </View>
       ))}
-      <Button title="Add Image URL" onPress={handleAddImageUrl} color="#007BFF" />
+      <Button
+        title="Add Image URL"
+        onPress={handleAddImageUrl}
+        color="#007BFF"
+      />
 
       {tags.map((tag, index) => (
         <View key={index} style={styles.inputContainer}>
@@ -143,7 +172,10 @@ const AddActivityScreen = ({ navigation }) => {
             onChangeText={(value) => handleTagChange(index, value)}
             placeholder="Adventure"
           />
-          <TouchableOpacity onPress={() => handleRemoveTag(index)} style={styles.removeButton}>
+          <TouchableOpacity
+            onPress={() => handleRemoveTag(index)}
+            style={styles.removeButton}
+          >
             <Text style={styles.removeButtonText}>Remove Tag</Text>
           </TouchableOpacity>
         </View>
@@ -156,25 +188,32 @@ const AddActivityScreen = ({ navigation }) => {
           <TextInput
             style={styles.input}
             value={review.content}
-            onChangeText={(value) => handleReviewChange(index, 'content', value)}
+            onChangeText={(value) =>
+              handleReviewChange(index, "content", value)
+            }
             placeholder="Great place!"
           />
           <Text style={styles.label}>Review Image URL</Text>
           <TextInput
             style={styles.input}
             value={review.imageUrl}
-            onChangeText={(value) => handleReviewChange(index, 'imageUrl', value)}
+            onChangeText={(value) =>
+              handleReviewChange(index, "imageUrl", value)
+            }
             placeholder="https://example.com/review.jpg"
           />
           <Text style={styles.label}>Review Rating</Text>
           <TextInput
             style={styles.input}
             value={review.rating}
-            onChangeText={(value) => handleReviewChange(index, 'rating', value)}
+            onChangeText={(value) => handleReviewChange(index, "rating", value)}
             placeholder="5"
             keyboardType="numeric"
           />
-          <TouchableOpacity onPress={() => handleRemoveReview(index)} style={styles.removeButton}>
+          <TouchableOpacity
+            onPress={() => handleRemoveReview(index)}
+            style={styles.removeButton}
+          >
             <Text style={styles.removeButtonText}>Remove Review</Text>
           </TouchableOpacity>
         </View>
@@ -202,10 +241,13 @@ const AddActivityScreen = ({ navigation }) => {
           placeholder="Yosemite National Park"
         />
       </View>
-<View style={styles.buttonAdd}>
-      <Button  title="Add Activity" onPress={handleAddActivity} color="#28A745" />
-
-</View>
+      <View style={styles.buttonAdd}>
+        <Button
+          title="Add Activity"
+          onPress={handleAddActivity}
+          color="#28A745"
+        />
+      </View>
     </ScrollView>
   );
 };
@@ -214,20 +256,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: "#F8F9FA",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 16,
-    textAlign: 'center',
+    textAlign: "center",
   },
   inputContainer: {
     marginBottom: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     padding: 16,
     borderRadius: 8,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -235,31 +277,31 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
     marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#CED4DA',
+    borderColor: "#CED4DA",
     padding: 10,
     borderRadius: 4,
     marginBottom: 8,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: "#F8F9FA",
   },
   removeButton: {
     marginTop: 8,
     padding: 8,
-    backgroundColor: '#DC3545',
+    backgroundColor: "#DC3545",
     borderRadius: 4,
-    alignItems: 'center',
+    alignItems: "center",
   },
   removeButtonText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
+    color: "#FFFFFF",
+    fontWeight: "bold",
   },
-  buttonAdd:{
-    marginBottom: 20
-  }
+  buttonAdd: {
+    marginBottom: 20,
+  },
 });
 
 export default AddActivityScreen;
