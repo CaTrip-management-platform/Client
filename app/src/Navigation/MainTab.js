@@ -14,9 +14,11 @@ import SettingsScreen from "../screens/ActivityHistoryScreen";
 import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../context/authContext";
 import { Icon } from "react-native-paper";
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useQuery} from '@apollo/client';
-import {SEARCH_ACTIVITY} from "../queries/searchActivity.js";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useQuery } from "@apollo/client";
+import { SEARCH_ACTIVITY } from "../queries/searchActivity.js";
+import Map from "../googleMap/Map";
+
 const Tab = createBottomTabNavigator();
 
 export function LogoTitle() {
@@ -25,20 +27,18 @@ export function LogoTitle() {
   );
 }
 
-
-
 export default function MainTab() {
   const navigation = useNavigation();
   const { setIsSignedIn } = useContext(AuthContext);
   const [text, setText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  
+
   const { refetch } = useQuery(SEARCH_ACTIVITY, {
     variables: { searchTerm: text },
-    skip: true, 
+    skip: true,
     onCompleted: (data) => {
       setSearchResults(data.searchActivity);
-    }
+    },
   });
 
   useEffect(() => {
@@ -78,8 +78,11 @@ export default function MainTab() {
           headerLeft: () => <LogoTitle />,
           headerRight: () => (
             <View style={styles.headerRightContainer}>
-              <MaterialIcons name="luggage" size={25} color="black"
-                onPress={() => navigation.navigate('Activity')}
+              <MaterialIcons
+                name="luggage"
+                size={25}
+                color="black"
+                onPress={() => navigation.navigate("Activity")}
               />
               <Feather
                 name="menu"
@@ -104,6 +107,23 @@ export default function MainTab() {
         component={AddScreen}
         options={{
           tabBarLabel: () => null,
+          tabBarStyle: { backgroundColor: "black" },
+          headerStyle: { backgroundColor: "black" },
+          headerTitleAlign: "center",
+          headerTitle: () => <LogoTitle />,
+          tabBarIcon: ({ focused, color, size }) => (
+            <FontAwesome
+              name={focused ? "search" : "globe"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Map"
+        component={Map}
+        options={{
           tabBarStyle: { backgroundColor: "black" },
           headerStyle: { backgroundColor: "black" },
           headerTitleAlign: "center",
