@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Modal, ImageBackground, TextInput } from 'react-native';
+import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Modal, ImageBackground, TextInput, ScrollView } from 'react-native';
 import { useQuery, useApolloClient, gql } from '@apollo/client';
 import { GET_Activity } from '../queries/getAllActivity';
 import { ActivityIndicator } from 'react-native-paper';
@@ -114,22 +114,26 @@ const HomeScreen = () => {
         >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Image
-                source={{ uri: selectedActivity.image }}
-                style={styles.selectedActivityImage}
-              />
-              <Text style={styles.selectedActivityTitle}>{selectedActivity.name}</Text>
-              <Text style={styles.selectedActivityDescription}>{selectedActivity.description || 'No Description'}</Text>
-              <Text style={styles.modalLabel}>Type :</Text>
-              {selectedActivity.types?.map((type, index) => (
-                <Text key={index}>{type.name} - {formatPrice(type.price)}</Text>
-              ))}
-              <Text style={styles.selectedActivityRating}>Rating: {selectedActivity.rating}</Text>
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.closeButton} onPress={() => setActivityModalVisible(false)}>
-                  <Text style={styles.closeButtonText}>Close</Text>
-                </TouchableOpacity>
-              </View>
+              <ScrollView contentContainerStyle={styles.scrollViewContent}>
+                <Image
+                  source={{ uri: selectedActivity.image }}
+                  style={styles.selectedActivityImage}
+                />
+                <Text style={styles.selectedActivityTitle}>{selectedActivity.name}</Text>
+                <Text style={styles.selectedActivityDescription}>{selectedActivity.description || 'No Description'}</Text>
+                <Text style={styles.modalLabel}>Type :</Text>
+                {selectedActivity.types?.map((type, index) => (
+                  <Text key={index} style={styles.activityType}>
+                    {type.name} - {formatPrice(type.price)}
+                  </Text>
+                ))}
+                <Text style={styles.selectedActivityRating}>Rating: {selectedActivity.rating}</Text>
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity style={styles.closeButton} onPress={() => setActivityModalVisible(false)}>
+                    <Text style={styles.closeButtonText}>Close</Text>
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
             </View>
           </View>
         </Modal>
