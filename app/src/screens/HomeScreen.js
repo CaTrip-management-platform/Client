@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Modal, ImageBackground, TextInput, ScrollView } from 'react-native';
 import { useQuery, useApolloClient, gql } from '@apollo/client';
 import { GET_Activity } from '../queries/getAllActivity';
@@ -42,40 +42,25 @@ const HomeScreen = ({ searchResults }) => {
 
   if (error) return <Text style={styles.errorText}>Error: {error.message}</Text>;
 
-  const formatPrice = (price) => `Rp.${price.toLocaleString('id-ID')}`;
+  const formatPrice = (price) => `Rp.${price.toLocaleString('id-ID')},-`;
 
-  const getPriceRange = (prices) => {
-    if (!prices || prices.length === 0) return 'N/A';
-    const minPrice = Math.min(...prices);
-    const maxPrice = Math.max(...prices);
-    return `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`;
-  };
-
-  const activities = searchResults.length > 0 ? searchResults.map(activity => {
-    const prices = (activity.types && activity.types.map(type => type.price)) || [];
-    return {
-      id: activity._id,
-      name: activity.title,
-      rating: (activity.reviews && activity.reviews.length > 0) ? activity.reviews[0].rating : 'N/A',
-      location: activity.location || 'Unknown Location',
-      price: getPriceRange(prices),
-      image: (activity.imgUrls && activity.imgUrls.length > 0) ? activity.imgUrls[0] : 'https://via.placeholder.com/150',
-      description: activity.description,
-      types: activity.types,
-    };
-  }) : data.getAllActivity.map(activity => {
-    const prices = (activity.types && activity.types.map(type => type.price)) || [];
-    return {
-      id: activity._id,
-      name: activity.title,
-      rating: (activity.reviews && activity.reviews.length > 0) ? activity.reviews[0].rating : 'N/A',
-      location: activity.location || 'Unknown Location',
-      price: getPriceRange(prices),
-      image: (activity.imgUrls && activity.imgUrls.length > 0) ? activity.imgUrls[0] : 'https://via.placeholder.com/150',
-      description: activity.description,
-      types: activity.types,
-    };
-  });
+  const activities = searchResults.length > 0 ? searchResults.map(activity => ({
+    id: activity._id,
+    name: activity.title,
+    rating: activity.reviews && activity.reviews.length > 0 ? activity.reviews[0].rating : 'N/A',
+    location: activity.location || 'Unknown Location',
+    price: formatPrice(activity.price),
+    image: activity.imgUrls && activity.imgUrls.length > 0 ? activity.imgUrls[0] : 'https://via.placeholder.com/150',
+    description: activity.description,
+  })) : data.getAllActivity.map(activity => ({
+    id: activity._id,
+    name: activity.title,
+    rating: activity.reviews && activity.reviews.length > 0 ? activity.reviews[0].rating : 'N/A',
+    location: activity.location || 'Unknown Location',
+    price: formatPrice(activity.price),
+    image: activity.imgUrls && activity.imgUrls.length > 0 ? activity.imgUrls[0] : 'https://via.placeholder.com/150',
+    description: activity.description,
+  }));
 
   const ListHeader = () => (
     <View style={styles.headerContainer}>
@@ -132,13 +117,9 @@ const HomeScreen = ({ searchResults }) => {
                 />
                 <Text style={styles.selectedActivityTitle}>{selectedActivity.name}</Text>
                 <Text style={styles.selectedActivityDescription}>{selectedActivity.description || 'No Description'}</Text>
-                <Text style={styles.modalLabel}>Type :</Text>
-                {selectedActivity.types?.map((type, index) => (
-                  <Text key={index} style={styles.activityType}>
-                    {type.name} - {formatPrice(type.price)}
-                  </Text>
-                ))}
                 <Text style={styles.selectedActivityRating}>Rating: {selectedActivity.rating}</Text>
+                <Text style={styles.modalLabel}>Price:</Text>
+                <Text style={styles.activityPrice}>{selectedActivity.price}</Text>
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity style={styles.closeButton} onPress={() => setActivityModalVisible(false)}>
                     <Text style={styles.closeButtonText}>Close</Text>
@@ -370,6 +351,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginTop: 10,
+  },
+  activityPrice: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 5,
   },
 });
 
