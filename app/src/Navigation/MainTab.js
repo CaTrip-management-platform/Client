@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   Image,
   View,
@@ -15,6 +15,8 @@ import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../context/authContext";
 import { Icon } from "react-native-paper";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useQuery } from "@apollo/client";
+import { SEARCH_ACTIVITY } from "../queries/searchActivity.js";
 import Map from "../googleMap/Map";
 
 const Tab = createBottomTabNavigator();
@@ -29,13 +31,31 @@ export default function MainTab() {
   const navigation = useNavigation();
   const { setIsSignedIn } = useContext(AuthContext);
   const [text, setText] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+
+  const { refetch } = useQuery(SEARCH_ACTIVITY, {
+    variables: { searchTerm: text },
+    skip: true,
+    onCompleted: (data) => {
+      setSearchResults(data.searchActivity);
+    },
+  });
+
+  useEffect(() => {
+    if (text) {
+      refetch({ searchTerm: text });
+    } else {
+      setSearchResults([]);
+    }
+  }, [text, refetch]);
 
   return (
     <Tab.Navigator>
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
+        children={() => <HomeScreen searchResults={searchResults} />}
         options={{
+          tabBarLabel: () => null,
           tabBarStyle: { backgroundColor: "white" },
           headerStyle: { backgroundColor: "white" },
           headerTitleAlign: "center",
@@ -86,6 +106,7 @@ export default function MainTab() {
         name="Add"
         component={AddScreen}
         options={{
+          tabBarLabel: () => null,
           tabBarStyle: { backgroundColor: "black" },
           headerStyle: { backgroundColor: "black" },
           headerTitleAlign: "center",
@@ -120,6 +141,7 @@ export default function MainTab() {
         name="Profile"
         component={SettingsScreen}
         options={{
+          tabBarLabel: () => null,
           tabBarStyle: { backgroundColor: "black" },
           headerStyle: { backgroundColor: "black" },
           headerTitleAlign: "center",
@@ -153,14 +175,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     width: 250,
-    flexDirection: "row",
-    alignItems: "center",
-    width: 250,
     height: 40,
     borderRadius: 20,
-    borderColor: "black",
-    backgroundColor: "#aaa",
-    shadowColor: "#000",
     borderColor: "black",
     backgroundColor: "#aaa",
     shadowColor: "#000",
@@ -171,7 +187,6 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: "100%",
-    height: "100%",
     borderRadius: 20,
     paddingHorizontal: 10,
   },
@@ -181,9 +196,9 @@ const styles = StyleSheet.create({
   headerRightContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginRight: 10, // Adjust margin as needed
+    marginRight: 10,
   },
   headerIcon: {
-    marginLeft: 15, // Space between icons
+    marginLeft: 15,
   },
 });

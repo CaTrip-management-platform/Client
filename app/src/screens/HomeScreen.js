@@ -4,9 +4,14 @@ import { useQuery, useApolloClient, gql } from '@apollo/client';
 import { GET_Activity } from '../queries/getAllActivity';
 import { ActivityIndicator } from 'react-native-paper';
 import Ionicons from '@expo/vector-icons/Ionicons';
+
 import ImageViewer from 'react-native-image-zoom-viewer'; // Import ImageViewer
 
-const HomeScreen = () => {
+
+
+
+const HomeScreen = ({ searchResults }) => {
+
   const [modalVisible, setModalVisible] = useState(false);
   const [activityModalVisible, setActivityModalVisible] = useState(false);
   const [userMessage, setUserMessage] = useState('');
@@ -33,7 +38,7 @@ const HomeScreen = () => {
       setAiMessages([...aiMessages, { type: 'user', text: userMessage }, { type: 'ai', text: data.getTravelSupport.message }]);
       setUserMessage('');
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.error(error);
     }
   };
 
@@ -45,29 +50,42 @@ const HomeScreen = () => {
 
   if (error) return <Text style={styles.errorText}>Error: {error.message}</Text>;
 
-  const formatPrice = (price) => `Rp.${price.toLocaleString('id-ID')}`;
+  const formatPrice = (price) => `Rp.${price.toLocaleString('id-ID')},-`;
 
-  const getPriceRange = (prices) => {
-    if (!prices || prices.length === 0) return 'N/A';
-    const minPrice = Math.min(...prices);
-    const maxPrice = Math.max(...prices);
-    return `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`;
-  };
 
-  const activities = data.getAllActivity.map(activity => {
-    const prices = (activity.types && activity.types.map(type => type.price)) || [];
-    return {
-      id: activity._id,
-      name: activity.title,
-      rating: (activity.reviews && activity.reviews.length > 0) ? activity.reviews[0].rating : 'N/A',
-      location: activity.location || 'Unknown Location',
-      price: getPriceRange(prices),
-      image: (activity.imgUrls && activity.imgUrls.length > 0) ? activity.imgUrls[0] : 'https://via.placeholder.com/150',
-      description: activity.description,
-      types: activity.types,
-      imgUrls: activity.imgUrls || [],
-    };
-  });
+//   const activities = data.getAllActivity.map(activity => {
+//     const prices = (activity.types && activity.types.map(type => type.price)) || [];
+//     return {
+//       id: activity._id,
+//       name: activity.title,
+//       rating: (activity.reviews && activity.reviews.length > 0) ? activity.reviews[0].rating : 'N/A',
+//       location: activity.location || 'Unknown Location',
+//       price: getPriceRange(prices),
+//       image: (activity.imgUrls && activity.imgUrls.length > 0) ? activity.imgUrls[0] : 'https://via.placeholder.com/150',
+//       description: activity.description,
+//       types: activity.types,
+//       imgUrls: activity.imgUrls || [],
+//     };
+//   });
+
+  const activities = searchResults.length > 0 ? searchResults.map(activity => ({
+    id: activity._id,
+    name: activity.title,
+    rating: activity.reviews && activity.reviews.length > 0 ? activity.reviews[0].rating : 'N/A',
+    location: activity.location || 'Unknown Location',
+    price: formatPrice(activity.price),
+    image: activity.imgUrls && activity.imgUrls.length > 0 ? activity.imgUrls[0] : 'https://via.placeholder.com/150',
+    description: activity.description,
+  })) : data.getAllActivity.map(activity => ({
+    id: activity._id,
+    name: activity.title,
+    rating: activity.reviews && activity.reviews.length > 0 ? activity.reviews[0].rating : 'N/A',
+    location: activity.location || 'Unknown Location',
+    price: formatPrice(activity.price),
+    image: activity.imgUrls && activity.imgUrls.length > 0 ? activity.imgUrls[0] : 'https://via.placeholder.com/150',
+    description: activity.description,
+  }));
+
 
   const ListHeader = () => (
     <View style={styles.headerContainer}>
@@ -143,13 +161,9 @@ const HomeScreen = () => {
                 </View>
                 <Text style={styles.selectedActivityTitle}>{selectedActivity.name}</Text>
                 <Text style={styles.selectedActivityDescription}>{selectedActivity.description || 'No Description'}</Text>
-                <Text style={styles.modalLabel}>Type :</Text>
-                {selectedActivity.types?.map((type, index) => (
-                  <Text key={index} style={styles.activityType}>
-                    {type.name} - {formatPrice(type.price)}
-                  </Text>
-                ))}
                 <Text style={styles.selectedActivityRating}>Rating: {selectedActivity.rating}</Text>
+                <Text style={styles.modalLabel}>Price:</Text>
+                <Text style={styles.activityPrice}>{selectedActivity.price}</Text>
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity style={styles.closeButton} onPress={() => setActivityModalVisible(false)}>
                     <Text style={styles.closeButtonText}>Close</Text>
@@ -426,6 +440,11 @@ const styles = StyleSheet.create({
   },
   floatingButtonText: {
     fontSize: 24,
+  },
+  activityPrice: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 5,
   },
 });
 
