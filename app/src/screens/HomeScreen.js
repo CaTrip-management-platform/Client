@@ -16,12 +16,16 @@ import { GET_Activity } from "../queries/getAllActivity";
 import { ActivityIndicator } from "react-native-paper";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
+import ImageViewer from "react-native-image-zoom-viewer"; // Import ImageViewer
+
 const HomeScreen = ({ searchResults }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [activityModalVisible, setActivityModalVisible] = useState(false);
   const [userMessage, setUserMessage] = useState("");
   const [aiMessages, setAiMessages] = useState([]);
   const [selectedActivity, setSelectedActivity] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showImageViewer, setShowImageViewer] = useState(false); // State to control ImageViewer visibility
 
   const client = useApolloClient();
   const { loading, error, data } = useQuery(GET_Activity);
@@ -59,6 +63,42 @@ const HomeScreen = ({ searchResults }) => {
   if (error)
     return <Text style={styles.errorText}>Error: {error.message}</Text>;
 
+  // <<<<<<< HEAD
+  //   const formatPrice = (price) => `Rp.${price.toLocaleString("id-ID")},-`;
+
+  //   const activities =
+  //     searchResults.length > 0
+  //       ? searchResults.map((activity) => ({
+  //           id: activity._id,
+  //           name: activity.title,
+  //           rating:
+  //             activity.reviews && activity.reviews.length > 0
+  //               ? activity.reviews[0].rating
+  //               : "N/A",
+  //           location: activity.location || "Unknown Location",
+  //           price: formatPrice(activity.price),
+  //           image:
+  //             activity.imgUrls && activity.imgUrls.length > 0
+  //               ? activity.imgUrls[0]
+  //               : "https://via.placeholder.com/150",
+  //           description: activity.description,
+  //         }))
+  //       : data.getAllActivity.map((activity) => ({
+  //           id: activity._id,
+  //           name: activity.title,
+  //           rating:
+  //             activity.reviews && activity.reviews.length > 0
+  //               ? activity.reviews[0].rating
+  //               : "N/A",
+  //           location: activity.location || "Unknown Location",
+  //           price: formatPrice(activity.price),
+  //           image:
+  //             activity.imgUrls && activity.imgUrls.length > 0
+  //               ? activity.imgUrls[0]
+  //               : "https://via.placeholder.com/150",
+  //           description: activity.description,
+  // //         }));
+  // // =======
   const formatPrice = (price) => `Rp.${price.toLocaleString("id-ID")},-`;
 
   const activities =
@@ -78,21 +118,29 @@ const HomeScreen = ({ searchResults }) => {
               : "https://via.placeholder.com/150",
           description: activity.description,
         }))
-      : data.getAllActivity.map((activity) => ({
-          id: activity._id,
-          name: activity.title,
-          rating:
-            activity.reviews && activity.reviews.length > 0
-              ? activity.reviews[0].rating
-              : "N/A",
-          location: activity.location || "Unknown Location",
-          price: formatPrice(activity.price),
-          image:
-            activity.imgUrls && activity.imgUrls.length > 0
-              ? activity.imgUrls[0]
-              : "https://via.placeholder.com/150",
-          description: activity.description,
-        }));
+      : data.getAllActivity.map((activity) => {
+          const prices =
+            (activity.types && activity.types.map((type) => type.price)) || [];
+          return {
+            id: activity._id,
+            name: activity.title,
+            rating:
+              activity.reviews && activity.reviews.length > 0
+                ? activity.reviews[0].rating
+                : "N/A",
+            location: activity.location || "Unknown Location",
+            price: formatPrice(activity.price),
+            image:
+              activity.imgUrls && activity.imgUrls.length > 0
+                ? activity.imgUrls[0]
+                : "https://via.placeholder.com/150",
+            description: activity.description,
+            types: activity.types,
+            imgUrls: activity.imgUrls || [],
+          };
+        });
+
+  // >>>>>>> e3b79304eb97485185eda9a347a6a0d420297d46
 
   const ListHeader = () => (
     <View style={styles.headerContainer}>
@@ -102,6 +150,18 @@ const HomeScreen = ({ searchResults }) => {
       <Text style={styles.sectionTitle}>Populer</Text>
     </View>
   );
+
+  const handlePrevImage = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex > 0 ? prevIndex - 1 : selectedActivity.imgUrls.length - 1
+    );
+  };
+
+  const handleNextImage = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex < selectedActivity.imgUrls.length - 1 ? prevIndex + 1 : 0
+    );
+  };
 
   return (
     <ImageBackground
@@ -117,6 +177,7 @@ const HomeScreen = ({ searchResults }) => {
             style={styles.card}
             onPress={() => {
               setSelectedActivity(item);
+              setCurrentImageIndex(0); // Reset to first image
               setActivityModalVisible(true);
             }}
           >
@@ -145,7 +206,8 @@ const HomeScreen = ({ searchResults }) => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <ScrollView contentContainerStyle={styles.scrollViewContent}>
-                <Image
+                {/* <<<<<<< HEAD */}
+                {/* <Image
                   source={{ uri: selectedActivity.image }}
                   style={styles.selectedActivityImage}
                 />
@@ -161,7 +223,44 @@ const HomeScreen = ({ searchResults }) => {
                 <Text style={styles.modalLabel}>Price:</Text>
                 <Text style={styles.activityPrice}>
                   {selectedActivity.price}
+                </Text> */}
+                {/* ======= */}
+                <TouchableOpacity onPress={() => setShowImageViewer(true)}>
+                  <Image
+                    source={{
+                      uri: selectedActivity.imgUrls[currentImageIndex],
+                    }}
+                    style={styles.selectedActivityImage}
+                  />
+                </TouchableOpacity>
+                <View style={styles.imageNavigationContainer}>
+                  <TouchableOpacity
+                    onPress={handlePrevImage}
+                    style={styles.navButton}
+                  >
+                    <Text style={styles.navButtonText}>&lt;</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={handleNextImage}
+                    style={styles.navButton}
+                  >
+                    <Text style={styles.navButtonText}>&gt;</Text>
+                  </TouchableOpacity>
+                </View>
+                <Text style={styles.selectedActivityTitle}>
+                  {selectedActivity.name}
                 </Text>
+                <Text style={styles.selectedActivityDescription}>
+                  {selectedActivity.description || "No Description"}
+                </Text>
+                <Text style={styles.selectedActivityRating}>
+                  Rating: {selectedActivity.rating}
+                </Text>
+                <Text style={styles.modalLabel}>Price:</Text>
+                <Text style={styles.activityPrice}>
+                  {selectedActivity.price}
+                </Text>
+                {/* >>>>>>> e3b79304eb97485185eda9a347a6a0d420297d46 */}
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity
                     style={styles.closeButton}
@@ -173,6 +272,24 @@ const HomeScreen = ({ searchResults }) => {
               </ScrollView>
             </View>
           </View>
+
+          {/* Image Viewer Modal */}
+          {showImageViewer && (
+            <Modal
+              visible={showImageViewer}
+              transparent={true}
+              onRequestClose={() => setShowImageViewer(false)}
+            >
+              <View style={styles.imageViewerContainer}>
+                <ImageViewer
+                  imageUrls={selectedActivity.imgUrls.map((url) => ({ url }))}
+                  enableImageZoom={true}
+                  enableSwipeDown={true}
+                  onSwipeDown={() => setShowImageViewer(false)}
+                />
+              </View>
+            </Modal>
+          )}
         </Modal>
       )}
 
@@ -185,6 +302,7 @@ const HomeScreen = ({ searchResults }) => {
           onRequestClose={() => setModalVisible(false)}
         >
           <View style={styles.modalContainer}>
+            {/* <<<<<<< HEAD
             <View style={styles.modalContent}>
               <View style={styles.chatContainer}>
                 <FlatList
@@ -226,6 +344,42 @@ const HomeScreen = ({ searchResults }) => {
                   <Text style={styles.closeButtonText}>Close</Text>
                 </TouchableOpacity>
               </View>
+======= */}
+            <View style={styles.chatContainer}>
+              <FlatList
+                data={aiMessages}
+                renderItem={({ item }) => (
+                  <View
+                    style={
+                      item.type === "ai" ? styles.aiMessage : styles.userMessage
+                    }
+                  >
+                    <Text>{item.text}</Text>
+                  </View>
+                )}
+                keyExtractor={(item, index) => index.toString()}
+                style={styles.messagesList}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.textInput}
+                value={userMessage}
+                onChangeText={setUserMessage}
+                placeholder="Type your message"
+              />
+              <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
+                <Text style={styles.sendButtonText}>Send</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+              {/* >>>>>>> e3b79304eb97485185eda9a347a6a0d420297d46 */}
             </View>
           </View>
         </Modal>
@@ -258,10 +412,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 20,
   },
-  headerContainer: {
-    marginBottom: 20,
-    paddingHorizontal: 16,
-  },
   headerContent: {
     flexDirection: "row",
     alignItems: "center",
@@ -272,14 +422,15 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
+
+  // =======
   card: {
-    backgroundColor: "#fff",
+    margin: 10,
     borderRadius: 10,
     overflow: "hidden",
-    marginBottom: 10,
-    elevation: 3,
-    width: "100%",
-    alignSelf: "center",
+    backgroundColor: "white",
+    elevation: 2,
+    // >>>>>>> e3b79304eb97485185eda9a347a6a0d420297d46
   },
   cardImage: {
     width: "100%",
@@ -294,17 +445,26 @@ const styles = StyleSheet.create({
   },
   cardRating: {
     color: "#888",
+    fontSize: 14,
+    color: "gray",
   },
+
   cardLocation: {
-    color: "#888",
+    fontSize: 14,
+    color: "gray",
   },
   cardPrice: {
     fontSize: 16,
     fontWeight: "bold",
-    marginTop: 5,
   },
   listContent: {
-    paddingHorizontal: 16,
+    paddingBottom: 20,
+  },
+  headerContainer: {
+    padding: 15,
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
   },
   modalContainer: {
     flex: 1,
@@ -326,8 +486,20 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 10,
   },
-  messagesList: {
+  scrollViewContent: {
+    width: "100%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
+  },
+  selectedActivityImage: {
+    width: "100%",
+    height: 200,
+    borderRadius: 10,
+  },
+  imageViewerContainer: {
     flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
   },
   aiMessage: {
     backgroundColor: "#e1e1e1",
@@ -344,11 +516,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     alignSelf: "flex-end",
   },
-  inputContainer: {
-    flexDirection: "row",
-    padding: 10,
-    alignItems: "center",
-  },
+
   textInput: {
     flex: 1,
     borderColor: "#ccc",
@@ -359,11 +527,50 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     backgroundColor: "#007bff",
+  },
+
+  imageNavigationContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     padding: 10,
+  },
+  navButton: {
+    padding: 10,
+    backgroundColor: "rgba(255, 255, 255, 0.7)",
     borderRadius: 5,
   },
   sendButtonText: {
     color: "#fff",
+  },
+
+  navButtonText: {
+    fontSize: 20,
+  },
+  closeButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  selectedActivityTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginVertical: 10,
+  },
+  selectedActivityDescription: {
+    fontSize: 16,
+    marginVertical: 10,
+  },
+  modalLabel: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginVertical: 10,
+  },
+  activityType: {
+    fontSize: 16,
+    marginVertical: 5,
+  },
+  selectedActivityRating: {
+    fontSize: 16,
+    marginVertical: 10,
   },
   buttonContainer: {
     marginTop: 15,
@@ -371,20 +578,67 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 10,
     backgroundColor: "#E4003A",
+    alignSelf: "center",
     borderRadius: 5,
   },
   closeButtonText: {
     color: "white",
     fontWeight: "bold",
   },
+  chatContainer: {
+    flex: 1,
+  },
+  messagesList: {
+    padding: 10,
+  },
+  aiMessage: {
+    backgroundColor: "#e0e0e0",
+    padding: 10,
+    borderRadius: 10,
+    marginVertical: 5,
+    alignSelf: "flex-start",
+  },
+  userMessage: {
+    backgroundColor: "#007bff",
+    padding: 10,
+    borderRadius: 10,
+    marginVertical: 5,
+    alignSelf: "flex-end",
+    color: "white",
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderTopColor: "#ddd",
+  },
+  textInput: {
+    flex: 1,
+    borderRadius: 5,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    padding: 10,
+  },
+  sendButton: {
+    marginLeft: 10,
+    padding: 10,
+    backgroundColor: "#007bff",
+    borderRadius: 5,
+  },
+  sendButtonText: {
+    color: "white",
+  },
   floatingButton: {
     position: "absolute",
     bottom: 20,
     right: 20,
-    backgroundColor: "#007bff",
+    backgroundColor: "#fff",
     borderRadius: 50,
-    padding: 15,
+    padding: 10,
     elevation: 5,
+    // <<<<<<< HEAD
     alignItems: "center",
     justifyContent: "center",
   },
@@ -410,7 +664,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginTop: 10,
+    // =======
   },
+  floatingButtonText: {
+    fontSize: 24,
+  },
+
   activityPrice: {
     fontSize: 16,
     fontWeight: "bold",
