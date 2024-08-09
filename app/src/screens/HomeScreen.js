@@ -5,7 +5,7 @@ import { GET_Activity } from '../queries/getAllActivity';
 import { ActivityIndicator } from 'react-native-paper';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-import ImageViewer from 'react-native-image-zoom-viewer'; // Import ImageViewer
+import ImageViewer from 'react-native-image-zoom-viewer';
 
 
 
@@ -18,7 +18,7 @@ const HomeScreen = ({ searchResults }) => {
   const [aiMessages, setAiMessages] = useState([]);
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [showImageViewer, setShowImageViewer] = useState(false); // State to control ImageViewer visibility
+  const [showImageViewer, setShowImageViewer] = useState(false);
 
   const client = useApolloClient();
   const { loading, error, data } = useQuery(GET_Activity);
@@ -50,41 +50,35 @@ const HomeScreen = ({ searchResults }) => {
 
   if (error) return <Text style={styles.errorText}>Error: {error.message}</Text>;
 
-  const formatPrice = (price) => `Rp.${price.toLocaleString('id-ID')},-`;
+  const formatPrice = (price) => `Rp.${price},-`;
 
 
-//   const activities = data.getAllActivity.map(activity => {
-//     const prices = (activity.types && activity.types.map(type => type.price)) || [];
-//     return {
-//       id: activity._id,
-//       name: activity.title,
-//       rating: (activity.reviews && activity.reviews.length > 0) ? activity.reviews[0].rating : 'N/A',
-//       location: activity.location || 'Unknown Location',
-//       price: getPriceRange(prices),
-//       image: (activity.imgUrls && activity.imgUrls.length > 0) ? activity.imgUrls[0] : 'https://via.placeholder.com/150',
-//       description: activity.description,
-//       types: activity.types,
-//       imgUrls: activity.imgUrls || [],
-//     };
-//   });
 
   const activities = searchResults.length > 0 ? searchResults.map(activity => ({
     id: activity._id,
     name: activity.title,
-    rating: activity.reviews && activity.reviews.length > 0 ? activity.reviews[0].rating : 'N/A',
+    rating: (activity.reviews && activity.reviews.length > 0) ? activity.reviews[0].rating : 'N/A',
     location: activity.location || 'Unknown Location',
     price: formatPrice(activity.price),
-    image: activity.imgUrls && activity.imgUrls.length > 0 ? activity.imgUrls[0] : 'https://via.placeholder.com/150',
+    image: (activity.imgUrls && activity.imgUrls.length > 0) ? activity.imgUrls[0] : 'https://via.placeholder.com/150',
     description: activity.description,
-  })) : data.getAllActivity.map(activity => ({
-    id: activity._id,
-    name: activity.title,
-    rating: activity.reviews && activity.reviews.length > 0 ? activity.reviews[0].rating : 'N/A',
-    location: activity.location || 'Unknown Location',
-    price: formatPrice(activity.price),
-    image: activity.imgUrls && activity.imgUrls.length > 0 ? activity.imgUrls[0] : 'https://via.placeholder.com/150',
-    description: activity.description,
-  }));
+    types: activity.types,
+    imgUrls: activity.imgUrls || [],
+  })) : data.getAllActivity.map(activity => {
+    const prices = (activity.types && activity.types.map(type => type.price)) || [];
+    return {
+      id: activity._id,
+      name: activity.title,
+      rating: (activity.reviews && activity.reviews.length > 0) ? activity.reviews[0].rating : 'N/A',
+      location: activity.location || 'Unknown Location',
+      price: formatPrice(activity.price),
+      image: (activity.imgUrls && activity.imgUrls.length > 0) ? activity.imgUrls[0] : 'https://via.placeholder.com/150',
+      description: activity.description,
+      types: activity.types,
+      imgUrls: activity.imgUrls || [],
+    };
+  });
+
 
 
   const ListHeader = () => (

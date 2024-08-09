@@ -32,7 +32,7 @@ export default function MainTab() {
   const { setIsSignedIn } = useContext(AuthContext);
   const [text, setText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-
+  console.log(searchResults, '<=====')
   const { refetch } = useQuery(SEARCH_ACTIVITY, {
     variables: { searchTerm: text },
     skip: true,
