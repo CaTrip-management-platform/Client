@@ -4,7 +4,7 @@ import { useQuery, useApolloClient, gql } from '@apollo/client';
 import { GET_Activity } from '../queries/getAllActivity';
 import { ActivityIndicator } from 'react-native-paper';
 import Ionicons from '@expo/vector-icons/Ionicons';
-
+import ImageViewer from 'react-native-image-zoom-viewer';
 
 const HomeScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -12,6 +12,8 @@ const HomeScreen = () => {
   const [userMessage, setUserMessage] = useState('');
   const [aiMessages, setAiMessages] = useState([]);
   const [selectedActivity, setSelectedActivity] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [imageViewerVisible, setImageViewerVisible] = useState(false);
 
   const client = useApolloClient();
   const { loading, error, data } = useQuery(GET_Activity);
@@ -63,6 +65,7 @@ const HomeScreen = () => {
       image: (activity.imgUrls && activity.imgUrls.length > 0) ? activity.imgUrls[0] : 'https://via.placeholder.com/150',
       description: activity.description,
       types: activity.types,
+      imgUrls: activity.imgUrls || [],
     };
   });
 
@@ -74,6 +77,14 @@ const HomeScreen = () => {
       <Text style={styles.sectionTitle}>Populer</Text>
     </View>
   );
+
+  const handlePrevImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : selectedActivity.imgUrls.length - 1));
+  };
+
+  const handleNextImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex < selectedActivity.imgUrls.length - 1 ? prevIndex + 1 : 0));
+  };
 
   return (
     <ImageBackground
@@ -87,6 +98,7 @@ const HomeScreen = () => {
             style={styles.card}
             onPress={() => {
               setSelectedActivity(item);
+              setCurrentImageIndex(0); // Reset to first image
               setActivityModalVisible(true);
             }}
           >
@@ -115,10 +127,20 @@ const HomeScreen = () => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <ScrollView contentContainerStyle={styles.scrollViewContent}>
-                <Image
-                  source={{ uri: selectedActivity.image }}
-                  style={styles.selectedActivityImage}
-                />
+                <TouchableOpacity onPress={() => setImageViewerVisible(true)}>
+                  <Image
+                    source={{ uri: selectedActivity.imgUrls[currentImageIndex] }}
+                    style={styles.selectedActivityImage}
+                  />
+                </TouchableOpacity>
+                <View style={styles.imageNavigationContainer}>
+                  <TouchableOpacity onPress={handlePrevImage} style={styles.navButton}>
+                    <Text style={styles.navButtonText}>&lt;</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={handleNextImage} style={styles.navButton}>
+                    <Text style={styles.navButtonText}>&gt;</Text>
+                  </TouchableOpacity>
+                </View>
                 <Text style={styles.selectedActivityTitle}>{selectedActivity.name}</Text>
                 <Text style={styles.selectedActivityDescription}>{selectedActivity.description || 'No Description'}</Text>
                 <Text style={styles.modalLabel}>Type :</Text>
@@ -135,6 +157,24 @@ const HomeScreen = () => {
                 </View>
               </ScrollView>
             </View>
+          </View>
+        </Modal>
+      )}
+
+      {/* Image Viewer Modal */}
+      {selectedActivity && (
+        <Modal
+          visible={imageViewerVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setImageViewerVisible(false)}
+        >
+          <View style={styles.imageViewerContainer}>
+            <ImageViewer
+              imageUrls={selectedActivity.imgUrls.map(url => ({ url }))}
+              index={currentImageIndex}
+              onSwipeDown={() => setImageViewerVisible(false)}
+            />
           </View>
         </Modal>
       )}
@@ -320,6 +360,7 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 10,
     backgroundColor: '#E4003A',
+    alignSelf: 'center',
     borderRadius: 5,
   },
   closeButtonText: {
@@ -343,13 +384,13 @@ const styles = StyleSheet.create({
   },
   selectedActivityImage: {
     width: '100%',
-    height: 150,
+    height: 200,
     borderRadius: 10,
   },
   selectedActivityTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginVertical: 10,
+    marginBottom: 10,
   },
   selectedActivityDescription: {
     fontSize: 14,
@@ -359,6 +400,31 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginTop: 10,
+  },
+  activityType: {
+    fontSize: 16,
+    color: '#333',
+  },
+  selectedActivityRating: {
+    fontSize: 16,
+    marginVertical: 10,
+  },
+  imageNavigationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 10,
+  },
+  navButton: {
+    borderRadius: 5,
+  },
+  navButtonText: {
+    color: '#03346E',
+    fontSize: 43,
+    fontWeight: 'bold',
+  },
+  imageViewerContainer: {
+    flex: 1,
+    backgroundColor: 'black',
   },
 });
 
