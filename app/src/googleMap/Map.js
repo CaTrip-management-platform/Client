@@ -3,7 +3,7 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { StyleSheet, View } from "react-native";
 import * as Location from "expo-location";
 
-export default function Map({ title, location, coords }) {
+export default function Map({ name, location, coords }) {
   const [mapLocation, setMapLocation] = useState(null);
   const [deniedMessage, setDeniedMessage] = useState(null);
 
