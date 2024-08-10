@@ -18,6 +18,7 @@ export default function Map({ name, location, coords }) {
       let location = await Location.getCurrentPositionAsync({});
       setMapLocation(location);
     })();
+    console.log(coords);
   }, []);
 
   return (
@@ -39,24 +40,10 @@ export default function Map({ name, location, coords }) {
             coordinate={{
               latitude: 37.78825,
               longitude: -122.4324,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
             }}
             title={"test"}
           />
         </MapView>
-        // <MapView
-        //   style={StyleSheet.absoluteFill}
-        //   provider={PROVIDER_GOOGLE}
-        //   showsUserLocation={true}
-        //   showsMyLocationButton={true}
-        //   //   initialRegion={{
-        //   //     latitude: location.coords.latitude,
-        //   //     longitude: location.coords.longitude,
-        //   //     latitudeDelta: 0.0922,
-        //   //     longitudeDelta: 0.0421,
-        //   //   }}
-        // />
       )}
     </View>
   );

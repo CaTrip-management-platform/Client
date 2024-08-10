@@ -88,6 +88,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
               ? activity.imgUrls[0]
               : "https://via.placeholder.com/150",
           description: activity.description,
+          coords: activity.coords,
         }))
       : data.getAllActivity.map((activity) => ({
           id: activity._id,
@@ -105,6 +106,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
           description: activity.description,
           types: activity.types,
           imgUrls: activity.imgUrls || [],
+          coords: activity.coords,
         }));
 
   const ListHeader = () => (
@@ -225,6 +227,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
                             navigate.push("Map", {
                               name: selectedActivity.name,
                               location: selectedActivity.location,
+                              coords: selectedActivity.coords,
                             });
                           }}
                         >
