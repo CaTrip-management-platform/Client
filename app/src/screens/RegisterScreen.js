@@ -9,14 +9,13 @@ import { useNavigation } from '@react-navigation/native';
 
 function RegisterScreen() {
   const [username, setUsername] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('');
 
   const navigation = useNavigation()
 
-  const [registerUser] = useMutation(REGISTER_USER, {
+  const [registerUser, { loading, error, data }] = useMutation(REGISTER_USER, {
     onCompleted: () => {
       navigation.navigate('Login');
     },
@@ -25,10 +24,10 @@ function RegisterScreen() {
 
   const handleRegister = async () => {
     try {
-      const { data } = await registerUser({
-        variables: { name, username, email, password, role },
+      const result = await registerUser({
+        variables: { username, phoneNumber, email, password },
       });
-
+      console.log(result)
     } catch (err) {
       console.log(err)
     }
@@ -59,8 +58,8 @@ function RegisterScreen() {
           style={styles.inputText}
           placeholder="PhoneNumber..."
           placeholderTextColor="#003f5c"
-          value={phone}
-          onChangeText={setPhone}
+          value={phoneNumber}
+          onChangeText={setPhoneNumber}
         />
       </View>
       <View style={styles.inputView}>
@@ -84,7 +83,7 @@ function RegisterScreen() {
         />
       </View>
 
-      <View style={styles.roleContainer}>
+      {/* <View style={styles.roleContainer}>
         <TouchableOpacity
           style={[styles.roleButton, role === 'Seller' && styles.selectedRole]}
           onPress={() => setRole('Seller')}>
@@ -95,7 +94,7 @@ function RegisterScreen() {
           onPress={() => setRole('Customer')}>
           <Text style={[styles.roleText, role === 'Customer' && styles.selectedRoleText]}>Customer</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
 
       <View style={styles.btnContainer}>

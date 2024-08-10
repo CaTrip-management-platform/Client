@@ -21,9 +21,13 @@ query FindUserById($userId: String!) {
   `
 
 export const REGISTER_USER = gql`
-  mutation Register($name: String!, $username: String!, $email: String!, $password: String!, $image: String!) {
-  register(name: $name, username: $username, email: $email, password: $password, image: $image) {
-    message
+ mutation CreateUser($phoneNumber: String, $username: String, $email: String, $password: String) {
+  createUser(phoneNumber: $phoneNumber, username: $username, email: $email, password: $password) {
+    _id
+    username
+    email
+    password
+    phoneNumber
   }
 }
   `

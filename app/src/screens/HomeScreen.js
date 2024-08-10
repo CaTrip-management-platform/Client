@@ -32,7 +32,6 @@ const HomeScreen = ({ searchResults }) => {
 
   const client = useApolloClient();
   const { loading, error, data } = useQuery(GET_Activity);
-
   const sendMessage = async () => {
     try {
       const { data } = await client.query({
@@ -66,8 +65,12 @@ const HomeScreen = ({ searchResults }) => {
   if (error)
     return <Text style={styles.errorText}>Error: {error.message}</Text>;
 
-  const formatPrice = (price) => `Rp.${price},-`;
-
+  const formatPrice = (price) => {
+    if (typeof price !== 'number' || isNaN(price)) {
+      return 'Invalid price';
+    }
+    return `Rp ${price.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }).replace('IDR', '')}`;
+  };
 
 
   const activities = searchResults.length > 0 ? searchResults.map(activity => ({
@@ -133,7 +136,7 @@ const HomeScreen = ({ searchResults }) => {
             style={styles.card}
             onPress={() => {
               setSelectedActivity(item);
-              setCurrentImageIndex(0); // Reset to first image
+              setCurrentImageIndex(0);
               setActivityModalVisible(true);
             }}
           >
@@ -432,7 +435,7 @@ const styles = StyleSheet.create({
     width: "80%",
     backgroundColor: "#fff",
     borderRadius: 10,
-    padding: 20,
+    // padding: 20,
     alignItems: "center",
     height: "80%",
     justifyContent: "space-between",
@@ -488,7 +491,7 @@ const styles = StyleSheet.create({
   imageNavigationContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 10,
+    // padding: 10,
   },
   navButton: {
     padding: 10,
@@ -500,7 +503,8 @@ const styles = StyleSheet.create({
   },
 
   navButtonText: {
-    fontSize: 20,
+    fontSize: 30,
+    fontWeight: 'bold'
   },
   closeButtonText: {
     color: "white",

@@ -5,6 +5,10 @@ query GetAllActivity {
   getAllActivity {
     _id
     title
+    types {
+      price
+      name
+    }
     imgUrls
     reviews {
       content
@@ -14,14 +18,12 @@ query GetAllActivity {
       updatedAt
     }
     description
-
+    sellerId
     tags
     createdAt
     updatedAt
     customers
     location
-    price
-    userId
   }
 }
 `;
