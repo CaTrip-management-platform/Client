@@ -3,26 +3,26 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { StyleSheet, View } from "react-native";
 import * as Location from "expo-location";
 
-export default function Map() {
-  const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
+export default function Map({ title, location, coords }) {
+  const [mapLocation, setMapLocation] = useState(null);
+  const [deniedMessage, setDeniedMessage] = useState(null);
 
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
+        setDeniedMessage("Permission to access location was denied");
         return;
       }
 
       let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
+      setMapLocation(location);
     })();
   }, []);
 
   return (
     <View style={styles.container}>
-      {location && (
+      {mapLocation && (
         <MapView
           provider={PROVIDER_GOOGLE}
           style={StyleSheet.absoluteFill}
