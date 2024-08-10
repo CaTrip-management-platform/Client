@@ -31,7 +31,7 @@ export default function MainTab() {
   const { setIsSignedIn } = useContext(AuthContext);
   const [text, setText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  console.log(searchResults, '<=====')
+  console.log(searchResults, "<=====");
   const { refetch } = useQuery(SEARCH_ACTIVITY, {
     variables: { searchTerm: text },
     skip: true,
@@ -119,24 +119,7 @@ export default function MainTab() {
           ),
         }}
       />
-      <Tab.Screen
-        name="Map"
-        component={Map}
-        options={{
-          tabBarLabel: () => null,
-          tabBarStyle: { backgroundColor: "black" },
-          headerStyle: { backgroundColor: "black" },
-          headerTitleAlign: "center",
-          headerTitle: () => <LogoTitle />,
-          tabBarIcon: ({ focused, color, size }) => (
-            <FontAwesome
-              name={focused ? "search" : "globe"}
-              size={size}
-              color={color}
-            />
-          ),
-        }}
-      />
+
       <Tab.Screen
         name="Profile"
         component={SettingsScreen}

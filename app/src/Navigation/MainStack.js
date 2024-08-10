@@ -13,6 +13,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native-paper";
 import RightDrawerContent from "../components/rightDrawer";
 import ActivityScreen from "../screens/ActivityScreen";
+import Map from "../googleMap/Map";
+import HomeScreen from "../screens/HomeScreen";
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -40,7 +42,7 @@ const AuthStack = () => (
   </Stack.Navigator>
 );
 
-const AppStack = () => (
+const AppStack = ({ navigation }) => (
   <Stack.Navigator>
     <Stack.Screen
       name="MainTab"
@@ -65,6 +67,12 @@ const AppStack = () => (
       component={ActivityScreen}
       options={{ headerShown: true }}
     />
+    <Stack.Screen name="Map" component={Map} options={{ headerShown: true }} />
+    <Stack.Screen
+      name="Home"
+      component={HomeScreen}
+      options={{ headerShown: true }}
+    />
   </Stack.Navigator>
 );
 
@@ -73,13 +81,12 @@ const MainStack = () => {
   const [fetchTokenLoading, setFetchTokenLoading] = useState(true);
 
   useEffect(() => {
-    SecureStore.getItemAsync("accessToken")
-      .then((accessToken) => {
-        if (accessToken) {
-          setIsSignedIn(true);
-        }
-        setFetchTokenLoading(false);
-      });
+    SecureStore.getItemAsync("accessToken").then((accessToken) => {
+      if (accessToken) {
+        setIsSignedIn(true);
+      }
+      setFetchTokenLoading(false);
+    });
   }, [setIsSignedIn]);
 
   if (fetchTokenLoading) {
@@ -93,27 +100,83 @@ const MainStack = () => {
   return (
     <NavigationContainer>
       <StatusBar style="auto" />
-      <Drawer.Navigator
-        id="RightDrawer"
-        drawerContent={(props) => <RightDrawerContent {...props} />}
-        screenOptions={{
-          drawerPosition: 'right',
-          headerShown: false,
-          overlayStyle: { backgroundColor: 'rgba(0, 0, 0, 0.1)' },
-          drawerStyle: {
-            backgroundColor: 'rgba(0, 0, 0, 0.2)',
-          },
-        }}
-        sceneContainerStyle={{ backgroundColor: 'transparent' }}
-      >
+      <Stack.Navigator>
         {isSignedIn ? (
-          <Drawer.Screen name="AppStack" component={AppStack} />
+          <>
+            <Stack.Screen
+              name="MainTab"
+              component={MainTab}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Detail"
+              component={DetailsScreen}
+              options={{
+                headerStyle: { backgroundColor: "black" },
+                headerTitleAlign: "center",
+              }}
+            />
+            <Stack.Screen
+              name="Settings"
+              component={SettingsScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Activity"
+              component={ActivityScreen}
+              options={{ headerShown: true }}
+            />
+            <Stack.Screen
+              name="Map"
+              component={Map}
+              options={{ headerShown: true }}
+            />
+          </>
         ) : (
-          <Drawer.Screen name="AuthStack" component={AuthStack} />
+          <>
+            <Stack.Screen
+              name="Register"
+              component={RegisterScreen}
+              options={{
+                headerStyle: { backgroundColor: "black" },
+                headerTitleAlign: "center",
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="Login"
+              component={LoginScreen}
+              options={{
+                headerStyle: { backgroundColor: "black" },
+                headerTitleAlign: "center",
+                headerShown: false,
+              }}
+            />
+          </>
         )}
-      </Drawer.Navigator>
+      </Stack.Navigator>
     </NavigationContainer>
   );
 };
 
 export default MainStack;
+
+/* <Drawer.Navigator
+  id="RightDrawer"
+  drawerContent={(props) => <RightDrawerContent {...props} />}
+  screenOptions={{
+    drawerPosition: "right",
+    headerShown: false,
+    overlayStyle: { backgroundColor: "rgba(0, 0, 0, 0.1)" },
+    drawerStyle: {
+      backgroundColor: "rgba(0, 0, 0, 0.2)",
+    },
+  }}
+  sceneContainerStyle={{ backgroundColor: "transparent" }}
+>
+  {isSignedIn ? (
+    <Drawer.Screen name="AppStack" component={AppStack} />
+  ) : (
+    <Drawer.Screen name="AuthStack" component={AuthStack} />
+  )}
+</Drawer.Navigator> */

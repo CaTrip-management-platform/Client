@@ -19,8 +19,11 @@ import { ActivityIndicator } from "react-native-paper";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ImageViewer from "react-native-image-zoom-viewer";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import EvilIcons from "@expo/vector-icons/EvilIcons";
+import { useNavigation } from "@react-navigation/native";
 
-const HomeScreen = ({ searchResults }) => {
+const HomeScreen = ({ searchResults, navigation }) => {
+  const navigate = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [activityModalVisible, setActivityModalVisible] = useState(false);
   const [userMessage, setUserMessage] = useState("");
@@ -69,42 +72,42 @@ const HomeScreen = ({ searchResults }) => {
     return <Text style={styles.errorText}>Error: {error.message}</Text>;
   }
 
-  const formatPrice = (price) => `Rp.${price},-`;
+  const formatPrice = (price) => `Rp.${price.toLocaleString("id-ID")},-`;
 
   const activities =
     searchResults.length > 0
       ? searchResults.map((activity) => ({
-        id: activity._id,
-        name: activity.title,
-        rating:
-          activity.reviews && activity.reviews.length > 0
-            ? activity.reviews[0].rating
-            : "N/A",
-        location: activity.location || "Unknown Location",
-        price: formatPrice(activity.price),
-        image:
-          activity.imgUrls && activity.imgUrls.length > 0
-            ? activity.imgUrls[0]
-            : "https://via.placeholder.com/150",
-        description: activity.description,
-      }))
+          id: activity._id,
+          name: activity.title,
+          rating:
+            activity.reviews && activity.reviews.length > 0
+              ? activity.reviews[0].rating
+              : "N/A",
+          location: activity.location || "Unknown Location",
+          price: formatPrice(activity.price),
+          image:
+            activity.imgUrls && activity.imgUrls.length > 0
+              ? activity.imgUrls[0]
+              : "https://via.placeholder.com/150",
+          description: activity.description,
+        }))
       : data.getAllActivity.map((activity) => ({
-        id: activity._id,
-        name: activity.title,
-        rating:
-          activity.reviews && activity.reviews.length > 0
-            ? activity.reviews[0].rating
-            : "N/A",
-        location: activity.location || "Unknown Location",
-        price: formatPrice(activity.price),
-        image:
-          activity.imgUrls && activity.imgUrls.length > 0
-            ? activity.imgUrls[0]
-            : "https://via.placeholder.com/150",
-        description: activity.description,
-        types: activity.types,
-        imgUrls: activity.imgUrls || [],
-      }));
+          id: activity._id,
+          name: activity.title,
+          rating:
+            activity.reviews && activity.reviews.length > 0
+              ? activity.reviews[0].rating
+              : "N/A",
+          location: activity.location || "Unknown Location",
+          price: formatPrice(activity.price),
+          image:
+            activity.imgUrls && activity.imgUrls.length > 0
+              ? activity.imgUrls[0]
+              : "https://via.placeholder.com/150",
+          description: activity.description,
+          types: activity.types,
+          imgUrls: activity.imgUrls || [],
+        }));
 
   const ListHeader = () => (
     <View style={styles.headerContainer}>
@@ -185,21 +188,54 @@ const HomeScreen = ({ searchResults }) => {
                     <View style={styles.imageNavigationContainer}>
                       <TouchableOpacity
                         onPress={handlePrevImage}
-                        style={styles.navButton}
+                        style={{
+                          ...styles.navButton,
+                          position: "absolute",
+                          top: 0,
+                        }}
                       >
                         <Text style={styles.navButtonText}>&lt;</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         onPress={handleNextImage}
-                        style={styles.navButton}
+                        style={{
+                          ...styles.navButton,
+                          position: "absolute",
+                          top: 0,
+                          end: 0,
+                        }}
                       >
                         <Text style={styles.navButtonText}>&gt;</Text>
                       </TouchableOpacity>
                     </View>
-                    <TouchableOpacity>
+                    <View style={{ marginTop: 10 }}>
                       <Text style={styles.selectedActivityTitle}>
                         {selectedActivity.name}
                       </Text>
+                      <View>
+                        <TouchableOpacity
+                          style={{
+                            flex: 1,
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginVertical: 5,
+                            gap: 10,
+                          }}
+                          onPress={() => {
+                            setSelectedActivity(null);
+                            navigate.push("Map", {
+                              name: selectedActivity.name,
+                              location: selectedActivity.location,
+                            });
+                          }}
+                        >
+                          <Text style={{ color: "gray" }}>
+                            {selectedActivity.location}
+                          </Text>
+                          <EvilIcons name="location" size={22} color="black" />
+                        </TouchableOpacity>
+                      </View>
                       <Text style={styles.selectedActivityDescription}>
                         {selectedActivity.description || "No Description"}
                       </Text>
@@ -210,7 +246,7 @@ const HomeScreen = ({ searchResults }) => {
                       <Text style={styles.activityPrice}>
                         {selectedActivity.price}
                       </Text>
-                    </TouchableOpacity>
+                    </View>
                     <View style={styles.buttonContainer}>
                       <TouchableOpacity
                         style={styles.closeButton}
@@ -410,6 +446,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginVertical: 10,
+    position: "absolute",
+    top: 75,
+    left: 10,
+    width: "100%",
   },
   navButton: {
     backgroundColor: "#000",
