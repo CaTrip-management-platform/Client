@@ -35,7 +35,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
   const client = useApolloClient();
   const { loading, error, data } = useQuery(GET_Activity);
 
-  console.log(data.getAllActivity[1])
+  console.log(data)
 
   const sendMessage = async () => {
     try {
@@ -72,42 +72,42 @@ const HomeScreen = ({ searchResults, navigation }) => {
     return <Text style={styles.errorText}>Error: {error.message}</Text>;
   }
 
-  const formatPrice = (price) => `Rp.${price.toLocaleString("id-ID")},-`;
+  const formatPrice = (price) => `Rp.${price},-`;
 
   const activities =
     searchResults.length > 0
       ? searchResults.map((activity) => ({
-          id: activity._id,
-          name: activity.title,
-          rating:
-            activity.reviews && activity.reviews.length > 0
-              ? activity.reviews[0].rating
-              : "N/A",
-          location: activity.location || "Unknown Location",
-          price: formatPrice(activity.price),
-          image:
-            activity.imgUrls && activity.imgUrls.length > 0
-              ? activity.imgUrls[0]
-              : "https://via.placeholder.com/150",
-          description: activity.description,
-        }))
+        id: activity._id,
+        name: activity.title,
+        rating:
+          activity.reviews && activity.reviews.length > 0
+            ? activity.reviews[0].rating
+            : "N/A",
+        location: activity.location || "Unknown Location",
+        price: formatPrice(activity.price),
+        image:
+          activity.imgUrls && activity.imgUrls.length > 0
+            ? activity.imgUrls[0]
+            : "https://via.placeholder.com/150",
+        description: activity.description,
+      }))
       : data.getAllActivity.map((activity) => ({
-          id: activity._id,
-          name: activity.title,
-          rating:
-            activity.reviews && activity.reviews.length > 0
-              ? activity.reviews[0].rating
-              : "N/A",
-          location: activity.location || "Unknown Location",
-          price: formatPrice(activity.price),
-          image:
-            activity.imgUrls && activity.imgUrls.length > 0
-              ? activity.imgUrls[0]
-              : "https://via.placeholder.com/150",
-          description: activity.description,
-          types: activity.types,
-          imgUrls: activity.imgUrls || [],
-        }));
+        id: activity._id,
+        name: activity.title,
+        rating:
+          activity.reviews && activity.reviews.length > 0
+            ? activity.reviews[0].rating
+            : "N/A",
+        location: activity.location || "Unknown Location",
+        price: formatPrice(activity.price),
+        image:
+          activity.imgUrls && activity.imgUrls.length > 0
+            ? activity.imgUrls[0]
+            : "https://via.placeholder.com/150",
+        description: activity.description,
+        types: activity.types,
+        imgUrls: activity.imgUrls || [],
+      }));
 
   const ListHeader = () => (
     <View style={styles.headerContainer}>
