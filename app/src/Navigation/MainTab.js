@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FontAwesome, Feather } from "@expo/vector-icons";
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import HomeScreen from "../screens/HomeScreen";
 import AddScreen from "../screens/AddScreen";
 import SettingsScreen from "../screens/ActivityHistoryScreen";
@@ -93,11 +94,7 @@ export default function MainTab() {
             </View>
           ),
           tabBarIcon: ({ focused, color, size }) => (
-            <FontAwesome
-              name={focused ? "home" : "plane"}
-              size={size}
-              color={color}
-            />
+            <MaterialCommunityIcons name={focused ? "home" : "home-outline"} size={24} color="black" />
           ),
         }}
       />
@@ -106,16 +103,12 @@ export default function MainTab() {
         component={AddScreen}
         options={{
           tabBarLabel: () => null,
-          tabBarStyle: { backgroundColor: "black" },
-          headerStyle: { backgroundColor: "black" },
+          tabBarStyle: { backgroundColor: "white" },
+          headerStyle: { backgroundColor: "white" },
           headerTitleAlign: "center",
           headerTitle: () => <LogoTitle />,
           tabBarIcon: ({ focused, color, size }) => (
-            <FontAwesome
-              name={focused ? "search" : "globe"}
-              size={size}
-              color={color}
-            />
+            <MaterialIcons name={focused ? "add-location-alt" : "add-location"} size={24} color="black" />
           ),
         }}
       />
@@ -124,8 +117,8 @@ export default function MainTab() {
         component={Map}
         options={{
           tabBarLabel: () => null,
-          tabBarStyle: { backgroundColor: "black" },
-          headerStyle: { backgroundColor: "black" },
+          tabBarStyle: { backgroundColor: "white" },
+          headerStyle: { backgroundColor: "white" },
           headerTitleAlign: "center",
           headerTitle: () => <LogoTitle />,
           tabBarIcon: ({ focused, color, size }) => (
@@ -142,8 +135,8 @@ export default function MainTab() {
         component={SettingsScreen}
         options={{
           tabBarLabel: () => null,
-          tabBarStyle: { backgroundColor: "black" },
-          headerStyle: { backgroundColor: "black" },
+          tabBarStyle: { backgroundColor: "white" },
+          headerStyle: { backgroundColor: "white" },
           headerTitleAlign: "center",
           headerTitle: () => <LogoTitle />,
           tabBarIcon: ({ focused, color, size }) => (
