@@ -3,10 +3,10 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { StyleSheet, View } from "react-native";
 import * as Location from "expo-location";
 
-export default function Map({ name, location, coords }) {
+export default function Map({ route, navigation }) {
+  const { name, location, coords } = route.params;
   const [mapLocation, setMapLocation] = useState(null);
   const [deniedMessage, setDeniedMessage] = useState(null);
-
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -18,7 +18,7 @@ export default function Map({ name, location, coords }) {
       let location = await Location.getCurrentPositionAsync({});
       setMapLocation(location);
     })();
-    console.log(coords);
+    console.log(name, location, coords, '<<<');
   }, []);
 
   return (

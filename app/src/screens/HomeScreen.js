@@ -75,39 +75,39 @@ const HomeScreen = ({ searchResults, navigation }) => {
   const activities =
     searchResults.length > 0
       ? searchResults.map((activity) => ({
-          id: activity._id,
-          name: activity.title,
-          rating:
-            activity.reviews && activity.reviews.length > 0
-              ? activity.reviews[0].rating
-              : "N/A",
-          location: activity.location || "Unknown Location",
-          price: formatPrice(activity.price),
-          image:
-            activity.imgUrls && activity.imgUrls.length > 0
-              ? activity.imgUrls[0]
-              : "https://via.placeholder.com/150",
-          description: activity.description,
-          coords: activity.coords,
-        }))
+        id: activity._id,
+        name: activity.title,
+        rating:
+          activity.reviews && activity.reviews.length > 0
+            ? activity.reviews[0].rating
+            : "N/A",
+        location: activity.location || "Unknown Location",
+        price: formatPrice(activity.price),
+        image:
+          activity.imgUrls && activity.imgUrls.length > 0
+            ? activity.imgUrls[0]
+            : "https://via.placeholder.com/150",
+        description: activity.description,
+        coords: activity.coords,
+      }))
       : data.getAllActivity.map((activity) => ({
-          id: activity._id,
-          name: activity.title,
-          rating:
-            activity.reviews && activity.reviews.length > 0
-              ? activity.reviews[0].rating
-              : "N/A",
-          location: activity.location || "Unknown Location",
-          price: formatPrice(activity.price),
-          image:
-            activity.imgUrls && activity.imgUrls.length > 0
-              ? activity.imgUrls[0]
-              : "https://via.placeholder.com/150",
-          description: activity.description,
-          types: activity.types,
-          imgUrls: activity.imgUrls || [],
-          coords: activity.coords,
-        }));
+        id: activity._id,
+        name: activity.title,
+        rating:
+          activity.reviews && activity.reviews.length > 0
+            ? activity.reviews[0].rating
+            : "N/A",
+        location: activity.location || "Unknown Location",
+        price: formatPrice(activity.price),
+        image:
+          activity.imgUrls && activity.imgUrls.length > 0
+            ? activity.imgUrls[0]
+            : "https://via.placeholder.com/150",
+        description: activity.description,
+        types: activity.types,
+        imgUrls: activity.imgUrls || [],
+        coords: activity.coords,
+      }));
 
   const ListHeader = () => (
     <View style={styles.headerContainer}>
