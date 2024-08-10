@@ -5,6 +5,7 @@ query GetAllActivity {
   getAllActivity {
     _id
     title
+    price
     imgUrls
     reviews {
       content
@@ -14,14 +15,17 @@ query GetAllActivity {
       updatedAt
     }
     description
-
+    userId
     tags
     createdAt
     updatedAt
     customers
     location
-    price
-    userId
+    coords {
+      latitude
+      longitude
+    }
   }
+
 }
 `;
