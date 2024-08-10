@@ -11,14 +11,14 @@ import {
   TextInput,
   ScrollView,
   Keyboard,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
 } from "react-native";
 import { useQuery, useApolloClient, gql } from "@apollo/client";
 import { GET_Activity } from "../queries/getAllActivity";
 import { ActivityIndicator } from "react-native-paper";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ImageViewer from "react-native-image-zoom-viewer";
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 
 const HomeScreen = ({ searchResults }) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -159,143 +159,153 @@ const HomeScreen = ({ searchResults }) => {
 
       {/* Activity Detail Modal */}
       {selectedActivity && (
-  <Modal
-    visible={activityModalVisible}
-    transparent={true}
-    animationType="slide"
-    onRequestClose={() => setActivityModalVisible(false)}
-  >
-    <TouchableWithoutFeedback onPress={() => setActivityModalVisible(false)}>
-      <View style={styles.modalOverlay}>
-        <TouchableWithoutFeedback>
-          <View style={styles.modalContainer}>
-            <ScrollView contentContainerStyle={styles.scrollViewContent}>
-              <TouchableOpacity onPress={() => setShowImageViewer(true)}>
-                <Image
-                  source={{
-                    uri: selectedActivity.imgUrls[currentImageIndex],
-                  }}
-                  style={styles.selectedActivityImage}
-                />
-              </TouchableOpacity>
-              <View style={styles.imageNavigationContainer}>
-                <TouchableOpacity
-                  onPress={handlePrevImage}
-                  style={styles.navButton}
-                >
-                  <Text style={styles.navButtonText}>&lt;</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={handleNextImage}
-                  style={styles.navButton}
-                >
-                  <Text style={styles.navButtonText}>&gt;</Text>
-                </TouchableOpacity>
-              </View>
-              <TouchableOpacity>
-              <Text style={styles.selectedActivityTitle}>
-                {selectedActivity.name}
-              </Text>
-              <Text style={styles.selectedActivityDescription}>
-                {selectedActivity.description || "No Description"}
-              </Text>
-              <Text style={styles.selectedActivityRating}>
-                Rating: {selectedActivity.rating}
-              </Text>
-              <Text style={styles.modalLabel}>Price:</Text>
-              <Text style={styles.activityPrice}>
-                {selectedActivity.price}
-              </Text>
-              </TouchableOpacity>
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={styles.closeButton}
-                  onPress={() => setActivityModalVisible(false)}
-                >
-                  <Text style={styles.closeButtonText}>Close</Text>
-                </TouchableOpacity>
-              </View>
-            </ScrollView>
-          </View>
-        </TouchableWithoutFeedback>
-      </View>
-    </TouchableWithoutFeedback>
-
-    {/* Image Viewer Modal */}
-    {showImageViewer && (
-      <Modal
-        visible={showImageViewer}
-        transparent={true}
-        onRequestClose={() => setShowImageViewer(false)}
-      >
-        <View style={styles.imageViewerContainer}>
-          <ImageViewer
-            imageUrls={selectedActivity.imgUrls.map((url) => ({ url }))}
-            enableImageZoom={true}
-            enableSwipeDown={true}
-            onSwipeDown={() => setShowImageViewer(false)}
-          />
-        </View>
-      </Modal>
-    )}
-  </Modal>
-)}
-      {/* AI Modal */}
-     {modalVisible && (
-  <Modal
-    visible={modalVisible}
-    transparent={true}
-    animationType="slide"
-    onRequestClose={() => setModalVisible(false)}
-  >
-    <TouchableOpacity
-      style={styles.modalOverlay}
-      activeOpacity={1}
-      onPressOut={() => setModalVisible(false)}
-    >
-      <View style={styles.modalContainer} onStartShouldSetResponder={() => true}>
-        <FlatList
-          data={aiMessages}
-          renderItem={({ item }) => (
-            <TouchableOpacity>
-            <View
-              style={
-                item.type === "ai" ? styles.aiMessage : styles.userMessage
-              }
-            >
-              <Text style={styles.messageText}>{item.text}</Text>
-            </View>
-              </TouchableOpacity>
-          )}
-          keyExtractor={(item, index) => index.toString()}
-          style={styles.messagesList}
-          contentContainerStyle={{ flexGrow: 1, justifyContent: "flex-end" }}
-        />
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            value={userMessage}
-            onChangeText={setUserMessage}
-            placeholder="Type your message"
-            placeholderTextColor="#888"
-          />
-          <TouchableOpacity
-            onPress={sendMessage}
-            style={styles.sendButton}
-          >
-            <Text style={styles.sendButtonText}>Send</Text>
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity
-          style={styles.closeIcon}
-          onPress={() => setModalVisible(false)}
+        <Modal
+          visible={activityModalVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setActivityModalVisible(false)}
         >
-          <Ionicons name="close" size={30} color="#fff" />
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
-  </Modal>
-)}
+          <TouchableWithoutFeedback
+            onPress={() => setActivityModalVisible(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <TouchableWithoutFeedback>
+                <View style={styles.modalContainer}>
+                  <ScrollView contentContainerStyle={styles.scrollViewContent}>
+                    <TouchableOpacity onPress={() => setShowImageViewer(true)}>
+                      <Image
+                        source={{
+                          uri: selectedActivity.imgUrls[currentImageIndex],
+                        }}
+                        style={styles.selectedActivityImage}
+                      />
+                    </TouchableOpacity>
+                    <View style={styles.imageNavigationContainer}>
+                      <TouchableOpacity
+                        onPress={handlePrevImage}
+                        style={styles.navButton}
+                      >
+                        <Text style={styles.navButtonText}>&lt;</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={handleNextImage}
+                        style={styles.navButton}
+                      >
+                        <Text style={styles.navButtonText}>&gt;</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <TouchableOpacity>
+                      <Text style={styles.selectedActivityTitle}>
+                        {selectedActivity.name}
+                      </Text>
+                      <Text style={styles.selectedActivityDescription}>
+                        {selectedActivity.description || "No Description"}
+                      </Text>
+                      <Text style={styles.selectedActivityRating}>
+                        Rating: {selectedActivity.rating}
+                      </Text>
+                      <Text style={styles.modalLabel}>Price:</Text>
+                      <Text style={styles.activityPrice}>
+                        {selectedActivity.price}
+                      </Text>
+                    </TouchableOpacity>
+                    <View style={styles.buttonContainer}>
+                      <TouchableOpacity
+                        style={styles.closeButton}
+                        onPress={() => setActivityModalVisible(false)}
+                      >
+                        <Text style={styles.closeButtonText}>Close</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </ScrollView>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+
+          {/* Image Viewer Modal */}
+          {showImageViewer && (
+            <Modal
+              visible={showImageViewer}
+              transparent={true}
+              onRequestClose={() => setShowImageViewer(false)}
+            >
+              <View style={styles.imageViewerContainer}>
+                <ImageViewer
+                  imageUrls={selectedActivity.imgUrls.map((url) => ({ url }))}
+                  enableImageZoom={true}
+                  enableSwipeDown={true}
+                  onSwipeDown={() => setShowImageViewer(false)}
+                />
+              </View>
+            </Modal>
+          )}
+        </Modal>
+      )}
+      {/* AI Modal */}
+      {modalVisible && (
+        <Modal
+          visible={modalVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPressOut={() => setModalVisible(false)}
+          >
+            <View
+              style={styles.modalContainer}
+              onStartShouldSetResponder={() => true}
+            >
+              <FlatList
+                data={aiMessages}
+                renderItem={({ item }) => (
+                  <TouchableOpacity>
+                    <View
+                      style={
+                        item.type === "ai"
+                          ? styles.aiMessage
+                          : styles.userMessage
+                      }
+                    >
+                      <Text style={styles.messageText}>{item.text}</Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
+                keyExtractor={(item, index) => index.toString()}
+                style={styles.messagesList}
+                contentContainerStyle={{
+                  flexGrow: 1,
+                  justifyContent: "flex-end",
+                }}
+              />
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.textInput}
+                  value={userMessage}
+                  onChangeText={setUserMessage}
+                  placeholder="Type your message"
+                  placeholderTextColor="#888"
+                />
+                <TouchableOpacity
+                  onPress={sendMessage}
+                  style={styles.sendButton}
+                >
+                  <Text style={styles.sendButtonText}>Send</Text>
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity
+                style={styles.closeIcon}
+                onPress={() => setModalVisible(false)}
+              >
+                <Ionicons name="close" size={30} color="#fff" />
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+      )}
 
       {/* Floating Action Button */}
       <TouchableOpacity
@@ -378,8 +388,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
-    
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContainer: {
     backgroundColor: "#fff",
