@@ -279,6 +279,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
         </Modal>
       )}
       {/* AI Modal */}
+   {/* AI Modal */}
       {modalVisible && (
         <Modal
           visible={modalVisible}
@@ -295,6 +296,15 @@ const HomeScreen = ({ searchResults, navigation }) => {
               style={styles.modalContainer}
               onStartShouldSetResponder={() => true}
             >
+              <View style={styles.headerContainer}>
+                <TouchableOpacity
+                  style={styles.closeIcon}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Ionicons name="close" size={15} color="#fff" />
+                </TouchableOpacity>
+                <Text style={styles.headerText}>Ask Something?</Text>
+              </View>
               <FlatList
                 data={aiMessages}
                 renderItem={({ item }) => (
@@ -332,16 +342,11 @@ const HomeScreen = ({ searchResults, navigation }) => {
                   <Text style={styles.sendButtonText}>Send</Text>
                 </TouchableOpacity>
               </View>
-              <TouchableOpacity
-                style={styles.closeIcon}
-                onPress={() => setModalVisible(false)}
-              >
-                <Ionicons name="close" size={30} color="#fff" />
-              </TouchableOpacity>
             </View>
           </TouchableOpacity>
         </Modal>
       )}
+
 
       {/* Floating Action Button */}
       <TouchableOpacity

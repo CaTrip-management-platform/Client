@@ -3,36 +3,43 @@ import { View, Text, StyleSheet, Image, FlatList, ActivityIndicator } from "reac
 import { useQuery } from "@apollo/client";
 import { StatusBar } from "expo-status-bar";
 import * as SecureStore from "expo-secure-store";
-import jwtDecode from "jwt-decode";
+import {jwtDecode} from 'jwt-decode';
 import { GET_TRIPS_BY_CUSTOMER_ID } from "../queries/getTripsByCustomerId";
 
 function ActivityHistoryScreen() {
   const [userId, setUserId] = useState("");
+
   const { loading, error, data } = useQuery(GET_TRIPS_BY_CUSTOMER_ID, {
     variables: { id: userId },
     skip: !userId,
   });
 
-  const fetchTokenData = async () => {
-    try {
-      const token = await SecureStore.getItemAsync("accessToken");
-      if (token) {
-        const decoded = jwtDecode(token);
-        setUserId(decoded._id);
-      }
-    } catch (error) {
-      console.error("Error fetching token data:", error);
-    }
-  };
-
+  console.log(data)
   useEffect(() => {
+    const fetchTokenData = async () => {
+      try {
+        const token = await SecureStore.getItemAsync("accessToken");
+        if (token) {
+          try {
+            const decoded = jwtDecode(token);
+            setUserId(decoded.id);
+           
+          } catch (decodeError) {
+            console.error("Error decoding token:", decodeError);
+          }
+        } else {
+          console.log("No token found");
+        }
+      } catch (error) {
+        console.error("Error fetching token data:", error);
+      }
+    };
+
     fetchTokenData();
   }, []);
 
   if (loading) {
-    return (
-      <ActivityIndicator size="large" color="blue" style={styles.loader} />
-    );
+    return <ActivityIndicator size="large" color="blue" style={styles.loader} />;
   }
 
   if (error) {
@@ -43,10 +50,7 @@ function ActivityHistoryScreen() {
 
   const renderTrip = ({ item }) => (
     <View style={styles.card}>
-      <Image
-        source={{ uri: item.imgUrls?.[0] || "https://via.placeholder.com/150" }}
-        style={styles.cardImage}
-      />
+   
       <View style={styles.cardContent}>
         <Text style={styles.cardTitle}>{item.destination}</Text>
         <Text style={styles.cardDate}>

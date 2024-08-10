@@ -20,17 +20,33 @@ function LoginScreen({ navigation }) {
   const [password, setPassword] = useState("");
   const { setIsSignedIn } = useContext(AuthContext);
   const [loginFn, { loading, error, data }] = useMutation(LOGIN_USER);
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
+  const [loginError, setLoginError] = useState(null);
+
+  const handleLogin = async () => {
+    try {
+      const result = await loginFn({ variables: { password, username } });
+      console.log(result, "<==");
+
+    
+      const token = result?.data?.login?.access_token;
+
+      if (typeof token === 'string') {
+        await SecureStore.setItemAsync("accessToken", token);
+        console.log("Stored Token:", await SecureStore.getItemAsync("accessToken"));
+        setIsSignedIn(true);
+      } else {
+        console.error("Token is not a string or is undefined");
+        setLoginError("Invalid token received");
+      }
+    } catch (err) {
+      console.error("Login Error:", err);
+      setLoginError("Login failed. Please try again.");
+    }
+  };
 
   return (
     <ImageBackground
-      src="https://marketplace.canva.com/EAGD_Vn7lkQ/1/0/900w/canva-blue-and-white-modern-watercolor-background-instagram-story-L-nceizV6kA.jpg"
+      source={{ uri: "https://marketplace.canva.com/EAGD_Vn7lkQ/1/0/900w/canva-blue-and-white-modern-watercolor-background-instagram-story-L-nceizV6kA.jpg" }}
       style={styles.container}
     >
       <StatusBar style="dark" />
@@ -54,44 +70,42 @@ function LoginScreen({ navigation }) {
           onChangeText={setPassword}
         />
       </View>
-      <View style={styles.btnContainer}>
-        <TouchableOpacity
-          style={styles.loginBtn}
-          onPress={async () => {
-            // console.log(username, password, '<==')
-            const result = await loginFn({
-              variables: { password, username },
-            });
-            console.log(result, "<==");
 
-            setIsSignedIn(true);
-
-            await SecureStore.setItemAsync(
-              "accessToken",
-              result.data.login.accessToken
-            );
-          }}
-        >
-          <Text style={styles.loginText}>Login</Text>
-        </TouchableOpacity>
-        <Image style={styles.car} source={require("../../assets/car.png")} />
-        <View style={styles.roadContainer}>
-          <View style={styles.road} />
-          <View style={styles.road} />
-          <View style={styles.road} />
-          <View style={styles.road} />
-          <View style={styles.road} />
+      {loginError && (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{loginError}</Text>
         </View>
+      )}
 
-        <TouchableOpacity
-          style={styles.regis}
-          onPress={() => {
-            navigation.navigate("Register");
-          }}
-        >
-          <Text style={styles.loginText}>To Register</Text>
-        </TouchableOpacity>
-      </View>
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" />
+        </View>
+      ) : (
+        <View style={styles.btnContainer}>
+          <TouchableOpacity
+            style={styles.loginBtn}
+            onPress={handleLogin}
+          >
+            <Text style={styles.loginText}>Login</Text>
+          </TouchableOpacity>
+          <Image style={styles.car} source={require("../../assets/car.png")} />
+          <View style={styles.roadContainer}>
+            <View style={styles.road} />
+            <View style={styles.road} />
+            <View style={styles.road} />
+            <View style={styles.road} />
+            <View style={styles.road} />
+          </View>
+
+          <TouchableOpacity
+            style={styles.regis}
+            onPress={() => navigation.navigate("Register")}
+          >
+            <Text style={styles.loginText}>To Register</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </ImageBackground>
   );
 }
@@ -122,7 +136,6 @@ const styles = StyleSheet.create({
     color: "#134B70",
   },
   loginBtn: {
-    // width: "10",
     backgroundColor: "#134B70",
     height: 50,
     alignItems: "center",
@@ -144,12 +157,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 7,
   },
   regis: {
-    // width: "100%",
     backgroundColor: "#134B70",
     height: 50,
     alignItems: "center",
     justifyContent: "center",
-    // marginTop: 3,
     marginBottom: 10,
   },
   loginText: {
@@ -177,10 +188,9 @@ const styles = StyleSheet.create({
     left: "73%",
     width: 130,
     height: 65,
-    // transform: [{ rotate: '90deg' }],
-    zIndex: 1, // Make sure car is on top of other elements
-    marginLeft: -32.5, // Adjust position to center the car
-    marginTop: 10, // Adjust position to be on top of the button
+    zIndex: 1,
+    marginLeft: -32.5,
+    marginTop: 10,
   },
   btnContainer: {
     // flex: 1

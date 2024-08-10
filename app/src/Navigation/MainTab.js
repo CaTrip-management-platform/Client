@@ -10,7 +10,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FontAwesome, Feather } from "@expo/vector-icons";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import HomeScreen from "../screens/HomeScreen";
-import AddScreen from "../screens/AddScreen";
+import AddTripUserScreen from "../screens/AddTripUserScreen"; // Update import path if necessary
 import SettingsScreen from "../screens/ActivityHistoryScreen";
 import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../context/authContext";
@@ -18,7 +18,9 @@ import { Icon } from "react-native-paper";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useQuery } from "@apollo/client";
 import { SEARCH_ACTIVITY } from "../queries/searchActivity.js";
-import Map from "../googleMap/Map.js";
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+
+
 const Tab = createBottomTabNavigator();
 
 export function LogoTitle() {
@@ -99,8 +101,8 @@ export default function MainTab() {
         }}
       />
       <Tab.Screen
-        name="Add"
-        component={AddScreen}
+        name="AddTrip"
+        component={AddTripUserScreen}
         options={{
           tabBarLabel: () => null,
           tabBarStyle: { backgroundColor: "white" },
@@ -112,12 +114,25 @@ export default function MainTab() {
           ),
         }}
       />
-
+      {/* <Tab.Screen
+        name="Add"
+        component={AddScreen}
+        options={{
+          tabBarLabel: () => null,
+          tabBarIcon: ({ focused, color, size }) => (
+            <MaterialIcons name={focused ? "add-location-alt" : "add-location"} size={24} color="black" />
+          ),
+          headerStyle: { backgroundColor: "white" },
+          headerTitleAlign: "center",
+          headerTitle: () => <LogoTitle />,
+        }}
+      /> */}
       <Tab.Screen
         name="Profile"
         component={SettingsScreen}
         options={{
           tabBarLabel: () => null,
+          headerLeft: () => <FontAwesome5 name="plus-circle" size={24} color="black" style={styles.headerIcon} onPress={() => navigation.push("Add")} />,
           tabBarStyle: { backgroundColor: "white" },
           headerStyle: { backgroundColor: "white" },
           headerTitleAlign: "center",
@@ -142,8 +157,6 @@ const styles = StyleSheet.create({
   },
   addContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     justifyContent: "center",
     alignItems: "center",
   },
