@@ -7,6 +7,7 @@ query Query($searchTerm: String) {
     location
     imgUrls
     description
+    price
     reviews {
       content
       username
