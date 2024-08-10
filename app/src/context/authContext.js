@@ -2,7 +2,7 @@ import React, { createContext, useState } from "react";
 
 export const AuthContext = createContext({
   isSignedIn: false,
-  setIsSignedIn: () => {},
+  setIsSignedIn: () => { },
 });
 
 export default function AuthProvider({ children }) {
