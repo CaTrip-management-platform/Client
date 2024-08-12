@@ -280,72 +280,78 @@ const HomeScreen = ({ searchResults, navigation }) => {
       )}
       {/* AI Modal */}
    {/* AI Modal */}
-      {modalVisible && (
-        <Modal
-          visible={modalVisible}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => setModalVisible(false)}
+    {modalVisible && (
+  <Modal
+    visible={modalVisible}
+    transparent={true}
+    animationType="slide"
+    onRequestClose={() => setModalVisible(false)}
+    style={styles.modalContainer}
+  >
+    <TouchableOpacity
+      style={styles.modalOverlay}
+      activeOpacity={1}
+      onPressOut={() => setModalVisible(false)}
+    >
+      <View style={styles.modalContainer}>
+        <ImageBackground
+          source={{
+            uri: "https://5.imimg.com/data5/SELLER/Default/2023/7/322745470/DM/IE/MR/127740382/whatsapp-image-2023-07-05-at-6-40-02-pm.jpeg",
+          }}
+          style={styles.backgroundImage}
+          onStartShouldSetResponder={() => true}
         >
-          <TouchableOpacity
-            style={styles.modalOverlay}
-            activeOpacity={1}
-            onPressOut={() => setModalVisible(false)}
-          >
-            <View
-              style={styles.modalContainer}
-              onStartShouldSetResponder={() => true}
+          <View style={styles.headerContainer}>
+            <TouchableOpacity
+              style={styles.closeIcon}
+              onPress={() => setModalVisible(false)}
             >
-              <View style={styles.headerContainer}>
-                <TouchableOpacity
-                  style={styles.closeIcon}
-                  onPress={() => setModalVisible(false)}
+              <Ionicons name="close" size={15} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.headerText}>Ask Something?</Text>
+          </View>
+          <FlatList
+            data={aiMessages}
+            renderItem={({ item }) => (
+              <TouchableOpacity>
+                <View
+                  style={
+                    item.type === "ai"
+                      ? styles.aiMessage
+                      : styles.userMessage
+                  }
                 >
-                  <Ionicons name="close" size={15} color="#fff" />
-                </TouchableOpacity>
-                <Text style={styles.headerText}>Ask Something?</Text>
-              </View>
-              <FlatList
-                data={aiMessages}
-                renderItem={({ item }) => (
-                  <TouchableOpacity>
-                    <View
-                      style={
-                        item.type === "ai"
-                          ? styles.aiMessage
-                          : styles.userMessage
-                      }
-                    >
-                      <Text style={styles.messageText}>{item.text}</Text>
-                    </View>
-                  </TouchableOpacity>
-                )}
-                keyExtractor={(item, index) => index.toString()}
-                style={styles.messagesList}
-                contentContainerStyle={{
-                  flexGrow: 1,
-                  justifyContent: "flex-end",
-                }}
-              />
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.textInput}
-                  value={userMessage}
-                  onChangeText={setUserMessage}
-                  placeholder="Type your message"
-                  placeholderTextColor="#888"
-                />
-                <TouchableOpacity
-                  onPress={sendMessage}
-                  style={styles.sendButton}
-                >
-                  <Text style={styles.sendButtonText}>Send</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </TouchableOpacity>
-        </Modal>
-      )}
+                  <Text style={styles.messageText}>{item.text}</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+            keyExtractor={(item, index) => index.toString()}
+            style={styles.messagesList}
+            contentContainerStyle={{
+              flexGrow: 1,
+              justifyContent: "flex-end",
+            }}
+          />
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.textInput}
+              value={userMessage}
+              onChangeText={setUserMessage}
+              placeholder="Type your message"
+              placeholderTextColor="#888"
+            />
+            <TouchableOpacity
+              onPress={sendMessage}
+              style={styles.sendButton}
+            >
+              <Text style={styles.sendButtonText}>Send</Text>
+            </TouchableOpacity>
+          </View>
+        </ImageBackground>
+      </View>
+    </TouchableOpacity>
+  </Modal>
+)}
 
 
       {/* Floating Action Button */}
@@ -428,10 +434,12 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#fff",
     elevation: 3,
+    borderRadius: 10,
   },
   headerContent: {
     flexDirection: "row",
     alignItems: "center",
+    
   },
   sectionTitle: {
     fontSize: 20,
@@ -446,6 +454,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+    
   },
   modalContainer: {
     backgroundColor: "#fff",
@@ -586,12 +595,17 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 8,
 
-    backgroundColor: "red",
+    backgroundColor: "#FFC436",
     borderRadius: 50,
     padding: 9,
 
     left: 10,
   },
+// modalContainer: {
+
+//     borderRadius: 30,
+
+// },
 });
 
 export default HomeScreen;
