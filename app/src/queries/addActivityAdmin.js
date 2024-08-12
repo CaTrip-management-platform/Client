@@ -22,4 +22,4 @@ mutation AddActivityForSeller($title: String, $price: Int, $imgurls: [String], $
       updatedAt
     }
   }
-}`
+}` 

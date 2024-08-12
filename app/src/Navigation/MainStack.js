@@ -16,7 +16,7 @@ import AddScreen from "../screens/AddScreen";
 const Stack = createNativeStackNavigator();
 
 const AuthStack = () => (
-  <Stack.Navigator initialRouteName="Login">
+  <Stack.Navigator initialRouteName="Login"> 
     <Stack.Screen
       name="Register"
       component={RegisterScreen}

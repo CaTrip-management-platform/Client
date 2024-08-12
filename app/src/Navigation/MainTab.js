@@ -95,7 +95,7 @@ export default function MainTab() {
           //       style={styles.headerIcon}
           //     />
           //   </View>
-          // ),
+          // ), 
           tabBarIcon: ({ focused, color, size }) => (
             <MaterialCommunityIcons name={focused ? "home" : "home-outline"} size={24} color="black" />
           ),

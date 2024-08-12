@@ -25,7 +25,7 @@ const AddTripScreen = () => {
       });
       if (data) {
         Alert.alert("Success", data.addTrip.message)
-      }
+      } 
       navigate.navigate("Profile")
     } catch (err) {
       Alert.alert("Error", err.message);

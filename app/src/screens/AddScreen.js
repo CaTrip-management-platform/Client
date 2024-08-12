@@ -110,7 +110,7 @@ const AddActivityScreen = ({ navigation }) => {
               const newTags = [...tags];
               newTags[index] = text;
               setTags(newTags);
-            }}
+            }} 
             placeholder={`Tag ${index + 1}`}
           />
           <TouchableOpacity onPress={() => handleRemoveTag(index)}>

@@ -24,4 +24,4 @@ query GetAllActivity {
     userId
   }
 }
-`;
+`; 
