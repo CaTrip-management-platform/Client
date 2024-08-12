@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
 import { useMutation } from "@apollo/client";
 import { ADD_TRIP_USER } from "../queries/addTrip";
+import { useNavigation } from "@react-navigation/native";
 
 const AddTripScreen = () => {
   const [destination, setDestination] = useState("");
@@ -9,6 +10,8 @@ const AddTripScreen = () => {
   const [endDate, setEndDate] = useState("");
   const [addTrip, { data, loading, error }] = useMutation(ADD_TRIP_USER);
 
+
+  const navigate = useNavigation();
   const handleSubmit = async () => {
     try {
       await addTrip({
@@ -21,8 +24,9 @@ const AddTripScreen = () => {
         },
       });
       if (data) {
-        Alert.alert("Success", data.addTrip.message);
-      }
+        Alert.alert("Success", data.addTrip.message)
+      } 
+      navigate.navigate("Profile")
     } catch (err) {
       Alert.alert("Error", err.message);
     }

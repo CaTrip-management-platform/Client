@@ -29,7 +29,7 @@ function LoginScreen({ navigation }) {
 
     
       const token = result?.data?.login?.access_token;
-
+ 
       if (typeof token === 'string') {
         await SecureStore.setItemAsync("accessToken", token);
         console.log("Stored Token:", await SecureStore.getItemAsync("accessToken"));

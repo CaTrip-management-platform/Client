@@ -24,7 +24,7 @@ function DetailsScreen({ route }) {
         <ActivityIndicator size="large" />
       </View>
     );
-  }
+  } 
 
   if (error) {
     return (

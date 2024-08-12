@@ -28,4 +28,4 @@ query GetAllActivity {
   }
 
 }
-`;
+`; 
