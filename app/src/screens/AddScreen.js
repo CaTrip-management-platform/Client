@@ -14,6 +14,7 @@ import { ADD_ACTIVITY } from "../queries/addActivityAdmin";
 import { GET_ACTIVITY } from "../queries/getAllActivity";
 import MapView, { Marker } from "react-native-maps";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+// import { GOOGLE_MAPS_API_KEY } from "@env";
 
 const AddActivityScreen = ({ navigation }) => {
   const [title, setTitle] = useState("");
@@ -47,6 +48,7 @@ const AddActivityScreen = ({ navigation }) => {
         1000
       );
     }
+    // console.log(GOOGLE_MAPS_API_KEY);
   }, [coords]);
 
   const [addActivity] = useMutation(ADD_ACTIVITY, {
@@ -185,7 +187,7 @@ const AddActivityScreen = ({ navigation }) => {
             setLocation(data.description);
           }}
           query={{
-            key: process.env.GOOGLE_MAPS_API_KEY,
+            key: "AIzaSyAnEU34u_1aoWcg5hsNQ-e312z-EIWvXF4",
             language: "en",
           }}
           styles={{
