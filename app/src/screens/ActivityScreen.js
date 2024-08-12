@@ -11,40 +11,17 @@ import {
 } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
-
-const dataToRender = [
-  {
-    _id: "66b990c42a1d478f78d13793",
-    activities: [Array],
-    createdAt: "2024-08-12T04:34:12.084Z",
-    customer: [Object],
-    customerId: "66b1ab1a1f8a522270a599d2",
-    destination: "Jerman",
-    endDate: "2024-11-30T17:00:00.000Z",
-    paymentStatus: "Pending",
-    startDate: "2024-10-31T17:00:00.000Z",
-    totalPrice: 0,
-    updatedAt: "2024-08-12T04:34:12.084Z"
-  },
-  {
-    _id: "66b604d8498891e633cda568",
-    activities: [Array],
-    createdAt: "2024-08-09T12:00:24.959Z",
-    customer: [Object],
-    customerId: "66b1ab1a1f8a522270a599d2",
-    destination: "Hong Kong",
-    endDate: "2024-09-20T00:00:00.000Z",
-    paymentStatus: "Pending",
-    startDate: "2024-09-10T00:00:00.000Z",
-    totalPrice: 300000,
-    updatedAt: "2024-08-09T12:00:24.959Z"
-  }
-];
+import { useQuery } from "@apollo/client";
+import { GET_TRIPS_BY_CUSTOMER_ID } from "../queries/getTripsByCustomerId";
 
 const ActivityScreen = () => {
   const [timeline, setTimeline] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+
+  const { loading, error, data } = useQuery(GET_TRIPS_BY_CUSTOMER_ID);
+  console.log(data)
+  const dataToRender = data.getTripsByCustomerId
 
   const getData = async (key) => {
     try {
