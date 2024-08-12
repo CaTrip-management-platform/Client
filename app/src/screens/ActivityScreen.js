@@ -1,90 +1,83 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
   Image,
   StyleSheet,
   FlatList,
-  TouchableOpacity,
   ImageBackground,
   Modal,
+  TouchableOpacity,
 } from "react-native";
-import { GET_Activity } from "../queries/getAllActivity";
-import { useQuery } from "@apollo/client";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
+
+const dataToRender = [
+  {
+    _id: "66b990c42a1d478f78d13793",
+    activities: [Array],
+    createdAt: "2024-08-12T04:34:12.084Z",
+    customer: [Object],
+    customerId: "66b1ab1a1f8a522270a599d2",
+    destination: "Jerman",
+    endDate: "2024-11-30T17:00:00.000Z",
+    paymentStatus: "Pending",
+    startDate: "2024-10-31T17:00:00.000Z",
+    totalPrice: 0,
+    updatedAt: "2024-08-12T04:34:12.084Z"
+  },
+  {
+    _id: "66b604d8498891e633cda568",
+    activities: [Array],
+    createdAt: "2024-08-09T12:00:24.959Z",
+    customer: [Object],
+    customerId: "66b1ab1a1f8a522270a599d2",
+    destination: "Hong Kong",
+    endDate: "2024-09-20T00:00:00.000Z",
+    paymentStatus: "Pending",
+    startDate: "2024-09-10T00:00:00.000Z",
+    totalPrice: 300000,
+    updatedAt: "2024-08-09T12:00:24.959Z"
+  }
+];
 
 const ActivityScreen = () => {
-  const [activeView, setActiveView] = useState("Recommendations");
-  const [selectedActivity, setSelectedActivity] = useState(null);
   const [timeline, setTimeline] = useState([]);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
-  const { loading, error, data } = useQuery(GET_Activity);
-  const activities = data?.getAllActivity || [];
-  // console.log(JSON.stringify(activities, null, 2));
-
-  const handleAddToTimeline = () => {
-    if (selectedActivity) {
-      setTimeline([selectedActivity, ...timeline]);
-      setSelectedActivity(null);
-    } else {
-      alert("Please select an activity first.");
+  const getData = async (key) => {
+    try {
+      const value = await AsyncStorage.getItem(key);
+      return value ? JSON.parse(value) : [];
+    } catch (error) {
+      console.error('Error retrieving data:', error);
+      return [];
     }
   };
 
-  const handleDeleteActivity = (id) => {
-    const updatedTimeline = timeline.filter((item) => item._id !== id);
-    setTimeline(updatedTimeline);
-  };
+  const fetchTimeline = useCallback(async () => {
+    const storedTimeline = await getData('timelineData');
+    setTimeline(storedTimeline);
+  }, []);
 
-  const handleCloseDetails = () => {
-    setSelectedActivity(null);
-    setCurrentImageIndex(0);
-  };
-
-  const goToPreviousImage = () => {
-    if (selectedActivity?.imgUrls?.length > 0) {
-      setCurrentImageIndex((prevIndex) =>
-        prevIndex > 0 ? prevIndex - 1 : selectedActivity.imgUrls.length - 1
-      );
-    }
-  };
-
-  const goToNextImage = () => {
-    if (selectedActivity?.imgUrls?.length > 0) {
-      setCurrentImageIndex((prevIndex) =>
-        prevIndex < selectedActivity.imgUrls.length - 1 ? prevIndex + 1 : 0
-      );
-    }
-  };
-
-  const renderActivityCard = ({ item }) => (
-    <TouchableOpacity
-      style={styles.recommendationCard}
-      onPress={() => setSelectedActivity(item)}
-    >
-      {item.imgUrls && item.imgUrls.length > 0 ? (
-        <Image
-          source={{ uri: item.imgUrls[0] }}
-          style={styles.recommendationImage}
-        />
-      ) : (
-        <View style={styles.placeholderImage}>
-          <Text style={styles.placeholderText}>No Image</Text>
-        </View>
-      )}
-      <View style={styles.recommendationDetails}>
-        <Text style={styles.recommendationPrice}>{item.title}</Text>
-      </View>
-    </TouchableOpacity>
+  useFocusEffect(
+    useCallback(() => {
+      fetchTimeline();
+    }, [fetchTimeline])
   );
 
-  const chunkArray = (arr, chunkSize) => {
-    const result = [];
-    for (let i = 0; i < arr.length; i += chunkSize) {
-      result.push(arr.slice(i, i + chunkSize));
-    }
-    return result;
+  const handleOpenModal = (item) => {
+    setSelectedItem(item);
+    setModalVisible(true);
   };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    setSelectedItem(null);
+  };
+
+  const keyExtractor = (item) => item._id || item.id || `${item.title}-${item.date}`;
 
   return (
     <ImageBackground
@@ -93,142 +86,18 @@ const ActivityScreen = () => {
       }}
       style={styles.container}
     >
-      <View style={styles.roleContainer}>
-        <TouchableOpacity
-          style={[
-            styles.roleButton,
-            activeView === "Recommendations" && styles.selectedRole,
-          ]}
-          onPress={() => setActiveView("Recommendations")}
-        >
-          <Text
-            style={[
-              styles.roleText,
-              activeView === "Recommendations" && styles.selectedRoleText,
-            ]}
-          >
-            Recommendations
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.roleButton,
-            activeView === "Timeline" && styles.selectedRole,
-          ]}
-          onPress={() => setActiveView("Timeline")}
-        >
-          <Text
-            style={[
-              styles.roleText,
-              activeView === "Timeline" && styles.selectedRoleText,
-            ]}
-          >
-            Timeline
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <Text style={styles.timelineHeader}>Timeline</Text>
 
-      {activeView === "Recommendations" && (
-        <>
-          <Text style={styles.header}>Available Activities</Text>
-
-          <FlatList
-            data={chunkArray(activities, 2)}
-            keyExtractor={(item, index) => `chunk-${index}`}
-            renderItem={({ item }) => (
-              <View style={styles.row}>
-                {item.map((activity) => (
-                  <View key={activity._id} style={styles.cardWrapper}>
-                    {renderActivityCard({ item: activity })}
-                  </View>
-                ))}
-              </View>
-            )}
-            contentContainerStyle={styles.cardContainer}
-          />
-
-          {selectedActivity && (
-            <Modal
-              transparent={true}
-              visible={!!selectedActivity}
-              animationType="fade"
-              onRequestClose={handleCloseDetails}
-            >
-              <View style={styles.overlay}>
-                <View style={styles.selectedActivityContainer}>
-                  <View style={styles.imageContainer}>
-                    {/* {selectedActivity.imgUrls && selectedActivity.imgUrls.length > 1 && (
-                                            <TouchableOpacity onPress={goToPreviousImage} style={styles.navButton}>
-                                                <Text style={styles.navButtonText}>{"<"}</Text>
-                                            </TouchableOpacity>
-                                        )} */}
-                    {selectedActivity.imgUrls &&
-                    selectedActivity.imgUrls.length > 0 ? (
-                      <Image
-                        source={{
-                          uri: selectedActivity.imgUrls[currentImageIndex],
-                        }}
-                        style={styles.selectedActivityImage}
-                      />
-                    ) : (
-                      <View style={styles.placeholderImage}>
-                        <Text style={styles.placeholderText}>No Image</Text>
-                      </View>
-                    )} 
-                    {selectedActivity.imgUrls &&
-                      selectedActivity.imgUrls.length > 1 && (
-                        <TouchableOpacity
-                          onPress={goToNextImage}
-                          style={styles.navButton}
-                        >
-                          <Text style={styles.navButtonText}>{">"}</Text>
-                        </TouchableOpacity>
-                      )}
-                  </View>
-                  <Text style={styles.selectedActivityTitle}>
-                    {selectedActivity.title}
-                  </Text>
-                  <Text style={styles.selectedActivityDescription}>
-                    {selectedActivity.description || "No Description"}
-                  </Text>
-                  <Text>Type :</Text>
-                  {selectedActivity.types?.map((type, index) => (
-                    <Text key={index}>
-                      {type.name} - {type.price}
-                    </Text>
-                  ))}
-                  <Text style={styles.selectedActivityRating}>
-                    Rating: {selectedActivity.reviews?.[0]?.rating || "N/A"}
-                  </Text>
-                  <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                      style={styles.closeButton}
-                      onPress={handleCloseDetails}
-                    >
-                      <Text style={styles.closeButtonText}>Close</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.addButton}
-                      onPress={handleAddToTimeline}
-                    >
-                      <Text style={styles.addButtonText}>Add to Timeline</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-            </Modal>
-          )}
-        </>
-      )}
-
-      {activeView === "Timeline" && (
-        <>
-          <Text style={styles.timelineHeader}>Timeline</Text>
-
-          <FlatList
-            data={timeline}
-            keyExtractor={(item) => item._id}
-            renderItem={({ item }) => (
+      {timeline.length === 0 ? (
+        <View style={styles.loadingContainer}>
+          <Text>No activities found.</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={timeline}
+          keyExtractor={keyExtractor}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => handleOpenModal(item)}>
               <View style={styles.timelineItem}>
                 <View style={styles.timelineDot} />
                 <View style={styles.timelineContent}>
@@ -247,19 +116,37 @@ const ActivityScreen = () => {
                     <Text style={styles.timelineRating}>
                       Rating: {item.reviews?.[0]?.rating || "N/A"}
                     </Text>
-                    <TouchableOpacity
-                      style={styles.deleteButton}
-                      onPress={() => handleDeleteActivity(item._id)}
-                    >
-                      <Text style={styles.deleteButtonText}>Delete</Text>
-                    </TouchableOpacity>
                   </View>
                 </View>
               </View>
-            )}
-          />
-        </>
+            </TouchableOpacity>
+          )}
+        />
       )}
+
+      <Modal
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={handleCloseModal}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>My Trip</Text>
+            <FlatList
+              data={dataToRender}
+              keyExtractor={(item) => item._id}
+              renderItem={({ item }) => (
+                <View style={styles.card}>
+                  <Text style={styles.cardText}>{item.destination}</Text>
+                </View>
+              )}
+            />
+            <TouchableOpacity onPress={handleCloseModal} style={styles.closeButton}>
+              <Text>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ImageBackground>
   );
 };
@@ -270,143 +157,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     padding: 16,
   },
-  roleContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 20,
-  },
-  roleButton: {
-    padding: 10,
-    backgroundColor: "white",
-    borderRadius: 25,
-    flex: 1,
-    marginHorizontal: 5,
-    alignItems: "center",
-  },
-  selectedRole: {
-    backgroundColor: "#134B70",
-  },
-  roleText: {
-    color: "#134B70",
-    fontWeight: "bold",
-  },
-  selectedRoleText: {
-    color: "#fff",
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  cardContainer: {
-    justifyContent: "space-between",
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  cardWrapper: {
-    flex: 1,
-    marginHorizontal: 5,
-  },
-  recommendationCard: {
-    backgroundColor: "#FFF8F3",
-    borderRadius: 10,
-    overflow: "hidden",
-    elevation: 3,
-    padding: 10,
-  },
-  recommendationImage: {
-    width: "100%",
-    height: 100,
-    borderRadius: 10,
-  },
-  placeholderImage: {
-    width: "100%",
-    height: 100,
-    backgroundColor: "#e0e0e0",
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  placeholderText: {
-    color: "#888",
-  },
-  recommendationDetails: {
-    padding: 10,
-    alignItems: "center",
-  },
-  recommendationPrice: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 5,
-  },
-  selectedActivityContainer: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    overflow: "hidden",
-    padding: 10,
-    elevation: 3,
-    marginHorizontal: 20,
-    marginVertical: 80,
-  },
-  overlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 15,
-  },
-  closeButton: {
-    padding: 10,
-    backgroundColor: "#E4003A",
-    borderRadius: 5,
-  },
-  closeButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  addButton: {
-    padding: 10,
-    backgroundColor: "#134B70",
-    borderRadius: 5,
-  },
-  addButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  selectedActivityTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  selectedActivityImage: {
-    width: "100%",
-    height: 200,
-    marginBottom: 10,
-  },
-  selectedActivityDescription: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  selectedActivityRating: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
   timelineHeader: {
     fontSize: 20,
     fontWeight: "bold",
-    marginVertical: 20,
+    marginTop: 20,
+    padding: 3,
+    textAlign: 'center',
+    backgroundColor: "#134B70",
+    color: 'white',
   },
   timelineItem: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
   },
   timelineDot: {
     width: 10,
@@ -419,7 +181,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 25,
     paddingLeft: 15,
-    borderLeftWidth: 2,
+    borderLeftWidth: 4,
     borderLeftColor: "#134B70",
     position: "relative",
   },
@@ -439,32 +201,60 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#888",
   },
-  deleteButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    backgroundColor: "#FF4C4C",
-    borderRadius: 5,
-    padding: 5,
-  },
-  deleteButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  imageContainer: {
+  placeholderImage: {
+    width: "100%",
+    height: 100,
+    backgroundColor: "#e0e0e0",
+    borderRadius: 10,
+    justifyContent: "center",
     alignItems: "center",
+  },
+  placeholderText: {
+    color: "#888",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
     marginBottom: 10,
   },
-  navButton: {
-    padding: 5,
-    paddingHorizontal: 20,
-    backgroundColor: "#134B70",
-    borderRadius: 5,
+  card: {
+    width: '100%',
+    padding: 15,
+    marginVertical: 5,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
   },
-  navButtonText: {
-    color: "white",
+  cardText: {
     fontSize: 18,
-    fontWeight: "bold",
+  },
+  closeButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: '#ddd',
+    borderRadius: 5,
   },
 });
 

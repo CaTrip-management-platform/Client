@@ -21,6 +21,8 @@ import ImageViewer from "react-native-image-zoom-viewer";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { useNavigation } from "@react-navigation/native";
+// import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeScreen = ({ searchResults, navigation }) => {
   const navigate = useNavigation();
@@ -31,11 +33,12 @@ const HomeScreen = ({ searchResults, navigation }) => {
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showImageViewer, setShowImageViewer] = useState(false);
+  const [timelineData, setTimelineData] = useState([])
 
   const client = useApolloClient();
   const { loading, error, data } = useQuery(GET_Activity);
 
-  console.log(data)
+  // console.log(data);
 
   const sendMessage = async () => {
     try {
@@ -72,7 +75,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
     return <Text style={styles.errorText}>Error: {error.message}</Text>;
   }
 
-  const formatPrice = (price) => `Rp.${price},-`;
+  const formatPrice = (price) => `Rp.${price.toLocaleString()},-`;
 
   const activities =
     searchResults.length > 0
@@ -130,6 +133,30 @@ const HomeScreen = ({ searchResults, navigation }) => {
     setCurrentImageIndex((prevIndex) =>
       prevIndex < selectedActivity.imgUrls.length - 1 ? prevIndex + 1 : 0
     );
+  };
+
+  const saveData = async (key, value) => {
+    try {
+      await AsyncStorage.setItem(key, value);
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
+  };
+  const handleAddToTimeline = async () => {
+    setTimelineData((timelineData) => {
+      const data = [...timelineData, selectedActivity];
+      return data;
+    });
+
+    try {
+      console.log(timelineData)
+
+      const timelineDataString = JSON.stringify(timelineData);
+      await saveData('timelineData', timelineDataString);
+      alert("Added to Timeline");
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
   };
 
   return (
@@ -190,11 +217,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
                     <View style={styles.imageNavigationContainer}>
                       <TouchableOpacity
                         onPress={handlePrevImage}
-                        style={{
-                          ...styles.navButton,
-                          position: "absolute",
-                          top: 0,
-                        }}
+                        style={styles.navButton}
                       >
                         <Text style={styles.navButtonText}>&lt;</Text>
                       </TouchableOpacity>
@@ -203,7 +226,6 @@ const HomeScreen = ({ searchResults, navigation }) => {
                         style={{
                           ...styles.navButton,
                           position: "absolute",
-                          top: 0,
                           end: 0,
                         }}
                       >
@@ -249,6 +271,14 @@ const HomeScreen = ({ searchResults, navigation }) => {
                       <Text style={styles.activityPrice}>
                         {selectedActivity.price}
                       </Text>
+                      <TouchableOpacity
+                        style={styles.addToTimelineButton}
+                        onPress={handleAddToTimeline}
+                      >
+                        <Text style={styles.addToTimelineButtonText}>
+                          Add to Timeline
+                        </Text>
+                      </TouchableOpacity>
                     </View>
                     <View style={styles.buttonContainer}>
                       <TouchableOpacity
@@ -283,134 +313,91 @@ const HomeScreen = ({ searchResults, navigation }) => {
           )}
         </Modal>
       )}
-      {/* AI Modal */}
-   {/* AI Modal */}
-    {modalVisible && (
-  <Modal
-    visible={modalVisible}
-    transparent={true}
-    animationType="slide"
-    onRequestClose={() => setModalVisible(false)}
-    style={styles.modalContainer}
-  >
-    <TouchableOpacity
-      style={styles.modalOverlay}
-      activeOpacity={1}
-      onPressOut={() => setModalVisible(false)}
-    >
-      <View style={styles.modalContainer}>
-        <ImageBackground
-          source={{
-            uri: "https://5.imimg.com/data5/SELLER/Default/2023/7/322745470/DM/IE/MR/127740382/whatsapp-image-2023-07-05-at-6-40-02-pm.jpeg",
-          }}
-          style={styles.backgroundImage}
-          onStartShouldSetResponder={() => true}
-        >
-          <View style={styles.headerContainer}>
-            <TouchableOpacity
-              style={styles.closeIcon}
-              onPress={() => setModalVisible(false)}
-            >
-              <Ionicons name="close" size={15} color="#fff" />
-            </TouchableOpacity>
-            <Text style={styles.headerText}>Ask Something?</Text>
-          </View>
-          <FlatList
-            data={aiMessages}
-            renderItem={({ item }) => (
-              <TouchableOpacity>
-                <View
-                  style={
-                    item.type === "ai"
-                      ? styles.aiMessage
-                      : styles.userMessage
-                  }
-                >
-                  <Text style={styles.messageText}>{item.text}</Text>
-                </View>
-              </TouchableOpacity>
-            )}
-            keyExtractor={(item, index) => index.toString()}
-            style={styles.messagesList}
-            contentContainerStyle={{
-              flexGrow: 1,
-              justifyContent: "flex-end",
-            }}
-          />
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.textInput}
-              value={userMessage}
-              onChangeText={setUserMessage}
-              placeholder="Type your message"
-              placeholderTextColor="#888"
-            />
-            <TouchableOpacity
-              onPress={sendMessage}
-              style={styles.sendButton}
-            >
-              <Text style={styles.sendButtonText}>Send</Text>
-            </TouchableOpacity>
-          </View>
-        </ImageBackground>
-      </View>
-    </TouchableOpacity>
-  </Modal>
-)}
 
-
-      {/* Floating Action Button */}
-      <TouchableOpacity
-        style={styles.floatingButton}
-        onPress={() => setModalVisible(true)}
+      {/* Chat Modal */}
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
       >
-        <FontAwesome5 name="github-alt" size={24} color="black" />
-      </TouchableOpacity>
+        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+          <View style={styles.chatModalContainer}>
+            <View style={styles.chatHeader}>
+              <Text style={styles.chatHeaderTitle}>Chat with AI</Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Ionicons name="close" size={24} color="white" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.chatContent}>
+              <ScrollView
+                style={styles.chatScroll}
+                contentContainerStyle={styles.chatScrollContent}
+              >
+                {aiMessages.map((message, index) => (
+                  <View
+                    key={index}
+                    style={
+                      message.type === "user"
+                        ? styles.userMessage
+                        : styles.aiMessage
+                    }
+                  >
+                    <Text
+                      style={
+                        message.type === "user"
+                          ? styles.userMessageText
+                          : styles.aiMessageText
+                      }
+                    >
+                      {message.text}
+                    </Text>
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
+            <View style={styles.chatFooter}>
+              <TextInput
+                style={styles.chatInput}
+                placeholder="Type your message"
+                value={userMessage}
+                onChangeText={setUserMessage}
+                onSubmitEditing={sendMessage}
+              />
+              <TouchableOpacity
+                style={styles.sendButton}
+                onPress={sendMessage}
+              >
+                <FontAwesome5 name="paper-plane" size={20} color="white" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+  },
   containerLoading: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
-  headerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#000",
-    padding: 10,
-    
-  },
-
-  headerText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    left: "45%",
-    transform: [{ translateX: -50 }],
-  },
   errorText: {
-    fontSize: 18,
     color: "red",
+    fontSize: 18,
     textAlign: "center",
     marginTop: 20,
   },
-  backgroundImage: {
-    flex: 1,
-  },
   card: {
-    margin: 10,
+    marginBottom: 20,
     backgroundColor: "#fff",
     borderRadius: 10,
     overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,
   },
   cardImage: {
     width: "100%",
@@ -424,52 +411,46 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   cardRating: {
-    fontSize: 16,
-    color: "#888",
+    color: "gray",
   },
   cardLocation: {
-    fontSize: 16,
-    color: "#888",
+    color: "gray",
   },
   cardPrice: {
     fontSize: 16,
-    fontWeight: "bold",
+    color: "green",
+  },
+  listContent: {
+    paddingHorizontal: 10,
   },
   headerContainer: {
-    padding: 10,
-    backgroundColor: "#fff",
-    elevation: 3,
-    borderRadius: 10,
+    backgroundColor: "#f8f8f8",
+    paddingVertical: 20,
+    paddingHorizontal: 10,
   },
   headerContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    
+    marginBottom: 10,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    marginVertical: 5,
-  },
-  listContent: {
-    paddingBottom: 100,
+    marginBottom: 10,
   },
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContainer: {
     backgroundColor: "#fff",
     borderRadius: 10,
+    padding: 20,
     width: "90%",
-    height: "80%",
-    
+    maxHeight: "80%",
   },
   scrollViewContent: {
-    padding: 10,
+    flexGrow: 1,
   },
   selectedActivityImage: {
     width: "100%",
@@ -477,26 +458,26 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   imageNavigationContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginVertical: 10,
-    position: "absolute",
-    top: 75,
-    left: 10,
-    width: "100%",
+    marginTop: 10,
+    position: "relative",
   },
   navButton: {
-    backgroundColor: "#000",
-    borderRadius: 20,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    borderRadius: 8,
     padding: 10,
+    paddingVertical: 86,
+    position: "absolute",
+    top: "50%",
+    transform: [{ translateY: -210 }],
   },
   navButtonText: {
     color: "#fff",
     fontSize: 20,
   },
   selectedActivityTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "bold",
+    marginVertical: 10,
   },
   selectedActivityDescription: {
     fontSize: 16,
@@ -504,113 +485,110 @@ const styles = StyleSheet.create({
   },
   selectedActivityRating: {
     fontSize: 16,
-    color: "#888",
+    marginVertical: 5,
   },
   modalLabel: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     marginTop: 10,
   },
   activityPrice: {
     fontSize: 18,
+    color: "green",
+  },
+  addToTimelineButton: {
+    backgroundColor: "#4CAF50",
+    borderRadius: 5,
+    padding: 10,
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  addToTimelineButtonText: {
+    color: "#fff",
+    fontSize: 16,
     fontWeight: "bold",
   },
   buttonContainer: {
-    padding: 10,
-    alignItems: "center",
+    marginTop: 20,
   },
   closeButton: {
-    backgroundColor: "#f00",
+    backgroundColor: "#f44336",
     borderRadius: 5,
     padding: 10,
-    marginTop: 10,
     alignItems: "center",
   },
   closeButtonText: {
     color: "#fff",
     fontSize: 16,
-  },
-  chatContainer: {
-    flex: 1,
-    padding: 10,
-  },
-  messagesList: {
-    flex: 1,
-  },
-  aiMessage: {
-    backgroundColor: "#e1ffc7",
-    borderRadius: 20,
-    padding: 8,
-    marginVertical: 4,
-    alignSelf: "flex-start",
-    maxWidth: "75%",
-    marginLeft: 10,
-  },
-  userMessage: {
-    backgroundColor: "#d3f1ff",
-    borderRadius: 20,
-    padding: 8,
-    marginVertical: 4,
-    alignSelf: "flex-end",
-    maxWidth: "75%",
-    marginLeft: "auto",
-    marginRight: 10,
-  },
-  messageText: {
-    fontSize: 16,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 10,
-    backgroundColor: "#fff",
-    borderTopWidth: 1,
-    borderTopColor: "#ddd",
-  },
-  textInput: {
-    flex: 1,
-    borderRadius: 20,
-    borderColor: "#ddd",
-    borderWidth: 1,
-    padding: 10,
-    marginRight: 10,
-  },
-  sendButton: {
-    backgroundColor: "#007bff",
-    borderRadius: 20,
-    padding: 10,
-  },
-  sendButtonText: {
-    color: "#fff",
-    fontSize: 16,
+    fontWeight: "bold",
   },
   imageViewerContainer: {
     flex: 1,
+    justifyContent: "center",
   },
-  floatingButton: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
-    backgroundColor: "white",
-    borderRadius: 30,
-    padding: 15,
-    elevation: 5,
+  chatModalContainer: {
+    flex: 1,
+    backgroundColor: "#fff",
+    padding: 20,
+    justifyContent: "space-between",
   },
-  closeIcon: {
-    position: "absolute",
-    top: 8,
-
-    backgroundColor: "#FFC436",
-    borderRadius: 50,
-    padding: 9,
-
-    left: 10,
-  }, 
-// modalContainer: {
-
-//     borderRadius: 30,
-
-// },
+  chatHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  chatHeaderTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  chatContent: {
+    flex: 1,
+  },
+  chatScroll: {
+    flex: 1,
+  },
+  chatScrollContent: {
+    paddingVertical: 10,
+  },
+  userMessage: {
+    alignSelf: "flex-end",
+    backgroundColor: "#e1ffc7",
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+    maxWidth: "80%",
+  },
+  aiMessage: {
+    alignSelf: "flex-start",
+    backgroundColor: "#e1e1e1",
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+    maxWidth: "80%",
+  },
+  userMessageText: {
+    color: "#000",
+  },
+  aiMessageText: {
+    color: "#000",
+  },
+  chatFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderTopWidth: 1,
+    borderTopColor: "#ddd",
+    paddingVertical: 10,
+  },
+  chatInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 20,
+    padding: 10,
+  },
+  sendButton: {
+    marginLeft: 10,
+  },
 });
 
 export default HomeScreen;

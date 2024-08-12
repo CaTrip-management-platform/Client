@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useMutation } from "@apollo/client";
 import { ADD_ACTIVITY } from "../queries/addActivityAdmin";
-import { GET_ACTIVITY } from "../queries/getAllActivity"; 
+import { GET_ACTIVITY } from "../queries/getAllActivity";
 
 const AddActivityScreen = ({ navigation }) => {
   const [title, setTitle] = useState("");
@@ -20,12 +20,12 @@ const AddActivityScreen = ({ navigation }) => {
   const [location, setLocation] = useState("");
   const [imgUrls, setImgUrls] = useState([""]);
   const [tags, setTags] = useState([""]);
-  const [addActivity] = useMutation(ADD_ACTIVITY, {
-    refetchQueries: [
-      { query: GET_ACTIVITY },
-    ],
-    awaitRefetchQueries: true, 
-  });
+  // const [addActivity] = useMutation(ADD_ACTIVITY, {
+  //   refetchQueries: [
+  //     { query: GET_ACTIVITY },
+  //   ],
+  //   awaitRefetchQueries: true, 
+  // });
 
   const handleAddImageUrl = () => setImgUrls([...imgUrls, ""]);
   const handleRemoveImageUrl = (index) => setImgUrls(imgUrls.filter((_, i) => i !== index));
@@ -34,18 +34,24 @@ const AddActivityScreen = ({ navigation }) => {
 
   const handleSubmit = async () => {
     try {
-      await addActivity({
-        variables: {
-          title,
-          description,
-          tags,
-          price: parseFloat(price),
-          location,
-          imgUrls,
-        },
-      });
+      console.log(title,
+        description,
+        tags,
+        price,
+        location,
+        imgUrls,)
+      // await addActivity({
+      //   variables: {
+      //     title,
+      //     description,
+      //     tags,
+      //     price: parseFloat(price),
+      //     location,
+      //     imgUrls,
+      //   },
+      // });
       Alert.alert("Success", "Activity added successfully");
-      navigation.goBack();
+      // navigation.goBack();
     } catch (error) {
       console.error(error);
       Alert.alert("Error", "Something went wrong");
@@ -110,7 +116,7 @@ const AddActivityScreen = ({ navigation }) => {
               const newTags = [...tags];
               newTags[index] = text;
               setTags(newTags);
-            }} 
+            }}
             placeholder={`Tag ${index + 1}`}
           />
           <TouchableOpacity onPress={() => handleRemoveTag(index)}>

@@ -5,10 +5,6 @@ query GetAllActivity {
   getAllActivity {
     _id
     title
-    types {
-      price
-      name
-    }
     price
     imgUrls
     reviews {
@@ -19,7 +15,6 @@ query GetAllActivity {
       updatedAt
     }
     description
-    sellerId
     userId
     tags
     createdAt
@@ -31,6 +26,5 @@ query GetAllActivity {
       longitude
     }
   }
-
 }
 `; 

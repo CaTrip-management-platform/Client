@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, FlatList, ActivityIndicator } from "reac
 import { useQuery } from "@apollo/client";
 import { StatusBar } from "expo-status-bar";
 import * as SecureStore from "expo-secure-store";
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import { GET_TRIPS_BY_CUSTOMER_ID } from "../queries/getTripsByCustomerId";
 
 function ActivityHistoryScreen() {
@@ -23,7 +23,7 @@ function ActivityHistoryScreen() {
           try {
             const decoded = jwtDecode(token);
             setUserId(decoded.id);
-           
+
           } catch (decodeError) {
             console.error("Error decoding token:", decodeError);
           }
@@ -50,7 +50,7 @@ function ActivityHistoryScreen() {
 
   const renderTrip = ({ item }) => (
     <View style={styles.card}>
-   
+
       <View style={styles.cardContent}>
         <Text style={styles.cardTitle}>{item.destination}</Text>
         <Text style={styles.cardDate}>
