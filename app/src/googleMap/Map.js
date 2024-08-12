@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import { StyleSheet, View } from "react-native";
+import { Button, StyleSheet, View } from "react-native";
 import * as Location from "expo-location";
 
-export default function Map({ name, location, coords }) {
+export default function Map({ route, navigation }) {
+  const { name, location, coords } = route.params;
   const [mapLocation, setMapLocation] = useState(null);
   const [deniedMessage, setDeniedMessage] = useState(null);
+  const mapRef = useRef(null);
 
   useEffect(() => {
     (async () => {
@@ -18,46 +20,51 @@ export default function Map({ name, location, coords }) {
       let location = await Location.getCurrentPositionAsync({});
       setMapLocation(location);
     })();
+    console.log(name, location, coords, "<<<");
   }, []);
+
+  const centerOnTarget = () => {
+    if (mapRef.current) {
+      mapRef.current.animateToRegion(
+        {
+          latitude: +coords.latitude,
+          longitude: +coords.longitude,
+          latitudeDelta: 0.002,
+          longitudeDelta: 0.002,
+        },
+        1000
+      );
+    }
+  };
 
   return (
     <View style={styles.container}>
       {mapLocation && (
         <MapView
+          ref={mapRef}
           provider={PROVIDER_GOOGLE}
           style={StyleSheet.absoluteFill}
           initialRegion={{
-            latitude: 37.78825,
-            longitude: -122.4324,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
+            latitude: +coords.latitude,
+            longitude: +coords.longitude,
+            latitudeDelta: 0.002,
+            longitudeDelta: 0.002,
           }}
           showsUserLocation={true}
           showsMyLocationButton={true}
         >
           <Marker
             coordinate={{
-              latitude: 37.78825,
-              longitude: -122.4324,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
+              latitude: +coords.latitude,
+              longitude: +coords.longitude,
             }}
-            title={"test"}
+            title={name}
           />
         </MapView>
-        // <MapView
-        //   style={StyleSheet.absoluteFill}
-        //   provider={PROVIDER_GOOGLE}
-        //   showsUserLocation={true}
-        //   showsMyLocationButton={true}
-        //   //   initialRegion={{
-        //   //     latitude: location.coords.latitude,
-        //   //     longitude: location.coords.longitude,
-        //   //     latitudeDelta: 0.0922,
-        //   //     longitudeDelta: 0.0421,
-        //   //   }}
-        // />
       )}
+      <View style={styles.buttonContainer}>
+        <Button title="Back to Target" onPress={centerOnTarget} />
+      </View>
     </View>
   );
 }
@@ -65,5 +72,12 @@ export default function Map({ name, location, coords }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  buttonContainer: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    right: 20,
+    alignItems: "center",
   },
 });
