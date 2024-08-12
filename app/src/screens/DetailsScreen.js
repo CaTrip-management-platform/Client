@@ -38,7 +38,7 @@ function DetailsScreen({ route }) {
     <View style={styles.container}>
       <StatusBar style="dark" />
       <ScrollView>
-         <Card card={post} />
+        <Card card={post} />
       </ScrollView>
     </View>
   );

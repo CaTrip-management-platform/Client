@@ -27,7 +27,7 @@ function RegisterScreen() {
       const result = await registerUser({
         variables: { username, phoneNumber, email, password },
       });
- 
+  
     } catch (err) {
       console.log(err)
     }

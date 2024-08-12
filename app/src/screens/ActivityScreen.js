@@ -9,8 +9,8 @@ import {
   Modal,
   TouchableOpacity,
 } from "react-native";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 import { useQuery } from "@apollo/client";
 import { GET_TRIPS_BY_CUSTOMER_ID } from "../queries/getTripsByCustomerId";
 
@@ -20,21 +20,21 @@ const ActivityScreen = () => {
   const [selectedItem, setSelectedItem] = useState(null);
 
   const { loading, error, data } = useQuery(GET_TRIPS_BY_CUSTOMER_ID);
-  console.log(data)
-  const dataToRender = data.getTripsByCustomerId
+  console.log(data);
+  const dataToRender = data.getTripsByCustomerId;
 
   const getData = async (key) => {
     try {
       const value = await AsyncStorage.getItem(key);
       return value ? JSON.parse(value) : [];
     } catch (error) {
-      console.error('Error retrieving data:', error);
+      console.error("Error retrieving data:", error);
       return [];
     }
   };
 
   const fetchTimeline = useCallback(async () => {
-    const storedTimeline = await getData('timelineData');
+    const storedTimeline = await getData("timelineData");
     setTimeline(storedTimeline);
   }, []);
 
@@ -54,7 +54,8 @@ const ActivityScreen = () => {
     setSelectedItem(null);
   };
 
-  const keyExtractor = (item) => item._id || item.id || `${item.title}-${item.date}`;
+  const keyExtractor = (item) =>
+    item._id || item.id || `${item.title}-${item.date}`;
 
   return (
     <ImageBackground
@@ -118,7 +119,10 @@ const ActivityScreen = () => {
                 </View>
               )}
             />
-            <TouchableOpacity onPress={handleCloseModal} style={styles.closeButton}>
+            <TouchableOpacity
+              onPress={handleCloseModal}
+              style={styles.closeButton}
+            >
               <Text>Close</Text>
             </TouchableOpacity>
           </View>
@@ -139,9 +143,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 20,
     padding: 3,
-    textAlign: 'center',
+    textAlign: "center",
     backgroundColor: "#134B70",
-    color: 'white',
+    color: "white",
   },
   timelineItem: {
     flexDirection: "row",
@@ -196,29 +200,29 @@ const styles = StyleSheet.create({
   },
   modalBackground: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
-    width: '80%',
+    width: "80%",
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   modalTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   card: {
-    width: '100%',
+    width: "100%",
     padding: 15,
     marginVertical: 5,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 8,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
@@ -230,7 +234,7 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: 20,
     padding: 10,
-    backgroundColor: '#ddd',
+    backgroundColor: "#ddd",
     borderRadius: 5,
   },
 });

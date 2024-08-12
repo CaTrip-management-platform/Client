@@ -190,7 +190,7 @@ const AddActivityScreen = ({ navigation }) => {
             <Text style={styles.removeButton}>Remove</Text>
           </TouchableOpacity>
         </View>
-      ))}
+      ))} 
       <TouchableOpacity onPress={handleAddTag}>
         <Text style={styles.addButton}>Add Another Tag</Text>
       </TouchableOpacity>

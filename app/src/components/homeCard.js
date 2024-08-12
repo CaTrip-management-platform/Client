@@ -5,7 +5,7 @@ import {
   FiraSans_600SemiBold_Italic,
 } from "@expo-google-fonts/fira-sans";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
-
+ 
 const Card = ({ card }) => {
   
   const {

@@ -26,7 +26,7 @@ const Card = ({ card }, params) => {
     tags = [],
 _id
   } = card;
-
+ 
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [allComments, setAllComments] = useState(comments);

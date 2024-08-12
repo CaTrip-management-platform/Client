@@ -1,17 +1,31 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import { View, Text, Button, StyleSheet, Alert, Modal, TouchableOpacity, TextInput } from "react-native";
 import { useMutation } from "@apollo/client";
 import { ADD_TRIP_USER } from "../queries/addTrip";
 import { useNavigation } from "@react-navigation/native";
+import { Calendar } from 'react-native-calendars';
 
 const AddTripScreen = () => {
   const [destination, setDestination] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [showStartDateCalendar, setShowStartDateCalendar] = useState(false);
+  const [showEndDateCalendar, setShowEndDateCalendar] = useState(false);
+  const [dateType, setDateType] = useState("");
+
   const [addTrip, { data, loading, error }] = useMutation(ADD_TRIP_USER);
+  const navigation = useNavigation();
 
+  const handleDateSelect = (date) => {
+    if (dateType === "start") {
+      setStartDate(date.dateString);
+      setShowStartDateCalendar(false);
+    } else if (dateType === "end") {
+      setEndDate(date.dateString);
+      setShowEndDateCalendar(false);
+    }
+  }; 
 
-  const navigate = useNavigation();
   const handleSubmit = async () => {
     try {
       await addTrip({
@@ -24,9 +38,9 @@ const AddTripScreen = () => {
         },
       });
       if (data) {
-        Alert.alert("Success", data.addTrip.message)
-      } 
-      navigate.navigate("Profile")
+        Alert.alert("Success", data.addTrip.message);
+        navigation.navigate("Profile");
+      }
     } catch (err) {
       Alert.alert("Error", err.message);
     }
@@ -41,24 +55,51 @@ const AddTripScreen = () => {
         value={destination}
         onChangeText={setDestination}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Start Date (YYYY-MM-DD)"
-        value={startDate}
-        onChangeText={setStartDate}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="End Date (YYYY-MM-DD)"
-        value={endDate}
-        onChangeText={setEndDate}
-      />
+      <TouchableOpacity onPress={() => { setDateType("start"); setShowStartDateCalendar(true); }}>
+        <Text style={styles.input}>{startDate || "Start Date (YYYY-MM-DD)"}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => { setDateType("end"); setShowEndDateCalendar(true); }}>
+        <Text style={styles.input}>{endDate || "End Date (YYYY-MM-DD)"}</Text>
+      </TouchableOpacity>
       <Button
         title={loading ? "Submitting..." : "Submit"}
         onPress={handleSubmit}
         disabled={loading}
       />
       {error && <Text style={styles.error}>Error: {error.message}</Text>}
+
+      {/* Calendar Modals */}
+      <Modal
+        transparent={true}
+        visible={showStartDateCalendar}
+        onRequestClose={() => setShowStartDateCalendar(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Calendar
+              onDayPress={handleDateSelect}
+              markedDates={{ [startDate]: { selected: true, selectedColor: 'blue' } }}
+            />
+            <Button title="Close" onPress={() => setShowStartDateCalendar(false)} />
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        transparent={true}
+        visible={showEndDateCalendar}
+        onRequestClose={() => setShowEndDateCalendar(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Calendar
+              onDayPress={handleDateSelect}
+              markedDates={{ [endDate]: { selected: true, selectedColor: 'blue' } }}
+            />
+            <Button title="Close" onPress={() => setShowEndDateCalendar(false)} />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -80,10 +121,23 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 12,
     paddingHorizontal: 8,
+    justifyContent: 'center',
   },
   error: {
     color: "red",
     marginTop: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
   },
 });
 

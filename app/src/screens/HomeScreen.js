@@ -589,6 +589,35 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
   },
+  sendButtonText: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  imageViewerContainer: {
+    flex: 1,
+  },
+  floatingButton: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    backgroundColor: "white",
+    borderRadius: 30,
+    padding: 15,
+    elevation: 5,
+  },
+  closeIcon: {
+    position: "absolute",
+    top: 8,
+
+    backgroundColor: "#FFC436",
+    borderRadius: 50,
+    padding: 9,
+
+    left: 10,
+  },
+  // modalContainer: {
+  //     borderRadius: 30,
+  // },
   sendButton: {
     marginLeft: 10,
   },

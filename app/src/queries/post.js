@@ -27,7 +27,7 @@ query Query {
       updatedAt
     }
     createdAt
-    updatedAt
+    updatedAt 
   }
 }
 `;
