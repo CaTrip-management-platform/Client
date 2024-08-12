@@ -90,6 +90,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
             ? activity.imgUrls[0]
             : "https://via.placeholder.com/150",
         description: activity.description,
+        coords: activity.coords,
       }))
       : data.getAllActivity.map((activity) => ({
         id: activity._id,
@@ -107,6 +108,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
         description: activity.description,
         types: activity.types,
         imgUrls: activity.imgUrls || [],
+        coords: activity.coords,
       }));
 
   const ListHeader = () => (
@@ -227,6 +229,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
                             navigate.push("Map", {
                               name: selectedActivity.name,
                               location: selectedActivity.location,
+                              coords: selectedActivity.coords,
                             });
                           }}
                         >
@@ -281,6 +284,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
         </Modal>
       )}
       {/* AI Modal */}
+   {/* AI Modal */}
       {modalVisible && (
         <Modal
           visible={modalVisible}
@@ -297,6 +301,15 @@ const HomeScreen = ({ searchResults, navigation }) => {
               style={styles.modalContainer}
               onStartShouldSetResponder={() => true}
             >
+              <View style={styles.headerContainer}>
+                <TouchableOpacity
+                  style={styles.closeIcon}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Ionicons name="close" size={15} color="#fff" />
+                </TouchableOpacity>
+                <Text style={styles.headerText}>Ask Something?</Text>
+              </View>
               <FlatList
                 data={aiMessages}
                 renderItem={({ item }) => (
@@ -334,16 +347,11 @@ const HomeScreen = ({ searchResults, navigation }) => {
                   <Text style={styles.sendButtonText}>Send</Text>
                 </TouchableOpacity>
               </View>
-              <TouchableOpacity
-                style={styles.closeIcon}
-                onPress={() => setModalVisible(false)}
-              >
-                <Ionicons name="close" size={30} color="#fff" />
-              </TouchableOpacity>
             </View>
           </TouchableOpacity>
         </Modal>
       )}
+
 
       {/* Floating Action Button */}
       <TouchableOpacity
@@ -361,6 +369,22 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "#000",
+    padding: 10,
+    
+  },
+
+  headerText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    left: "45%",
+    transform: [{ translateX: -50 }],
   },
   errorText: {
     fontSize: 18,
@@ -433,6 +457,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: "90%",
     height: "80%",
+    
   },
   scrollViewContent: {
     padding: 10,
@@ -510,6 +535,7 @@ const styles = StyleSheet.create({
     marginVertical: 4,
     alignSelf: "flex-start",
     maxWidth: "75%",
+    marginLeft: 10,
   },
   userMessage: {
     backgroundColor: "#d3f1ff",
@@ -519,6 +545,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
     maxWidth: "75%",
     marginLeft: "auto",
+    marginRight: 10,
   },
   messageText: {
     fontSize: 16,
@@ -562,11 +589,13 @@ const styles = StyleSheet.create({
   },
   closeIcon: {
     position: "absolute",
-    top: 10,
-    right: 10,
+    top: 8,
+
     backgroundColor: "red",
     borderRadius: 50,
-    padding: 10,
+    padding: 9,
+
+    left: 10,
   },
 });
 

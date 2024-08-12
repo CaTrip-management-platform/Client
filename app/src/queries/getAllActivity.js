@@ -9,6 +9,7 @@ query GetAllActivity {
       price
       name
     }
+    price
     imgUrls
     reviews {
       content
@@ -19,11 +20,17 @@ query GetAllActivity {
     }
     description
     sellerId
+    userId
     tags
     createdAt
     updatedAt
     customers
     location
+    coords {
+      latitude
+      longitude
+    }
   }
+
 }
 `;
