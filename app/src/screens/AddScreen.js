@@ -97,6 +97,15 @@ const AddActivityScreen = ({ navigation }) => {
 
   const handleSubmit = async () => {
     try {
+      console.log(
+        title,
+        description,
+        tags,
+        price,
+        location,
+        imgUrls,
+        coords.latitude
+      );
       await addActivity({
         variables: {
           title,
@@ -118,7 +127,10 @@ const AddActivityScreen = ({ navigation }) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      keyboardShouldPersistTaps="handled"
+      contentContainerStyle={styles.container}
+    >
       <Text style={styles.label}>Title:</Text>
       <TextInput style={styles.input} value={title} onChangeText={setTitle} />
       <Text style={styles.label}>Price:</Text>
@@ -275,6 +287,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 300,
     marginBottom: 16,
+    zIndex: 0,
   },
   removeMarkerButton: {
     backgroundColor: "red",
