@@ -46,7 +46,7 @@ export default function MainTab() {
     } else {
       setSearchResults([]);
     }
-  }, [text, refetch]);
+  }, [text, refetch]); 
 
   return (
     <Tab.Navigator>
