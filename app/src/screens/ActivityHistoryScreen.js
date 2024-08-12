@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Image, FlatList, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, Image, FlatList, ActivityIndicator, TouchableOpacity } from "react-native";
 import { useQuery } from "@apollo/client";
 import { StatusBar } from "expo-status-bar";
 import * as SecureStore from "expo-secure-store";
@@ -49,7 +49,11 @@ function ActivityHistoryScreen() {
   const trips = data?.getTripsByCustomerId || [];
 
   const renderTrip = ({ item }) => (
-    <View style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={() => {
+      navigation.navigate("TripDetailScreen", {
+          _id: item._id
+      })
+    }}>
    
       <View style={styles.cardContent}>
         <Text style={styles.cardTitle}>{item.destination}</Text>
@@ -59,7 +63,7 @@ function ActivityHistoryScreen() {
         <Text style={styles.cardDescription}>Total Price: {item.totalPrice}</Text>
         <Text style={styles.cardStatus}>Payment Status: {item.paymentStatus}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
