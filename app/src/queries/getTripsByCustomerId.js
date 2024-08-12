@@ -23,4 +23,4 @@ query GetTripsByCustomerId {
     }
   }
 }
-`
+` 

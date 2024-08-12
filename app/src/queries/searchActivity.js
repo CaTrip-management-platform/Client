@@ -19,3 +19,4 @@ query Query($searchTerm: String) {
   }
 }
 `;
+ 

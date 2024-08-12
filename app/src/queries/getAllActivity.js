@@ -33,4 +33,4 @@ query GetAllActivity {
   }
 
 }
-`;
+`; 
