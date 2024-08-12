@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -20,7 +20,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import ImageViewer from "react-native-image-zoom-viewer";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 const HomeScreen = ({ searchResults, navigation }) => {
   const navigate = useNavigation();
@@ -33,7 +33,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
   const [showImageViewer, setShowImageViewer] = useState(false);
 
   const client = useApolloClient();
-  const { loading, error, data } = useQuery(GET_Activity);
+  const { loading, error, data, refetch } = useQuery(GET_Activity);
 
   const sendMessage = async () => {
     try {
@@ -58,6 +58,12 @@ const HomeScreen = ({ searchResults, navigation }) => {
     }
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
+
   if (loading) {
     return (
       <View style={styles.containerLoading}>
@@ -75,39 +81,39 @@ const HomeScreen = ({ searchResults, navigation }) => {
   const activities =
     searchResults.length > 0
       ? searchResults.map((activity) => ({
-        id: activity._id,
-        name: activity.title,
-        rating:
-          activity.reviews && activity.reviews.length > 0
-            ? activity.reviews[0].rating
-            : "N/A",
-        location: activity.location || "Unknown Location",
-        price: formatPrice(activity.price),
-        image:
-          activity.imgUrls && activity.imgUrls.length > 0
-            ? activity.imgUrls[0]
-            : "https://via.placeholder.com/150",
-        description: activity.description,
-        coords: activity.coords,
-      }))
+          id: activity._id,
+          name: activity.title,
+          rating:
+            activity.reviews && activity.reviews.length > 0
+              ? activity.reviews[0].rating
+              : "N/A",
+          location: activity.location || "Unknown Location",
+          price: formatPrice(activity.price),
+          image:
+            activity.imgUrls && activity.imgUrls.length > 0
+              ? activity.imgUrls[0]
+              : "https://via.placeholder.com/150",
+          description: activity.description,
+          coords: activity.coords,
+        }))
       : data.getAllActivity.map((activity) => ({
-        id: activity._id,
-        name: activity.title,
-        rating:
-          activity.reviews && activity.reviews.length > 0
-            ? activity.reviews[0].rating
-            : "N/A",
-        location: activity.location || "Unknown Location",
-        price: formatPrice(activity.price),
-        image:
-          activity.imgUrls && activity.imgUrls.length > 0
-            ? activity.imgUrls[0]
-            : "https://via.placeholder.com/150",
-        description: activity.description,
-        types: activity.types,
-        imgUrls: activity.imgUrls || [],
-        coords: activity.coords,
-      }));
+          id: activity._id,
+          name: activity.title,
+          rating:
+            activity.reviews && activity.reviews.length > 0
+              ? activity.reviews[0].rating
+              : "N/A",
+          location: activity.location || "Unknown Location",
+          price: formatPrice(activity.price),
+          image:
+            activity.imgUrls && activity.imgUrls.length > 0
+              ? activity.imgUrls[0]
+              : "https://via.placeholder.com/150",
+          description: activity.description,
+          types: activity.types,
+          imgUrls: activity.imgUrls || [],
+          coords: activity.coords,
+        }));
 
   const ListHeader = () => (
     <View style={styles.headerContainer}>
@@ -282,7 +288,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
         </Modal>
       )}
       {/* AI Modal */}
-   {/* AI Modal */}
+      {/* AI Modal */}
       {modalVisible && (
         <Modal
           visible={modalVisible}
@@ -350,7 +356,6 @@ const HomeScreen = ({ searchResults, navigation }) => {
         </Modal>
       )}
 
-
       {/* Floating Action Button */}
       <TouchableOpacity
         style={styles.floatingButton}
@@ -375,7 +380,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#000",
     padding: 10,
-    
   },
 
   headerText: {
@@ -455,7 +459,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: "90%",
     height: "80%",
-    
   },
   scrollViewContent: {
     padding: 10,

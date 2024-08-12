@@ -50,10 +50,7 @@ const AddActivityScreen = ({ navigation }) => {
     }
   }, [coords]);
 
-  const [addActivity] = useMutation(ADD_ACTIVITY, {
-    refetchQueries: [{ query: GET_ACTIVITY }],
-    awaitRefetchQueries: true,
-  });
+  const [addActivity, { data, error, loading }] = useMutation(ADD_ACTIVITY);
 
   const handleAddImageUrl = () => setImgUrls([...imgUrls, ""]);
   const handleRemoveImageUrl = (index) =>
@@ -106,20 +103,23 @@ const AddActivityScreen = ({ navigation }) => {
         imgUrls,
         coords.latitude
       );
-      await addActivity({
+      const result = await addActivity({
         variables: {
           title,
+          price: +price,
           description,
-          tags,
-          price: parseFloat(price),
-          location,
           imgUrls,
-          latitude: coords.latitude.toString(),
-          longitude: coords.longitude.toString(),
+          tags,
+          location,
+          coords: {
+            latitude: coords.latitude.toString(),
+            longitude: coords.longitude.toString(),
+          },
         },
       });
+      console.log(result);
       Alert.alert("Success", "Activity added successfully");
-      navigation.goBack();
+      navigation.replace("MainTab");
     } catch (error) {
       console.error(error);
       Alert.alert("Error", "Something went wrong");

@@ -1,12 +1,19 @@
 import { gql } from "@apollo/client";
 
 export const ADD_ACTIVITY = gql`
-mutation AddActivityForSeller($title: String, $price: Int, $imgurls: [String], $description: String, $tags: [String], $location: String) {
-  addActivityForSeller(title: $title, price: $price, imgurls: $imgurls, description: $description, tags: $tags, location: $location, coords: $coords) {
+mutation Mutation($title: String, $price: Int, $imgUrls: [String], $description: String, $tags: [String], $location: String, $coords: CoordinateInput) {
+  addActivityForSeller(title: $title, price: $price, imgUrls: $imgUrls, description: $description, tags: $tags, location: $location, coords: $coords) {
     _id
     title
     price
     imgUrls
+    reviews {
+      content
+      username
+      rating
+      createdAt
+      updatedAt
+    }
     description
     userId
     tags
@@ -17,13 +24,6 @@ mutation AddActivityForSeller($title: String, $price: Int, $imgurls: [String], $
     coords {
       latitude
       longitude
-    }
-    reviews {
-      content
-      username
-      rating
-      createdAt
-      updatedAt
     }
   }
 }`;
