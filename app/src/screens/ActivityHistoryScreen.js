@@ -21,7 +21,8 @@ function ActivityHistoryScreen() {
   const { loading, error, data } = useQuery(GET_TRIPS_BY_CUSTOMER_ID, {
     variables: { id: userId },
     skip: !userId,
-    cache: "no-cache",
+    fetchPolicy: "no-cache",
+    refetchOnWindowFocus: false, // Prevents refetching when the window regains focus
   });
 
   useEffect(() => {
