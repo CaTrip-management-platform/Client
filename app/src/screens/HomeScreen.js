@@ -320,63 +320,87 @@ const HomeScreen = ({ searchResults, navigation }) => {
         </Modal>
       )}
 
-      {/* Chat Modal */}
-      <Modal
-        visible={modalVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-          <View style={styles.chatModalContainer}>
-            <View style={styles.chatHeader}>
-              <Text style={styles.chatHeaderTitle}>Chat with AI</Text>
-              <TouchableOpacity onPress={() => setModalVisible(false)}>
-                <Ionicons name="close" size={24} color="white" />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.chatContent}>
-              <ScrollView
-                style={styles.chatScroll}
-                contentContainerStyle={styles.chatScrollContent}
+      {/* AI Modal */}
+      {modalVisible && (
+        <Modal
+          visible={modalVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setModalVisible(false)}
+          style={styles.modalContainer}
+        >
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPressOut={() => setModalVisible(false)}
+          >
+            <View style={styles.modalContainer}>
+              <ImageBackground
+                source={{
+                  uri: "https://5.imimg.com/data5/SELLER/Default/2023/7/322745470/DM/IE/MR/127740382/whatsapp-image-2023-07-05-at-6-40-02-pm.jpeg",
+                }}
+                style={styles.backgroundImage}
+                onStartShouldSetResponder={() => true}
               >
-                {aiMessages.map((message, index) => (
-                  <View
-                    key={index}
-                    style={
-                      message.type === "user"
-                        ? styles.userMessage
-                        : styles.aiMessage
-                    }
+                <View style={styles.headerContainer}>
+                  <TouchableOpacity
+                    style={styles.closeIcon}
+                    onPress={() => setModalVisible(false)}
                   >
-                    <Text
-                      style={
-                        message.type === "user"
-                          ? styles.userMessageText
-                          : styles.aiMessageText
-                      }
-                    >
-                      {message.text}
-                    </Text>
-                  </View>
-                ))}
-              </ScrollView>
+                    <Ionicons name="close" size={15} color="#fff" />
+                  </TouchableOpacity>
+                  <Text style={styles.headerText}>Ask Something?</Text>
+                </View>
+                <FlatList
+                  data={aiMessages}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity>
+                      <View
+                        style={
+                          item.type === "ai"
+                            ? styles.aiMessage
+                            : styles.userMessage
+                        }
+                      >
+                        <Text style={styles.messageText}>{item.text}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                  keyExtractor={(item, index) => index.toString()}
+                  style={styles.messagesList}
+                  contentContainerStyle={{
+                    flexGrow: 1,
+                    justifyContent: "flex-end",
+                  }}
+                />
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={styles.textInput}
+                    value={userMessage}
+                    onChangeText={setUserMessage}
+                    placeholder="Type your message"
+                    placeholderTextColor="#888"
+                  />
+                  <TouchableOpacity
+                    onPress={sendMessage}
+                    style={styles.sendButton}
+                  >
+                    <Text style={styles.sendButtonText}>Send</Text>
+                  </TouchableOpacity>
+                </View>
+              </ImageBackground>
             </View>
-            <View style={styles.chatFooter}>
-              <TextInput
-                style={styles.chatInput}
-                placeholder="Type your message"
-                value={userMessage}
-                onChangeText={setUserMessage}
-                onSubmitEditing={sendMessage}
-              />
-              <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-                <FontAwesome5 name="paper-plane" size={20} color="white" />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+          </TouchableOpacity>
+        </Modal>
+      )}
+
+      {/* Floating Action Button */}
+      <TouchableOpacity
+        style={styles.floatingButton}
+        onPress={() => setModalVisible(true)}
+      >
+        <FontAwesome5 name="github-alt" size={24} color="black" />
+      </TouchableOpacity>
     </ImageBackground>
   );
 };
@@ -391,16 +415,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   errorText: {
-    color: "red",
     fontSize: 18,
+    color: "red",
     textAlign: "center",
     marginTop: 20,
   },
   card: {
+    margin: 10,
     marginBottom: 20,
     backgroundColor: "#fff",
     borderRadius: 10,
     overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
   },
   cardImage: {
     width: "100%",
@@ -414,29 +444,43 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   cardRating: {
-    color: "gray",
+    fontSize: 16,
+    color: "#888",
   },
   cardLocation: {
-    color: "gray",
+    fontSize: 16,
+    color: "#888",
   },
   cardPrice: {
     fontSize: 16,
+    fontWeight: "bold",
     color: "green",
   },
   listContent: {
     paddingHorizontal: 10,
+    paddingBottom: 100,
   },
   headerContainer: {
-    backgroundColor: "#f8f8f8",
-    paddingVertical: 20,
-    paddingHorizontal: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "#000",
+    padding: 15,
+    backgroundColor: "#fff",
+    elevation: 3,
+    borderBottomRightRadius: 15,
+    borderBottomLeftRadius: 15,
+    marginBottom: 8,
   },
   headerContent: {
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 10,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: "bold",
+    marginVertical: 5,
     marginBottom: 10,
   },
   modalOverlay: {
@@ -448,12 +492,14 @@ const styles = StyleSheet.create({
   modalContainer: {
     backgroundColor: "#fff",
     borderRadius: 10,
-    padding: 20,
+
     width: "90%",
+    height: "80%",
     maxHeight: "80%",
   },
   scrollViewContent: {
     flexGrow: 1,
+    padding: 10,
   },
   selectedActivityImage: {
     width: "100%",
@@ -461,12 +507,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   imageNavigationContainer: {
-    marginTop: 10,
-    position: "relative",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 10,
+    position: "absolute",
+    top: 75,
+    left: 10,
+    width: "100%",
   },
   navButton: {
-    backgroundColor: "rgba(0,0,0,0.5)",
-    borderRadius: 8,
+    backgroundColor: "#000",
+    borderRadius: 20,
     padding: 10,
     paddingVertical: 86,
     position: "absolute",
@@ -478,7 +529,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   selectedActivityTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "bold",
     marginVertical: 10,
   },
@@ -489,14 +540,16 @@ const styles = StyleSheet.create({
   selectedActivityRating: {
     fontSize: 16,
     marginVertical: 5,
+    color: "#888",
   },
   modalLabel: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
     marginTop: 10,
   },
   activityPrice: {
     fontSize: 18,
+    fontWeight: "bold",
     color: "green",
   },
   addToTimelineButton: {
@@ -512,12 +565,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   buttonContainer: {
+    padding: 10,
+    alignItems: "center",
     marginTop: 20,
   },
   closeButton: {
-    backgroundColor: "#f44336",
+    backgroundColor: "#f00",
     borderRadius: 5,
     padding: 10,
+    marginTop: 10,
     alignItems: "center",
   },
   closeButtonText: {
@@ -528,6 +584,15 @@ const styles = StyleSheet.create({
   imageViewerContainer: {
     flex: 1,
     justifyContent: "center",
+  },
+  chatContainer: {
+    flex: 1,
+    padding: 10,
+  },
+  headerText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
   },
   chatModalContainer: {
     flex: 1,
@@ -555,25 +620,28 @@ const styles = StyleSheet.create({
   },
   userMessage: {
     alignSelf: "flex-end",
-    backgroundColor: "#e1ffc7",
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 10,
-    maxWidth: "80%",
+    backgroundColor: "#d3f1ff",
+    borderRadius: 20,
+    padding: 8,
+    marginVertical: 4,
+    maxWidth: "75%",
+    marginLeft: "auto",
+    marginRight: 10,
   },
   aiMessage: {
     alignSelf: "flex-start",
-    backgroundColor: "#e1e1e1",
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 10,
-    maxWidth: "80%",
+    backgroundColor: "#e1ffc7",
+    borderRadius: 20,
+    padding: 8,
+    marginVertical: 4,
+    maxWidth: "75%",
+    marginLeft: 10,
   },
   userMessageText: {
     color: "#000",
   },
-  aiMessageText: {
-    color: "#000",
+  messageText: {
+    fontSize: 16,
   },
   chatFooter: {
     flexDirection: "row",
@@ -589,12 +657,30 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
   },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderTopColor: "#ddd",
+  },
+  textInput: {
+    flex: 1,
+    borderRadius: 20,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    padding: 10,
+    marginRight: 10,
+  },
+  sendButton: {
+    backgroundColor: "#007bff",
+    borderRadius: 20,
+    padding: 10,
+  },
   sendButtonText: {
     color: "#fff",
     fontSize: 16,
-  },
-  imageViewerContainer: {
-    flex: 1,
   },
   floatingButton: {
     position: "absolute",
@@ -608,18 +694,10 @@ const styles = StyleSheet.create({
   closeIcon: {
     position: "absolute",
     top: 8,
-
+    left: 10,
     backgroundColor: "#FFC436",
     borderRadius: 50,
     padding: 9,
-
-    left: 10,
-  },
-  // modalContainer: {
-  //     borderRadius: 30,
-  // },
-  sendButton: {
-    marginLeft: 10,
   },
 });
 
