@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Image, FlatList, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity } from "react-native";
 import { useQuery } from "@apollo/client";
 import { StatusBar } from "expo-status-bar";
 import * as SecureStore from "expo-secure-store";
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import { GET_TRIPS_BY_CUSTOMER_ID } from "../queries/getTripsByCustomerId";
+import { useNavigation } from '@react-navigation/native';
 
 function ActivityHistoryScreen() {
   const [userId, setUserId] = useState("");
+  const navigation = useNavigation();
 
   const { loading, error, data } = useQuery(GET_TRIPS_BY_CUSTOMER_ID, {
     variables: { id: userId },
     skip: !userId,
+    cache: 'no-cache',
   });
 
-  console.log(data)
   useEffect(() => {
     const fetchTokenData = async () => {
       try {
@@ -23,7 +25,6 @@ function ActivityHistoryScreen() {
           try {
             const decoded = jwtDecode(token);
             setUserId(decoded.id);
-           
           } catch (decodeError) {
             console.error("Error decoding token:", decodeError);
           }
@@ -48,9 +49,12 @@ function ActivityHistoryScreen() {
 
   const trips = data?.getTripsByCustomerId || [];
 
+  const handlePress = (tripId) => {
+    navigation.navigate('TripDetailScreen', { tripId });
+  };
+
   const renderTrip = ({ item }) => (
-    <View style={styles.card}>
-   
+    <TouchableOpacity style={styles.card} onPress={() => handlePress(item._id)}>
       <View style={styles.cardContent}>
         <Text style={styles.cardTitle}>{item.destination}</Text>
         <Text style={styles.cardDate}>
@@ -59,7 +63,7 @@ function ActivityHistoryScreen() {
         <Text style={styles.cardDescription}>Total Price: {item.totalPrice}</Text>
         <Text style={styles.cardStatus}>Payment Status: {item.paymentStatus}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -91,10 +95,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-  },
-  cardImage: {
-    width: "100%",
-    height: 120,
   },
   cardContent: {
     padding: 15,
@@ -136,4 +136,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ActivityHistoryScreen; 
+export default ActivityHistoryScreen;

@@ -13,6 +13,7 @@ import ActivityScreen from "../screens/ActivityScreen";
 import Map from "../googleMap/Map";
 import HomeScreen from "../screens/HomeScreen";
 import AddScreen from "../screens/AddScreen";
+import TripDetailScreen from "../screens/DetailTripByIdScreen";
 const Stack = createNativeStackNavigator();
 
 const AuthStack = () => (
@@ -61,6 +62,11 @@ const AppStack = () => (
        <Stack.Screen
       name="Add"
       component={AddScreen}
+      options={{ headerShown: true }}
+    />
+           <Stack.Screen
+      name="TripDetailScreen"
+      component={TripDetailScreen}
       options={{ headerShown: true }}
     />
     <Stack.Screen
