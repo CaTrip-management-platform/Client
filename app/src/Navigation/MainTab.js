@@ -19,7 +19,8 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useQuery } from "@apollo/client";
 import { SEARCH_ACTIVITY } from "../queries/searchActivity.js";
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-
+import ActivityScreen from "../screens/ActivityScreen.js";
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 const Tab = createBottomTabNavigator();
 
@@ -78,28 +79,47 @@ export default function MainTab() {
             </View>
           ),
           headerLeft: () => <LogoTitle />,
-          headerRight: () => (
-            <View style={styles.headerRightContainer}>
-              <MaterialIcons
-                name="luggage"
-                size={25}
-                color="black"
-                onPress={() => navigation.navigate("Activity")}
-              />
-              <Feather
-                name="menu"
-                size={27}
-                color={"black"}
-                onPress={() => navigation.getParent("RightDrawer").openDrawer()}
-                style={styles.headerIcon}
-              />
-            </View>
-          ),
+          // headerRight: () => (
+          //   <View style={styles.headerRightContainer}>
+          //     <MaterialIcons
+          //       name="luggage"
+          //       size={25}
+          //       color="black"
+          //       onPress={() => navigation.navigate("Activity")}
+          //     />
+          //     <Feather
+          //       name="menu"
+          //       size={27}
+          //       color={"black"}
+          //       onPress={() => navigation.getParent("RightDrawer").openDrawer()}
+          //       style={styles.headerIcon}
+          //     />
+          //   </View>
+          // ),
           tabBarIcon: ({ focused, color, size }) => (
             <MaterialCommunityIcons name={focused ? "home" : "home-outline"} size={24} color="black" />
           ),
         }}
       />
+      <Tab.Screen
+         name="Activity"
+         component={ActivityScreen}
+        options={{
+          tabBarLabel: () => null,
+          tabBarStyle: { backgroundColor: "white" },
+          headerStyle: { backgroundColor: "white" },
+          headerTitleAlign: "center",
+          headerTitle: () => <LogoTitle />,
+          tabBarIcon: ({ focused, color, size }) => (
+           focused ? <MaterialIcons
+            name="luggage"
+            size={25}
+            color="black"
+          /> : <FontAwesome6 name="person-walking-luggage" size={24} color="black" />
+          ),
+        }}
+      />
+
       <Tab.Screen
         name="AddTrip"
         component={AddTripUserScreen}
