@@ -13,7 +13,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
-import { useQuery, useApolloClient, gql } from "@apollo/client";
+import { useQuery, useApolloClient, gql, useMutation } from "@apollo/client";
 import { GET_Activity } from "../queries/getAllActivity";
 import { ActivityIndicator } from "react-native-paper";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -23,6 +23,7 @@ import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 // import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { DELETE_ACTIVITY } from "../queries/delete";
 
 const HomeScreen = ({ searchResults, navigation }) => {
   const navigate = useNavigation();
@@ -37,6 +38,8 @@ const HomeScreen = ({ searchResults, navigation }) => {
 
   const client = useApolloClient();
   const { loading, error, data, refetch } = useQuery(GET_Activity);
+  const [deleteActivity, { loading: deleteLoading, error: deleteError }] =
+    useMutation(DELETE_ACTIVITY);
 
   // console.log(data);
 
@@ -69,7 +72,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
     }, [])
   );
 
-  if (loading) {
+  if (loading || deleteLoading) {
     return (
       <View style={styles.containerLoading}>
         <ActivityIndicator size="large" />
@@ -162,6 +165,19 @@ const HomeScreen = ({ searchResults, navigation }) => {
       alert("Added to Timeline");
     } catch (error) {
       console.error("Error saving data:", error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      const result = await deleteActivity({
+        variables: { activityId: id },
+      });
+      setSelectedActivity(null);
+      console.log(result.data?.deleteActivityForSeller);
+      refetch();
+    } catch (err) {
+      console.log(error);
     }
   };
 
@@ -294,16 +310,19 @@ const HomeScreen = ({ searchResults, navigation }) => {
                           Add to Timeline
                         </Text>
                       </TouchableOpacity>
-                      {/* admin only */}
+                      //!! admin only add condition!
                       <TouchableOpacity
-                        style={styles.addToTimelineButton}
-                        onPress={handleAddToTimeline}
+                        style={{
+                          ...styles.addToTimelineButton,
+                          backgroundColor: "red",
+                        }}
+                        onPress={() => handleDelete(selectedActivity.id)}
                       >
                         <Text style={styles.addToTimelineButtonText}>
                           Delete Activity
                         </Text>
                       </TouchableOpacity>
-                      {/*  */}
+                      //!! admin only
                     </View>
                   </ScrollView>
                 </View>
