@@ -5,8 +5,10 @@ import { StatusBar } from "expo-status-bar";
 import * as SecureStore from "expo-secure-store";
 import {jwtDecode} from 'jwt-decode';
 import { GET_TRIPS_BY_CUSTOMER_ID } from "../queries/getTripsByCustomerId";
+import { useNavigation } from "@react-navigation/native";
 
 function ActivityHistoryScreen() {
+  const navigation = useNavigation()
   const [userId, setUserId] = useState("");
 
   const { loading, error, data } = useQuery(GET_TRIPS_BY_CUSTOMER_ID, {
