@@ -3,6 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
+  Image,
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
@@ -63,7 +64,14 @@ function ActivityHistoryScreen() {
   };
 
   const renderTrip = ({ item }) => (
-    <TouchableOpacity style={styles.card} onPress={() => handlePress(item._id)}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => {
+        navigation.navigate("TripDetailScreen", {
+          _id: item._id,
+        });
+      }}
+    >
       <View style={styles.cardContent}>
         <Text style={styles.cardTitle}>{item.destination}</Text>
         <Text style={styles.cardDate}>
