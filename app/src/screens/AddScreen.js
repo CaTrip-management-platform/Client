@@ -14,7 +14,7 @@ import { ADD_ACTIVITY } from "../queries/addActivityAdmin";
 import { GET_ACTIVITY } from "../queries/getAllActivity";
 import MapView, { Marker } from "react-native-maps";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-// import { GOOGLE_MAPS_API_KEY } from "@env";
+import { GOOGLE_MAPS_API_KEY } from "@env";
 
 const AddActivityScreen = ({ navigation }) => {
   const [title, setTitle] = useState("");
@@ -48,7 +48,6 @@ const AddActivityScreen = ({ navigation }) => {
         1000
       );
     }
-    // console.log(GOOGLE_MAPS_API_KEY);
   }, [coords]);
 
   const [addActivity] = useMutation(ADD_ACTIVITY, {
@@ -77,16 +76,22 @@ const AddActivityScreen = ({ navigation }) => {
     });
     setMarkerPresent(true);
   };
+
+  const moveToLocation = async (latitude, longitude) => {
+    mapRef.current.animateToRegion(
+      {
+        latitude,
+        longitude,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      },
+      2000
+    );
+  };
   const removeMarker = () => {
     setMarkerPresent(false);
     setCoords({ latitude: null, longitude: null });
     setLocation("");
-    setMapRegion({
-      latitude: 37.78825,
-      longitude: -122.4324,
-      latitudeDelta: 0.0922,
-      longitudeDelta: 0.0421,
-    });
   };
   // map
 
@@ -178,23 +183,28 @@ const AddActivityScreen = ({ navigation }) => {
         <Text style={styles.addButton}>Add Another Tag</Text>
       </TouchableOpacity>
       <View>
-        <GooglePlacesAutocomplete
-          placeholder="Search for a location"
-          fetchDetails
-          onPress={(data, details = null) => {
-            const { lat, lng } = details.geometry.location;
-            updateLocation(lat, lng);
-            setLocation(data.description);
-          }}
-          query={{
-            key: "AIzaSyAnEU34u_1aoWcg5hsNQ-e312z-EIWvXF4",
-            language: "en",
-          }}
-          styles={{
-            textInput: styles.input,
-          }}
-        />
-        <Text style={styles.label}>Map:</Text>
+        <View
+          style={{ position: "absolute", width: "100%", zIndex: 1, top: 27 }}
+        >
+          <GooglePlacesAutocomplete
+            placeholder="Search for a location"
+            fetchDetails={true}
+            onPress={(data, details = null) => {
+              const { lat, lng } = details?.geometry?.location;
+              moveToLocation(lat, lng);
+              updateLocation(latitude, longitude);
+            }}
+            query={{
+              key: GOOGLE_MAPS_API_KEY,
+              language: "en",
+            }}
+            onFail={(error) => console.error(error)}
+            styles={{
+              textInput: { ...styles.input, marginBottom: 0 },
+            }}
+          />
+        </View>
+        <Text style={styles.label}>Add location on map:</Text>
         <MapView
           ref={mapRef}
           style={styles.map}
@@ -211,7 +221,13 @@ const AddActivityScreen = ({ navigation }) => {
         {markerPresent && (
           <TouchableOpacity
             onPress={removeMarker}
-            style={styles.removeMarkerButton}
+            style={{
+              ...styles.removeMarkerButton,
+              position: "absolute",
+              end: 0,
+              bottom: 30,
+              right: 10,
+            }}
           >
             <Text style={styles.removeMarkerButtonText}>Remove Marker</Text>
           </TouchableOpacity>
