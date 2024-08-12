@@ -294,6 +294,16 @@ const HomeScreen = ({ searchResults, navigation }) => {
                           Add to Timeline
                         </Text>
                       </TouchableOpacity>
+                      {/* admin only */}
+                      <TouchableOpacity
+                        style={styles.addToTimelineButton}
+                        onPress={handleAddToTimeline}
+                      >
+                        <Text style={styles.addToTimelineButtonText}>
+                          Delete Activity
+                        </Text>
+                      </TouchableOpacity>
+                      {/*  */}
                     </View>
                   </ScrollView>
                 </View>
