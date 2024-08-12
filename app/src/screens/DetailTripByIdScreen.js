@@ -1,28 +1,25 @@
 import React from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import { useQuery } from '@apollo/client';
 import { GET_TRIP_BY_ID } from '../queries/getTripById';
 import { GET_ACTIVITY_BY_ID } from '../queries/getActivityById';
 
 function TripDetailScreen({ route }) {
   const { tripId } = route.params;
-  
-  // Query untuk mengambil detail trip
+
   const { loading: tripLoading, error: tripError, data: tripData } = useQuery(GET_TRIP_BY_ID, {
     variables: { tripId, caches: 'no-cache' },
   });
 
-  // Mendapatkan ID aktivitas dari trip
   const activityIds = tripData?.getTripById.activities.map(activity => activity.activityId) || [];
 
-  // Query untuk mengambil detail aktivitas
   const { loading: activityLoading, error: activityError, data: activityData } = useQuery(GET_ACTIVITY_BY_ID, {
-    variables: { id: activityIds[0] }, // Mengambil ID aktivitas pertama sebagai contoh
-    skip: activityIds.length === 0, // Jangan jalankan query jika tidak ada ID aktivitas
+    variables: { id: activityIds[0] },
+    skip: activityIds.length === 0, 
   });
 
   if (tripLoading || activityLoading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return <ActivityIndicator size="large" color="#0000ff" style={styles.loader} />;
   }
 
   if (tripError || activityError) {
@@ -36,17 +33,19 @@ function TripDetailScreen({ route }) {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{trip.destination || 'Destination not available'}</Text>
-      <Text style={styles.details}>Start Date: {trip.startDate ? new Date(trip.startDate).toLocaleDateString() : 'Not available'}</Text>
-      <Text style={styles.details}>End Date: {trip.endDate ? new Date(trip.endDate).toLocaleDateString() : 'Not available'}</Text>
-      <Text style={styles.details}>Total Price: {trip.totalPrice ?? 'Not available'}</Text>
-      <Text style={styles.details}>Payment Status: {trip.paymentStatus || 'Not available'}</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.card}>
+        <Text style={styles.title}>{trip.destination || 'Destination not available'}</Text>
+        <Text style={styles.details}>Start Date: {trip.startDate ? new Date(trip.startDate).toLocaleDateString() : 'Not available'}</Text>
+        <Text style={styles.details}>End Date: {trip.endDate ? new Date(trip.endDate).toLocaleDateString() : 'Not available'}</Text>
+        <Text style={styles.details}>Total Price: {trip.totalPrice ?? 'Not available'}</Text>
+        <Text style={styles.details}>Payment Status: {trip.paymentStatus || 'Not available'}</Text>
+      </View>
 
       {activityData && (
         <View style={styles.activitiesContainer}>
           {trip.activities.map((activity, index) => (
-            <View key={index} style={styles.activity}>
+            <View key={index} style={styles.card}>
               <Text style={styles.activityTitle}>{activityData.getActivityById.title}</Text>
               <Text style={styles.activityDetails}>Price: {activityData.getActivityById.price}</Text>
               <Text style={styles.activityDetails}>Description: {activityData.getActivityById.description}</Text>
@@ -54,15 +53,26 @@ function TripDetailScreen({ route }) {
           ))}
         </View>
       )}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     padding: 20,
     backgroundColor: "#fff",
+  },
+  card: {
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 15,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   title: {
     fontSize: 24,
@@ -87,15 +97,14 @@ const styles = StyleSheet.create({
   activitiesContainer: {
     marginTop: 20,
   },
-  activity: {
-    marginBottom: 20,
-  },
   activityTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    marginBottom: 5,
   },
   activityDetails: {
     fontSize: 16,
+    marginBottom: 5,
   },
 });
 
