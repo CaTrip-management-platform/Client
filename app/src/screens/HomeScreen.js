@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -20,9 +20,9 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import ImageViewer from "react-native-image-zoom-viewer";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 // import * as SecureStore from 'expo-secure-store';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const HomeScreen = ({ searchResults, navigation }) => {
   const navigate = useNavigation();
@@ -33,10 +33,10 @@ const HomeScreen = ({ searchResults, navigation }) => {
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showImageViewer, setShowImageViewer] = useState(false);
-  const [timelineData, setTimelineData] = useState([])
+  const [timelineData, setTimelineData] = useState([]);
 
   const client = useApolloClient();
-  const { loading, error, data } = useQuery(GET_Activity);
+  const { loading, error, data, refetch } = useQuery(GET_Activity);
 
   // console.log(data);
 
@@ -63,6 +63,12 @@ const HomeScreen = ({ searchResults, navigation }) => {
     }
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
+
   if (loading) {
     return (
       <View style={styles.containerLoading}>
@@ -80,39 +86,39 @@ const HomeScreen = ({ searchResults, navigation }) => {
   const activities =
     searchResults.length > 0
       ? searchResults.map((activity) => ({
-        id: activity._id,
-        name: activity.title,
-        rating:
-          activity.reviews && activity.reviews.length > 0
-            ? activity.reviews[0].rating
-            : "N/A",
-        location: activity.location || "Unknown Location",
-        price: formatPrice(activity.price),
-        image:
-          activity.imgUrls && activity.imgUrls.length > 0
-            ? activity.imgUrls[0]
-            : "https://via.placeholder.com/150",
-        description: activity.description,
-        coords: activity.coords,
-      }))
+          id: activity._id,
+          name: activity.title,
+          rating:
+            activity.reviews && activity.reviews.length > 0
+              ? activity.reviews[0].rating
+              : "N/A",
+          location: activity.location || "Unknown Location",
+          price: formatPrice(activity.price),
+          image:
+            activity.imgUrls && activity.imgUrls.length > 0
+              ? activity.imgUrls[0]
+              : "https://via.placeholder.com/150",
+          description: activity.description,
+          coords: activity.coords,
+        }))
       : data.getAllActivity.map((activity) => ({
-        id: activity._id,
-        name: activity.title,
-        rating:
-          activity.reviews && activity.reviews.length > 0
-            ? activity.reviews[0].rating
-            : "N/A",
-        location: activity.location || "Unknown Location",
-        price: formatPrice(activity.price),
-        image:
-          activity.imgUrls && activity.imgUrls.length > 0
-            ? activity.imgUrls[0]
-            : "https://via.placeholder.com/150",
-        description: activity.description,
-        types: activity.types,
-        imgUrls: activity.imgUrls || [],
-        coords: activity.coords,
-      }));
+          id: activity._id,
+          name: activity.title,
+          rating:
+            activity.reviews && activity.reviews.length > 0
+              ? activity.reviews[0].rating
+              : "N/A",
+          location: activity.location || "Unknown Location",
+          price: formatPrice(activity.price),
+          image:
+            activity.imgUrls && activity.imgUrls.length > 0
+              ? activity.imgUrls[0]
+              : "https://via.placeholder.com/150",
+          description: activity.description,
+          types: activity.types,
+          imgUrls: activity.imgUrls || [],
+          coords: activity.coords,
+        }));
 
   const ListHeader = () => (
     <View style={styles.headerContainer}>
@@ -139,7 +145,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
     try {
       await AsyncStorage.setItem(key, value);
     } catch (error) {
-      console.error('Error saving data:', error);
+      console.error("Error saving data:", error);
     }
   };
   const handleAddToTimeline = async () => {
@@ -149,13 +155,13 @@ const HomeScreen = ({ searchResults, navigation }) => {
     });
 
     try {
-      console.log(timelineData)
+      console.log(timelineData);
 
       const timelineDataString = JSON.stringify(timelineData);
-      await saveData('timelineData', timelineDataString);
+      await saveData("timelineData", timelineDataString);
       alert("Added to Timeline");
     } catch (error) {
-      console.error('Error saving data:', error);
+      console.error("Error saving data:", error);
     }
   };
 
@@ -364,10 +370,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
                 onChangeText={setUserMessage}
                 onSubmitEditing={sendMessage}
               />
-              <TouchableOpacity
-                style={styles.sendButton}
-                onPress={sendMessage}
-              >
+              <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
                 <FontAwesome5 name="paper-plane" size={20} color="white" />
               </TouchableOpacity>
             </View>
