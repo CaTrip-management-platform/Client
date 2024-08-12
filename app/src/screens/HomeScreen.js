@@ -210,7 +210,16 @@ const HomeScreen = ({ searchResults, navigation }) => {
           >
             <View style={styles.modalOverlay}>
               <TouchableWithoutFeedback>
-                <View style={styles.modalContainer}>
+                <View style={{ ...styles.modalContainer, borderRadius: 15 }}>
+                  <View style={styles.headerContainer}>
+                    <TouchableOpacity
+                      style={styles.closeIcon}
+                      onPress={() => setActivityModalVisible(false)}
+                    >
+                      <Ionicons name="close" size={15} color="#fff" />
+                    </TouchableOpacity>
+                    <Text style={styles.headerText}>Activity Detail</Text>
+                  </View>
                   <ScrollView contentContainerStyle={styles.scrollViewContent}>
                     <TouchableOpacity onPress={() => setShowImageViewer(true)}>
                       <Image
@@ -286,14 +295,6 @@ const HomeScreen = ({ searchResults, navigation }) => {
                         </Text>
                       </TouchableOpacity>
                     </View>
-                    <View style={styles.buttonContainer}>
-                      <TouchableOpacity
-                        style={styles.closeButton}
-                        onPress={() => setActivityModalVisible(false)}
-                      >
-                        <Text style={styles.closeButtonText}>Close</Text>
-                      </TouchableOpacity>
-                    </View>
                   </ScrollView>
                 </View>
               </TouchableWithoutFeedback>
@@ -327,19 +328,19 @@ const HomeScreen = ({ searchResults, navigation }) => {
           transparent={true}
           animationType="slide"
           onRequestClose={() => setModalVisible(false)}
-          style={styles.modalContainer}
+          style={{ ...styles.modalContainer, borderRadius: 15 }}
         >
           <TouchableOpacity
-            style={styles.modalOverlay}
+            style={{ ...styles.modalOverlay, borderRadius: 15 }}
             activeOpacity={1}
             onPressOut={() => setModalVisible(false)}
           >
-            <View style={styles.modalContainer}>
+            <View style={{ ...styles.modalContainer, borderRadius: 15 }}>
               <ImageBackground
                 source={{
                   uri: "https://5.imimg.com/data5/SELLER/Default/2023/7/322745470/DM/IE/MR/127740382/whatsapp-image-2023-07-05-at-6-40-02-pm.jpeg",
                 }}
-                style={styles.backgroundImage}
+                style={{ ...styles.backgroundImage, borderRadius: 15 }}
                 onStartShouldSetResponder={() => true}
               >
                 <View style={styles.headerContainer}>
@@ -417,7 +418,7 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 18,
     color: "red",
-    textAlign: "center",
+    lign: "center",
     marginTop: 20,
   },
   card: {
@@ -468,8 +469,7 @@ const styles = StyleSheet.create({
     padding: 15,
     backgroundColor: "#fff",
     elevation: 3,
-    borderBottomRightRadius: 15,
-    borderBottomLeftRadius: 15,
+    borderRadius: 15,
     marginBottom: 8,
   },
   headerContent: {
@@ -491,8 +491,6 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: "#fff",
-    borderRadius: 10,
-
     width: "90%",
     height: "80%",
     maxHeight: "80%",
@@ -519,10 +517,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
     borderRadius: 20,
     padding: 10,
-    paddingVertical: 86,
-    position: "absolute",
-    top: "50%",
-    transform: [{ translateY: -210 }],
   },
   navButtonText: {
     color: "#fff",
