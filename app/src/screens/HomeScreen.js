@@ -173,7 +173,16 @@ const HomeScreen = ({ searchResults, navigation }) => {
           >
             <View style={styles.modalOverlay}>
               <TouchableWithoutFeedback>
-                <View style={styles.modalContainer}>
+                <View style={{ ...styles.modalContainer, borderRadius: 15 }}>
+                  <View style={styles.headerContainer}>
+                    <TouchableOpacity
+                      style={styles.closeIcon}
+                      onPress={() => setActivityModalVisible(false)}
+                    >
+                      <Ionicons name="close" size={15} color="#fff" />
+                    </TouchableOpacity>
+                    <Text style={styles.headerText}>Activity Detail</Text>
+                  </View>
                   <ScrollView contentContainerStyle={styles.scrollViewContent}>
                     <TouchableOpacity onPress={() => setShowImageViewer(true)}>
                       <Image
@@ -245,14 +254,6 @@ const HomeScreen = ({ searchResults, navigation }) => {
                         {selectedActivity.price}
                       </Text>
                     </View>
-                    <View style={styles.buttonContainer}>
-                      <TouchableOpacity
-                        style={styles.closeButton}
-                        onPress={() => setActivityModalVisible(false)}
-                      >
-                        <Text style={styles.closeButtonText}>Close</Text>
-                      </TouchableOpacity>
-                    </View>
                   </ScrollView>
                 </View>
               </TouchableWithoutFeedback>
@@ -278,81 +279,80 @@ const HomeScreen = ({ searchResults, navigation }) => {
           )}
         </Modal>
       )}
-      {/* AI Modal */}
-   {/* AI Modal */}
-    {modalVisible && (
-  <Modal
-    visible={modalVisible}
-    transparent={true}
-    animationType="slide"
-    onRequestClose={() => setModalVisible(false)}
-    style={styles.modalContainer}
-  >
-    <TouchableOpacity
-      style={styles.modalOverlay}
-      activeOpacity={1}
-      onPressOut={() => setModalVisible(false)}
-    >
-      <View style={styles.modalContainer}>
-        <ImageBackground
-          source={{
-            uri: "https://5.imimg.com/data5/SELLER/Default/2023/7/322745470/DM/IE/MR/127740382/whatsapp-image-2023-07-05-at-6-40-02-pm.jpeg",
-          }}
-          style={styles.backgroundImage}
-          onStartShouldSetResponder={() => true}
-        >
-          <View style={styles.headerContainer}>
-            <TouchableOpacity
-              style={styles.closeIcon}
-              onPress={() => setModalVisible(false)}
-            >
-              <Ionicons name="close" size={15} color="#fff" />
-            </TouchableOpacity>
-            <Text style={styles.headerText}>Ask Something?</Text>
-          </View>
-          <FlatList
-            data={aiMessages}
-            renderItem={({ item }) => (
-              <TouchableOpacity>
-                <View
-                  style={
-                    item.type === "ai"
-                      ? styles.aiMessage
-                      : styles.userMessage
-                  }
-                >
-                  <Text style={styles.messageText}>{item.text}</Text>
-                </View>
-              </TouchableOpacity>
-            )}
-            keyExtractor={(item, index) => index.toString()}
-            style={styles.messagesList}
-            contentContainerStyle={{
-              flexGrow: 1,
-              justifyContent: "flex-end",
-            }}
-          />
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.textInput}
-              value={userMessage}
-              onChangeText={setUserMessage}
-              placeholder="Type your message"
-              placeholderTextColor="#888"
-            />
-            <TouchableOpacity
-              onPress={sendMessage}
-              style={styles.sendButton}
-            >
-              <Text style={styles.sendButtonText}>Send</Text>
-            </TouchableOpacity>
-          </View>
-        </ImageBackground>
-      </View>
-    </TouchableOpacity>
-  </Modal>
-)}
 
+      {/* AI Modal */}
+      {modalVisible && (
+        <Modal
+          visible={modalVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setModalVisible(false)}
+          style={{ ...styles.modalContainer, borderRadius: 15 }}
+        >
+          <TouchableOpacity
+            style={{ ...styles.modalOverlay, borderRadius: 15 }}
+            activeOpacity={1}
+            onPressOut={() => setModalVisible(false)}
+          >
+            <View style={{ ...styles.modalContainer, borderRadius: 15 }}>
+              <ImageBackground
+                source={{
+                  uri: "https://5.imimg.com/data5/SELLER/Default/2023/7/322745470/DM/IE/MR/127740382/whatsapp-image-2023-07-05-at-6-40-02-pm.jpeg",
+                }}
+                style={{ ...styles.backgroundImage, borderRadius: 15 }}
+                onStartShouldSetResponder={() => true}
+              >
+                <View style={styles.headerContainer}>
+                  <TouchableOpacity
+                    style={styles.closeIcon}
+                    onPress={() => setModalVisible(false)}
+                  >
+                    <Ionicons name="close" size={15} color="#fff" />
+                  </TouchableOpacity>
+                  <Text style={styles.headerText}>Ask Something?</Text>
+                </View>
+                <FlatList
+                  data={aiMessages}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity>
+                      <View
+                        style={
+                          item.type === "ai"
+                            ? styles.aiMessage
+                            : styles.userMessage
+                        }
+                      >
+                        <Text style={styles.messageText}>{item.text}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                  keyExtractor={(item, index) => index.toString()}
+                  style={styles.messagesList}
+                  contentContainerStyle={{
+                    flexGrow: 1,
+                    justifyContent: "flex-end",
+                  }}
+                />
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={styles.textInput}
+                    value={userMessage}
+                    onChangeText={setUserMessage}
+                    placeholder="Type your message"
+                    placeholderTextColor="#888"
+                  />
+                  <TouchableOpacity
+                    onPress={sendMessage}
+                    style={styles.sendButton}
+                  >
+                    <Text style={styles.sendButtonText}>Send</Text>
+                  </TouchableOpacity>
+                </View>
+              </ImageBackground>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+      )}
 
       {/* Floating Action Button */}
       <TouchableOpacity
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 18,
     color: "red",
-    textAlign: "center",
+    lign: "center",
     marginTop: 20,
   },
   backgroundImage: {
@@ -398,6 +398,7 @@ const styles = StyleSheet.create({
   },
   card: {
     margin: 10,
+    marginBottom: 20,
     backgroundColor: "#fff",
     borderRadius: 10,
     overflow: "hidden",
@@ -429,25 +430,33 @@ const styles = StyleSheet.create({
   cardPrice: {
     fontSize: 16,
     fontWeight: "bold",
+    color: "green",
+  },
+  listContent: {
+    paddingHorizontal: 10,
+    paddingBottom: 100,
   },
   headerContainer: {
-    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "#000",
+    padding: 15,
     backgroundColor: "#fff",
     elevation: 3,
-    borderRadius: 10,
+    borderRadius: 15,
+    marginBottom: 8,
   },
   headerContent: {
     flexDirection: "row",
     alignItems: "center",
-    
+    marginBottom: 10,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: "bold",
     marginVertical: 5,
-  },
-  listContent: {
-    paddingBottom: 100,
+    marginBottom: 10,
   },
   modalOverlay: {
     flex: 1,
@@ -458,12 +467,12 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: "#fff",
-    borderRadius: 10,
     width: "90%",
     height: "80%",
-    
+    maxHeight: "80%",
   },
   scrollViewContent: {
+    flexGrow: 1,
     padding: 10,
   },
   selectedActivityImage: {
@@ -499,6 +508,7 @@ const styles = StyleSheet.create({
   },
   selectedActivityRating: {
     fontSize: 16,
+    marginVertical: 5,
     color: "#888",
   },
   modalLabel: {
@@ -509,10 +519,24 @@ const styles = StyleSheet.create({
   activityPrice: {
     fontSize: 18,
     fontWeight: "bold",
+    color: "green",
+  },
+  addToTimelineButton: {
+    backgroundColor: "#4CAF50",
+    borderRadius: 5,
+    padding: 10,
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  addToTimelineButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   buttonContainer: {
     padding: 10,
     alignItems: "center",
+    marginTop: 20,
   },
   closeButton: {
     backgroundColor: "#f00",
@@ -527,9 +551,33 @@ const styles = StyleSheet.create({
   },
   chatContainer: {
     flex: 1,
+    justifyContent: "center",
+  },
+  chatContainer: {
+    flex: 1,
     padding: 10,
   },
-  messagesList: {
+  headerText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  chatModalContainer: {
+    flex: 1,
+    backgroundColor: "#fff",
+    padding: 20,
+    justifyContent: "space-between",
+  },
+  chatHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  chatHeaderTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  chatContent: {
     flex: 1,
   },
   aiMessage: {
@@ -547,12 +595,49 @@ const styles = StyleSheet.create({
     padding: 8,
     marginVertical: 4,
     alignSelf: "flex-end",
+    backgroundColor: "#d3f1ff",
+    borderRadius: 20,
+    padding: 8,
+    marginVertical: 4,
     maxWidth: "75%",
     marginLeft: "auto",
     marginRight: 10,
   },
+  aiMessage: {
+    alignSelf: "flex-start",
+    backgroundColor: "#e1ffc7",
+    borderRadius: 20,
+    padding: 8,
+    marginVertical: 4,
+    maxWidth: "75%",
+    marginLeft: 10,
+  },
+  userMessageText: {
+    color: "#000",
+  },
   messageText: {
     fontSize: 16,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderTopColor: "#ddd",
+  },
+  textInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    padding: 10,
+    marginRight: 10,
+  },
+  sendButton: {
+    backgroundColor: "#007bff",
+    borderRadius: 20,
+    padding: 10,
   },
   inputContainer: {
     flexDirection: "row",
@@ -579,9 +664,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
   },
-  imageViewerContainer: {
-    flex: 1,
-  },
   floatingButton: {
     position: "absolute",
     bottom: 20,
@@ -594,18 +676,11 @@ const styles = StyleSheet.create({
   closeIcon: {
     position: "absolute",
     top: 8,
-
+    left: 10,
     backgroundColor: "#FFC436",
     borderRadius: 50,
     padding: 9,
-
-    left: 10,
-  }, 
-// modalContainer: {
-
-//     borderRadius: 30,
-
-// },
+  },
 });
 
 export default HomeScreen;

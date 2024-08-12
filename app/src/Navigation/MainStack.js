@@ -13,11 +13,11 @@ import ActivityScreen from "../screens/ActivityScreen";
 import Map from "../googleMap/Map";
 import HomeScreen from "../screens/HomeScreen";
 import AddScreen from "../screens/AddScreen";
-import TripDetailScreen from "../screens/DetailTripByIdScreen";
+import TripDetailsScreen from "../screens/TripDetailsScreen";
 const Stack = createNativeStackNavigator();
 
 const AuthStack = () => (
-  <Stack.Navigator initialRouteName="Login"> 
+  <Stack.Navigator initialRouteName="Login">
     <Stack.Screen
       name="Register"
       component={RegisterScreen}
@@ -38,7 +38,7 @@ const AuthStack = () => (
     />
   </Stack.Navigator>
 );
- 
+
 const AppStack = () => (
   <Stack.Navigator>
     <Stack.Screen
@@ -59,14 +59,14 @@ const AppStack = () => (
       component={ActivityHistoryScreen}
       options={{ headerShown: false }}
     />
-       <Stack.Screen
+    <Stack.Screen
       name="Add"
       component={AddScreen}
       options={{ headerShown: true }}
     />
-           <Stack.Screen
+    <Stack.Screen
       name="TripDetailScreen"
-      component={TripDetailScreen}
+      component={TripDetailsScreen}
       options={{ headerShown: true }}
     />
     <Stack.Screen
@@ -91,7 +91,7 @@ const MainStack = () => {
     const checkToken = async () => {
       try {
         const accessToken = await SecureStore.getItemAsync("accessToken");
-        console.log("MainStack Token:", accessToken); 
+        console.log("MainStack Token:", accessToken);
         if (accessToken) {
           setIsSignedIn(true);
         } else {
