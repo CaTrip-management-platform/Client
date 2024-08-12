@@ -24,7 +24,7 @@ const AddTripScreen = () => {
       setEndDate(date.dateString);
       setShowEndDateCalendar(false);
     }
-  };
+  }; 
 
   const handleSubmit = async () => {
     try {

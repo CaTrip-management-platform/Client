@@ -39,7 +39,7 @@ function ActivityHistoryScreen() {
     fetchTokenData();
   }, []);
 
-  if (loading) {
+  if (loading) { 
     return <ActivityIndicator size="large" color="blue" style={styles.loader} />;
   }
 

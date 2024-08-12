@@ -31,7 +31,7 @@ function TripDetailScreen({ route }) {
   if (!trip) {
     return <Text style={styles.errorText}>Trip not found</Text>;
   }
-
+ 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.card}>

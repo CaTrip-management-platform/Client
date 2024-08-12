@@ -18,4 +18,4 @@ query GetTripById($tripId: String!) {
       updatedAt
     }
   }
-  `
+  ` 

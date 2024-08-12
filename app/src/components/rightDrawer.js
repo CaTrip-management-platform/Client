@@ -8,5 +8,5 @@ function RightDrawerContent() {
     </View>
   );
 }
-
+ 
 export default RightDrawerContent;

@@ -26,5 +26,5 @@ query GetActivityById($id: String) {
         longitude
       }
     }
-  }
+  } 
   `

@@ -12,3 +12,4 @@ export const ADD_TRIP_USER = gql`
 
 
 
+ 

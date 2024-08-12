@@ -174,7 +174,7 @@ const ActivityScreen = () => {
                       <View style={styles.placeholderImage}>
                         <Text style={styles.placeholderText}>No Image</Text>
                       </View>
-                    )} 
+                    )}  
                     {selectedActivity.imgUrls &&
                       selectedActivity.imgUrls.length > 1 && (
                         <TouchableOpacity

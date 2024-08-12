@@ -25,7 +25,7 @@ function DetailsScreen({ route }) {
       </View>
     );
   } 
-
+ 
   if (error) {
     return (
       <View style={styles.errorContainer}>

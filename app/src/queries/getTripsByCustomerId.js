@@ -22,5 +22,5 @@ query GetTripsByCustomerId {
       phoneNumber
     }
   }
-}
+} 
 ` 

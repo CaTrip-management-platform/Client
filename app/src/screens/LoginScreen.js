@@ -27,7 +27,7 @@ function LoginScreen({ navigation }) {
       const result = await loginFn({ variables: { password, username } });
       console.log(result, "<==");
 
-    
+     
       const token = result?.data?.login?.access_token;
  
       if (typeof token === 'string') {

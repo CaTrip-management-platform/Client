@@ -6,4 +6,4 @@ query Query($message: String!) {
       message
     }
   }
-  ` 
+  `  

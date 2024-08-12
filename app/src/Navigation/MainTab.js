@@ -100,7 +100,7 @@ export default function MainTab() {
             <MaterialCommunityIcons name={focused ? "home" : "home-outline"} size={24} color="black" />
           ),
         }}
-      />
+      /> 
       <Tab.Screen
          name="Activity"
          component={ActivityScreen}

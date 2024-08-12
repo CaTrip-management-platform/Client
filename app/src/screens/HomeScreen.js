@@ -600,7 +600,7 @@ const styles = StyleSheet.create({
     padding: 9,
 
     left: 10,
-  }, 
+  },  
 // modalContainer: {
 
 //     borderRadius: 30,
