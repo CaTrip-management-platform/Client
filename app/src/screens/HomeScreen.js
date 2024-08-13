@@ -24,6 +24,7 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 // import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DELETE_ACTIVITY } from "../queries/delete";
+import Recommended from "../components/recommended";
 
 const HomeScreen = ({ searchResults, navigation }) => {
   const navigate = useNavigation();
@@ -121,11 +122,16 @@ const HomeScreen = ({ searchResults, navigation }) => {
         }));
 
   const ListHeader = () => (
-    <View style={styles.headerContainer}>
-      <View style={styles.headerContent}>
-        <Text style={styles.sectionTitle}>Rekomendasi Tempat</Text>
+    <View
+      style={{
+        ...styles.headerContainer,
+        height: 200,
+      }}
+    >
+      <View style={{ ...styles.headerContent, flexDirection: "column" }}>
+        <Text style={styles.sectionTitle}>Recommended</Text>
       </View>
-      <Text style={styles.sectionTitle}>Populer</Text>
+      <Recommended />
     </View>
   );
 
@@ -185,6 +191,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
       }}
       style={styles.backgroundImage}
     >
+      <ListHeader />
       <FlatList
         data={activities}
         renderItem={({ item }) => (
@@ -206,7 +213,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
           </TouchableOpacity>
         )}
         keyExtractor={(item) => item.id}
-        ListHeaderComponent={ListHeader}
+        ListHeaderComponent={<Text style={styles.sectionTitle}>Populer</Text>}
         contentContainerStyle={styles.listContent}
       />
 
@@ -523,6 +530,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   sectionTitle: {
+    flex: 1,
     fontSize: 20,
     fontWeight: "bold",
     marginVertical: 5,
