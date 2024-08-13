@@ -10,17 +10,23 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
+import { Calendar } from 'react-native-calendars';
 import { TimelineContext } from "../context/timelineContext";
-import { useQuery } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import { GET_TRIPS_BY_CUSTOMER_ID } from "../queries/getTripsByCustomerId";
+import { ADD_ACTIVITY_TO_TRIP } from "../queries/addActivityToTrip";
 
 const ActivityScreen = () => {
   const { timeline } = useContext(TimelineContext);
   const [modalVisible, setModalVisible] = useState(false);
+  const [calendarModalVisible, setCalendarModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [tripsData, setTripsData] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [dateError, setDateError] = useState("");
 
   const { loading, error, data } = useQuery(GET_TRIPS_BY_CUSTOMER_ID);
+  const [addActivityToTripFn] = useMutation(ADD_ACTIVITY_TO_TRIP);
 
   useEffect(() => {
     if (data) {
@@ -42,7 +48,11 @@ const ActivityScreen = () => {
     );
   }
 
-  //============================================= HANDLE ===============================================//
+  const handleDateSelect = (day) => {
+    setSelectedDate(day.dateString);
+    setDateError("");
+    setCalendarModalVisible(false);
+  };
 
   const handleOpenModal = (item) => {
     setSelectedItem(item);
@@ -52,14 +62,32 @@ const ActivityScreen = () => {
   const handleCloseModal = () => {
     setModalVisible(false);
     setSelectedItem(null);
+    setSelectedDate(null);
+    setDateError("");
   };
 
-  const handleAddToTrip = (trip) => {
-    console.log(trip._id);
-    console.log(selectedItem.id);
-  };
+  const handleAddToTrip = async (trip) => {
+    if (!selectedDate) {
+      setDateError("Please select a date.");
+      return;
+    }
 
-  //============================================= HANDLE ===============================================//
+    try {
+      await addActivityToTripFn({
+        variables: {
+          activityInput: {
+            tripId: trip._id,
+            activityId: selectedItem.id,
+            quantity: 1,
+            activityDate: selectedDate
+          }
+        }
+      });
+      handleCloseModal();
+    } catch (error) {
+      console.error("Error adding activity to trip", error);
+    }
+  };
 
   const keyExtractor = (item) =>
     item._id || item.id || `${item.title}-${item.date}`;
@@ -119,23 +147,69 @@ const ActivityScreen = () => {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>My Trip</Text>
             {selectedItem ? (
-              <FlatList
-                data={tripsData}
-                keyExtractor={(item) => item._id}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    onPress={() => handleAddToTrip(item)} // Pass item to handler
-                    style={styles.card}
-                  >
-                    <Text style={styles.cardText}>{item.destination}</Text>
-                  </TouchableOpacity>
-                )}
-              />
+              <>
+                <FlatList
+                  data={tripsData}
+                  keyExtractor={(item) => item._id}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      onPress={() => handleAddToTrip(item)} // Pass item to handler
+                      style={styles.card}
+                    >
+                      <Text style={styles.cardText}>{item.destination}</Text>
+                    </TouchableOpacity>
+                  )}
+                />
+                <TouchableOpacity
+                  onPress={() => setCalendarModalVisible(true)}
+                  style={styles.dateButton}
+                >
+                  <Text style={styles.dateButtonText}>
+                    {selectedDate ? `Selected Date: ${selectedDate}` : "Select Date"}
+                  </Text>
+                </TouchableOpacity>
+                {dateError ? (
+                  <Text style={styles.errorText}>{dateError}</Text>
+                ) : null}
+                <TouchableOpacity
+                  onPress={handleCloseModal}
+                  style={styles.closeButton}
+                >
+                  <Text>Close</Text>
+                </TouchableOpacity>
+              </>
             ) : (
               <Text>No trip details available.</Text>
             )}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Calendar Modal */}
+      <Modal
+        transparent={true}
+        visible={calendarModalVisible}
+        onRequestClose={() => setCalendarModalVisible(false)}
+      >
+        <View style={styles.calendarModalBackground}>
+          <View style={styles.calendarModalContent}>
+            <Calendar
+              onDayPress={handleDateSelect}
+              markedDates={{
+                [selectedDate]: {
+                  selected: true,
+                  selectedColor: '#134B70',
+                  selectedTextColor: '#FFFFFF',
+                },
+              }}
+              theme={{
+                selectedDayBackgroundColor: '#134B70',
+                selectedDayTextColor: '#FFFFFF',
+                todayTextColor: '#134B70',
+              }}
+            />
             <TouchableOpacity
-              onPress={handleCloseModal}
+              onPress={() => setCalendarModalVisible(false)}
               style={styles.closeButton}
             >
               <Text>Close</Text>
@@ -252,9 +326,35 @@ const styles = StyleSheet.create({
     backgroundColor: "#ddd",
     borderRadius: 5,
   },
+  dateButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#134B70",
+    borderRadius: 5,
+  },
+  dateButtonText: {
+    color: "#FFFFFF",
+  },
+  errorText: {
+    color: "red",
+    marginTop: 5,
+  },
   loader: {
     flex: 1,
     justifyContent: "center",
+    alignItems: "center",
+  },
+  calendarModalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  calendarModalContent: {
+    width: "80%",
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
     alignItems: "center",
   },
 });
