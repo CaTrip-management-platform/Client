@@ -10,7 +10,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FontAwesome, Feather } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import HomeScreen from "../screens/HomeScreen";
-import AddTripUserScreen from "../screens/AddTripUserScreen"; // Update import path if necessary
+import AddTripUserScreen from "../screens/AddTripUserScreen";
 import SettingsScreen from "../screens/ActivityHistoryScreen";
 import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../context/authContext";
@@ -22,6 +22,7 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import ActivityScreen from "../screens/ActivityScreen.js";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import TravelTipsScreen from "../screens/TravelTipsScreen.js";
+import * as SecureStore from "expo-secure-store";
 
 const Tab = createBottomTabNavigator();
 
@@ -189,6 +190,21 @@ export default function MainTab() {
               color={color}
             />
           ),
+          headerRight: () => {
+            return (
+              <View style={styles.headerRightContainer}>
+                <FontAwesome
+                  name="sign-out"
+                  size={24}
+                  color="black"
+                  onPress={async () => {
+                    await SecureStore.deleteItemAsync("accessToken");
+                    setIsSignedIn(false);
+                  }}
+                />
+              </View>
+            );
+          }
         }}
       />
     </Tab.Navigator>
