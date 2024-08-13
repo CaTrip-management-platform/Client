@@ -56,7 +56,7 @@ export default function TripDetailsScreen({ route }) {
         if (data && data.getTripById && data.getTripById.paymentStatus === "Paid") {
             setPaid(true);
         }
-    }, [data]);
+    }, [data, count]);
 
     if (loading) {
         return (
@@ -121,6 +121,7 @@ export default function TripDetailsScreen({ route }) {
             const result = await updateQuantityFn({
                 variables: { newQuantity, tripId, activityId },
             });
+            console.log(result)
         }
         catch(err){
             console.log(err)
@@ -189,8 +190,8 @@ export default function TripDetailsScreen({ route }) {
                                             <View style={styles.quantityContainer}>
                                                 <TouchableOpacity
                                                     style={styles.quantityButton}
-                                                    onPress={() => {setCount(count > 0 ? count - 1 : 0)
-                                                        handleQuantity(count, route.params._id, activity.id)}
+                                                    onPress={() => {setCount(count > 1 ? count - 1 : 1)
+                                                        handleQuantity(count, route.params._id, activity.activityId)}
                                                     }
 
                                                 >
