@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 export const GET_TRIPS_BY_ID = gql`
 query Query($tripId: String!) {
-  getTripById(tripId: $tripId) {
+ getTripById(tripId: $tripId) {
     _id
     destination
     activities {
@@ -27,6 +27,10 @@ query Query($tripId: String!) {
     endDate
     createdAt
     updatedAt
+    customer {
+      username
+      phoneNumber
+    }
   }
 }
 `;

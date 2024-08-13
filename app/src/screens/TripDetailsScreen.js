@@ -24,6 +24,7 @@ import { UPDATE_ACTIVITY_QUANTITY } from "../queries/updateQuantity";
 import { useFocusEffect } from "@react-navigation/native";
 
 export default function TripDetailsScreen({ route }) {
+  console.log(route.params._id);
   const [pressed, setPressed] = useState(0);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [modal, setModal] = useState(false);
@@ -52,20 +53,19 @@ export default function TripDetailsScreen({ route }) {
   const { loading, error, data, refetch } = useQuery(GET_TRIPS_BY_ID, {
     variables: { tripId: route.params._id },
   });
-
   useEffect(() => {
     if (data && data.getTripById && data.getTripById.paymentStatus === "Paid") {
       setPaid(true);
     }
   }, [data]);
 
-  const trip = data.getTripById;
+  console.log(data);
+
   useFocusEffect(
     useCallback(() => {
       refetch();
     }, [])
   );
-
   if (loading) {
     return (
       <View style={styles.containerLoading}>
@@ -74,13 +74,15 @@ export default function TripDetailsScreen({ route }) {
     );
   }
 
+  console.log(data, loading, error, "<<<<<<<<<<<<<<<<<<<<!!!");
+
   if (error) {
     return (
       <Text>Error while finding trip: {JSON.stringify(route.params._id)}</Text>
     );
   }
 
-  const totalPrice = trip.activities.reduce(
+  const totalPrice = data.getTripById.activities.reduce(
     (sum, activity) => sum + activity.price,
     0
   );
@@ -138,231 +140,236 @@ export default function TripDetailsScreen({ route }) {
     }
   };
 
-  return (
-    <>
-      {modal && (
-        <WebView
-          style={styles.webview}
-          source={{ uri: paymentUrl }}
-          onNavigationStateChange={(navState) => {
-            console.log(navState.url, "<==========navState.urlss");
-            if (
-              !navState.url.includes("https://app.sandbox.midtrans.com/snap")
-            ) {
-              setModal(false);
-              setShowReviewModal(true);
-            }
-          }}
-        />
-      )}
-      {!modal && (
-        <ScrollView style={styles.container}>
-          <Text style={styles.title}>{trip.destination}</Text>
-          <Text style={styles.dates}>
-            {moment(trip.startDate).format("DD MMM YYYY")} -{" "}
-            {moment(trip.endDate).format("DD MMM YYYY")}
-          </Text>
+  if (loading === false) {
+    return (
+      <>
+        {modal && (
+          <WebView
+            style={styles.webview}
+            source={{ uri: paymentUrl }}
+            onNavigationStateChange={(navState) => {
+              console.log(navState.url, "<==========navState.urlss");
+              if (
+                !navState.url.includes("https://app.sandbox.midtrans.com/snap")
+              ) {
+                setModal(false);
+                setShowReviewModal(true);
+              }
+            }}
+          />
+        )}
+        {!modal && (
+          <ScrollView style={styles.container}>
+            <Text style={styles.title}>{data.getTripById.destination}</Text>
+            <Text style={styles.dates}>
+              {moment(data.getTripById.startDate).format("DD MMM YYYY")} -{" "}
+              {moment(data.getTripById.endDate).format("DD MMM YYYY")}
+            </Text>
 
-          {trip.activities.map((activity, index) => (
-            <View key={index} style={styles.card}>
-              <Image
-                source={{ uri: activity.Activity.imgUrls[0] }}
-                style={styles.image}
-              />
-              <View style={styles.cardContent}>
-                <Text style={styles.activityTitle}>
-                  {activity.Activity.title}
-                </Text>
-                {paid && (
-                  <Button
-                    onPress={() => {
-                      setActiveCard(activity.activityId);
-                      setShowReviewModal(true);
-                    }}
-                  >
-                    Review
-                  </Button>
-                )}
-                <View style={styles.barisBawah}>
-                  <View style={styles.underContainer}>
-                    <Text style={styles.subTitle}>Price:</Text>
-                    <Text style={styles.price}>Rp{activity.price}</Text>
-                  </View>
+            {data.getTripById.activities.map((activity, index) => (
+              <View key={index} style={styles.card}>
+                <Image
+                  source={{ uri: activity.Activity.imgUrls[0] }}
+                  style={styles.image}
+                />
+                <View style={styles.cardContent}>
+                  <Text style={styles.activityTitle}>
+                    {activity.Activity.title}
+                  </Text>
                   {paid && (
-                    <Text style={styles.quantity}>
-                      Tickets: {activity.quantity}
-                    </Text>
+                    <Button
+                      onPress={() => {
+                        setActiveCard(activity.activityId);
+                        setShowReviewModal(true);
+                      }}
+                    >
+                      Review
+                    </Button>
                   )}
-                  {!paid && (
+                  <View style={styles.barisBawah}>
                     <View style={styles.underContainer}>
-                      <Text style={styles.subTitle}>Tickets: </Text>
-                      <View style={styles.quantityContainer}>
-                        <TouchableOpacity
-                          style={styles.quantityButton}
-                          onPress={() => {
-                            if (activity.quantity > 1) {
+                      <Text style={styles.subTitle}>Price:</Text>
+                      <Text style={styles.price}>Rp{activity.price}</Text>
+                    </View>
+                    {paid && (
+                      <Text style={styles.quantity}>
+                        Tickets: {activity.quantity}
+                      </Text>
+                    )}
+                    {!paid && (
+                      <View style={styles.underContainer}>
+                        <Text style={styles.subTitle}>Tickets: </Text>
+                        <View style={styles.quantityContainer}>
+                          <TouchableOpacity
+                            style={styles.quantityButton}
+                            onPress={() => {
+                              if (activity.quantity > 1) {
+                                handleQuantity(
+                                  activity.quantity - 1,
+                                  route.params._id,
+                                  activity.activityId
+                                );
+                                setPressed(pressed + 1);
+                              }
+                            }}
+                          >
+                            <Text style={styles.quantityButtonText}>-</Text>
+                          </TouchableOpacity>
+                          <Text style={styles.quantityCountText}>
+                            {activity.quantity}
+                          </Text>
+                          <TouchableOpacity
+                            style={styles.quantityButton}
+                            onPress={() => {
                               handleQuantity(
-                                activity.quantity - 1,
+                                activity.quantity + 1,
                                 route.params._id,
                                 activity.activityId
                               );
                               setPressed(pressed + 1);
-                            }
-                          }}
-                        >
-                          <Text style={styles.quantityButtonText}>-</Text>
-                        </TouchableOpacity>
-                        <Text style={styles.quantityCountText}>
-                          {activity.quantity}
-                        </Text>
-                        <TouchableOpacity
-                          style={styles.quantityButton}
-                          onPress={() => {
-                            handleQuantity(
-                              activity.quantity + 1,
-                              route.params._id,
-                              activity.activityId
-                            );
-                            setPressed(pressed + 1);
-                          }}
-                        >
-                          <Text style={styles.quantityButtonText}>+</Text>
-                        </TouchableOpacity>
+                            }}
+                          >
+                            <Text style={styles.quantityButtonText}>+</Text>
+                          </TouchableOpacity>
+                        </View>
                       </View>
-                    </View>
-                  )}
+                    )}
+                  </View>
                 </View>
               </View>
+            ))}
+
+            <View style={styles.totalContainer}>
+              <Text style={styles.totalPrice}>Total Price: Rp{totalPrice}</Text>
             </View>
-          ))}
 
-          <View style={styles.totalContainer}>
-            <Text style={styles.totalPrice}>Total Price: Rp{totalPrice}</Text>
-          </View>
-
-          {!paid && (
-            <TouchableOpacity style={styles.buyButton} onPress={handleBuy}>
-              <Text style={styles.buyButtonText}>Buy Now</Text>
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity
-            style={styles.updateButton}
-            onPress={() => setShowDateModal(true)}
-          >
-            <Text style={styles.updateButtonText}>Update Dates</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      )}
-
-      <ReviewModal
-        visible={showReviewModal}
-        onClose={() => setShowReviewModal(false)}
-        onSubmit={async (reviewData) => {
-          let { rating, review } = reviewData;
-          // console.log(rating, review, activeCard)
-          try {
-            const result = await reviewFn({
-              variables: {
-                activityId: activeCard,
-                content: review,
-                rating: rating,
-              },
-            });
-            console.log("Review success!");
-          } catch (error) {
-            console.log("Error while reviewing:", error);
-          }
-
-          setActiveCard("");
-        }}
-      />
-      {/* Update Date Modal */}
-      <Modal
-        transparent={true}
-        visible={showDateModal}
-        onRequestClose={() => setShowDateModal(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Update Dates</Text>
+            {!paid && (
+              <TouchableOpacity style={styles.buyButton} onPress={handleBuy}>
+                <Text style={styles.buyButtonText}>Buy Now</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
-              onPress={() => {
-                setDateType("start");
-                setShowStartDateCalendar(true);
-              }}
+              style={styles.updateButton}
+              onPress={() => setShowDateModal(true)}
             >
-              <Text style={styles.input}>
-                {newStartDate
-                  ? moment(newStartDate).format("DD MMM YYYY")
-                  : "Select Start Date"}
-              </Text>
+              <Text style={styles.updateButtonText}>Update Dates</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setDateType("end");
-                setShowEndDateCalendar(true);
-              }}
-            >
-              <Text style={styles.input}>
-                {newEndDate
-                  ? moment(newEndDate).format("DD MMM YYYY")
-                  : "Select End Date"}
-              </Text>
-            </TouchableOpacity>
-            <View style={styles.modalButtons}>
-              <Button title="Cancel" onPress={() => setShowDateModal(false)} />
-              <Button title="Update" onPress={handleUpdateDate} />
+          </ScrollView>
+        )}
+
+        <ReviewModal
+          visible={showReviewModal}
+          onClose={() => setShowReviewModal(false)}
+          onSubmit={async (reviewData) => {
+            let { rating, review } = reviewData;
+            // console.log(rating, review, activeCard)
+            try {
+              const result = await reviewFn({
+                variables: {
+                  activityId: activeCard,
+                  content: review,
+                  rating: rating,
+                },
+              });
+              console.log("Review success!");
+            } catch (error) {
+              console.log("Error while reviewing:", error);
+            }
+
+            setActiveCard("");
+          }}
+        />
+        {/* Update Date Modal */}
+        <Modal
+          transparent={true}
+          visible={showDateModal}
+          onRequestClose={() => setShowDateModal(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Update Dates</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setDateType("start");
+                  setShowStartDateCalendar(true);
+                }}
+              >
+                <Text style={styles.input}>
+                  {newStartDate
+                    ? moment(newStartDate).format("DD MMM YYYY")
+                    : "Select Start Date"}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setDateType("end");
+                  setShowEndDateCalendar(true);
+                }}
+              >
+                <Text style={styles.input}>
+                  {newEndDate
+                    ? moment(newEndDate).format("DD MMM YYYY")
+                    : "Select End Date"}
+                </Text>
+              </TouchableOpacity>
+              <View style={styles.modalButtons}>
+                <Button
+                  title="Cancel"
+                  onPress={() => setShowDateModal(false)}
+                />
+                <Button title="Update" onPress={handleUpdateDate} />
+              </View>
             </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
 
-      {/* Start Date Calendar Modal */}
-      <Modal
-        transparent={true}
-        visible={showStartDateCalendar}
-        onRequestClose={() => setShowStartDateCalendar(false)}
-      >
-        <View style={styles.calendarContainer}>
-          <View style={styles.calendarContent}>
-            <Calendar
-              onDayPress={handleDateSelect}
-              markedDates={{
-                [newStartDate]: { selected: true, selectedColor: "blue" },
-              }}
-              style={styles.calendar}
-            />
-            <Button
-              title="Close"
-              onPress={() => setShowStartDateCalendar(false)}
-            />
+        {/* Start Date Calendar Modal */}
+        <Modal
+          transparent={true}
+          visible={showStartDateCalendar}
+          onRequestClose={() => setShowStartDateCalendar(false)}
+        >
+          <View style={styles.calendarContainer}>
+            <View style={styles.calendarContent}>
+              <Calendar
+                onDayPress={handleDateSelect}
+                markedDates={{
+                  [newStartDate]: { selected: true, selectedColor: "blue" },
+                }}
+                style={styles.calendar}
+              />
+              <Button
+                title="Close"
+                onPress={() => setShowStartDateCalendar(false)}
+              />
+            </View>
           </View>
-        </View>
-      </Modal>
-      {/* End Date Calendar Modal */}
-      <Modal
-        transparent={true}
-        visible={showEndDateCalendar}
-        onRequestClose={() => setShowEndDateCalendar(false)}
-      >
-        <View style={styles.calendarContainer}>
-          <View style={styles.calendarContent}>
-            <Calendar
-              onDayPress={handleDateSelect}
-              markedDates={{
-                [newEndDate]: { selected: true, selectedColor: "blue" },
-              }}
-              style={styles.calendar}
-            />
-            <Button
-              title="Close"
-              onPress={() => setShowEndDateCalendar(false)}
-            />
+        </Modal>
+        {/* End Date Calendar Modal */}
+        <Modal
+          transparent={true}
+          visible={showEndDateCalendar}
+          onRequestClose={() => setShowEndDateCalendar(false)}
+        >
+          <View style={styles.calendarContainer}>
+            <View style={styles.calendarContent}>
+              <Calendar
+                onDayPress={handleDateSelect}
+                markedDates={{
+                  [newEndDate]: { selected: true, selectedColor: "blue" },
+                }}
+                style={styles.calendar}
+              />
+              <Button
+                title="Close"
+                onPress={() => setShowEndDateCalendar(false)}
+              />
+            </View>
           </View>
-        </View>
-      </Modal>
-    </>
-  );
+        </Modal>
+      </>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
