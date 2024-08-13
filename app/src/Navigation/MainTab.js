@@ -83,8 +83,8 @@ export default function MainTab() {
               <View style={styles.addContainer}>
                 <View style={styles.inputWrapper}>
                   <TextInput
-                    placeholder="Search"
-                    placeholderTextColor="black"
+                    placeholder="Search Activity"
+                    placeholderTextColor="#868C97"
                     style={styles.input}
                     value={text}
                     onChangeText={setText}
@@ -232,17 +232,19 @@ const styles = StyleSheet.create({
     right: 30,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "silver",
+    backgroundColor: "#D0D2D7",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
+    paddingHorizontal: 10,
   },
   input: {
     flex: 1,
     height: "100%",
     borderRadius: 20,
     paddingHorizontal: 10,
+    fontSize: 16,
   },
   iconWrapper: {
     padding: 10,

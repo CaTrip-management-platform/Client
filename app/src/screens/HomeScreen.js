@@ -595,23 +595,28 @@ const styles = StyleSheet.create({
   },
   selectedActivityDescription: {
     fontSize: 16,
-    marginVertical: 10,
+    margin: 10,
     textAlign: "justify",
+    lineHeight: 20,
   },
   selectedActivityRating: {
     fontSize: 16,
     marginVertical: 5,
     color: "#888",
+    textAlign: "center",
   },
   modalLabel: {
     fontSize: 18,
     fontWeight: "bold",
     marginTop: 10,
+    textAlign: "center",
   },
   activityPrice: {
     fontSize: 18,
     fontWeight: "bold",
     color: "green",
+    textAlign: "center",
+    marginBottom: 20,
   },
   addToTimelineButton: {
     backgroundColor: "#7ec8e3",
