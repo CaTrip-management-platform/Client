@@ -358,14 +358,14 @@ const HomeScreen = ({ searchResults, navigation }) => {
           transparent={true}
           animationType="slide"
           onRequestClose={() => setModalVisible(false)}
-          style={{ ...styles.modalContainer, borderRadius: 15 }}
+          style={{ ...styles.modalContainer }}
         >
           <TouchableOpacity
-            style={{ ...styles.modalOverlay, borderRadius: 15 }}
+            style={{ ...styles.modalOverlay }}
             activeOpacity={1}
             onPressOut={() => setModalVisible(false)}
           >
-            <View style={{ ...styles.modalContainer, borderRadius: 15 }}>
+            <View style={{ ...styles.modalContainer }}>
               <ImageBackground
                 source={{
                   uri: "https://5.imimg.com/data5/SELLER/Default/2023/7/322745470/DM/IE/MR/127740382/whatsapp-image-2023-07-05-at-6-40-02-pm.jpeg",
@@ -539,6 +539,9 @@ const styles = StyleSheet.create({
     width: "90%",
     height: "80%",
     maxHeight: "80%",
+    borderRadius: 20,
+    alignSelf: "center",
+    overflow: "hidden",
   },
   scrollViewContent: {
     flexGrow: 1,
