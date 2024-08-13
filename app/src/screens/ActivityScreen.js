@@ -41,7 +41,7 @@ const ActivityScreen = () => {
     fetchTokenData();
     if (data && data.getTripsByCustomerId) {
       const filteredTrips = data.getTripsByCustomerId.filter(
-        (trip) => trip.customerId === user && trip.paymentStatus === "Pending"
+        (trip) => trip.customerId == user && trip.paymentStatus === "Pending"
       );
       setTripsData(filteredTrips);
     }
@@ -72,16 +72,16 @@ const ActivityScreen = () => {
     }
 
     try {
-      //   await addActivityToTripFn({
-      //     variables: {
-      //       activityInput: {
-      //         tripId: trip._id,
-      //         activityId: selectedItem.id,
-      //         quantity: 1,
-      //         activityDate: selectedDate
-      //       }
-      //     }
-      //   });
+      await addActivityToTripFn({
+        variables: {
+          activityInput: {
+            tripId: trip._id,
+            activityId: selectedItem.id,
+            quantity: 1,
+            activityDate: selectedDate,
+          },
+        },
+      });
       setSuccessModalVisible(true);
       setTimeout(() => {
         setSuccessModalVisible(false);
