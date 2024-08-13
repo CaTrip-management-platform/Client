@@ -74,8 +74,6 @@ export default function TripDetailsScreen({ route }) {
     );
   }
 
-  console.log(data, loading, error, "<<<<<<<<<<<<<<<<<<<<!!!");
-
   if (error) {
     return (
       <Text>Error while finding trip: {JSON.stringify(route.params._id)}</Text>
