@@ -310,7 +310,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
                           Add to Timeline
                         </Text>
                       </TouchableOpacity>
-                      //!! admin only add condition!
+                      {/*  !! admin only */}
                       <TouchableOpacity
                         style={{
                           ...styles.addToTimelineButton,
@@ -322,7 +322,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
                           Delete Activity
                         </Text>
                       </TouchableOpacity>
-                      //!! admin only
+                      {/*  !! admin only */}
                     </View>
                   </ScrollView>
                 </View>
