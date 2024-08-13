@@ -5,8 +5,10 @@ export const TimelineContext = createContext();
 export const TimelineProvider = ({ children }) => {
     const [timeline, setTimeline] = useState([]);
 
-    const addToTimeline = (activity) => {
-        setTimeline((prevTimeline) => [...prevTimeline, activity]);
+    const addToTimeline = (item) => {
+        if (!timeline.some(timelineItem => timelineItem.id === item.id)) {
+            setTimeline(prevTimeline => [...prevTimeline, item]);
+        }
     };
 
     return (
