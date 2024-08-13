@@ -14,6 +14,7 @@ import Map from "../googleMap/Map";
 import HomeScreen from "../screens/HomeScreen";
 import AddScreen from "../screens/AddScreen";
 import TripDetailsScreen from "../screens/TripDetailsScreen";
+import { TimelineProvider } from "../context/timelineContext";
 const Stack = createNativeStackNavigator();
 
 const AuthStack = () => (
@@ -117,24 +118,26 @@ const MainStack = () => {
   }
 
   return (
-    <NavigationContainer>
-      <StatusBar style="auto" />
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {isSignedIn ? (
-          <Stack.Screen
-            name="AppStack"
-            component={AppStack}
-            options={{ headerShown: false }}
-          />
-        ) : (
-          <Stack.Screen
-            name="AuthStack"
-            component={AuthStack}
-            options={{ headerShown: false }}
-          />
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+    <TimelineProvider>
+      <NavigationContainer>
+        <StatusBar style="auto" />
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          {isSignedIn ? (
+            <Stack.Screen
+              name="AppStack"
+              component={AppStack}
+              options={{ headerShown: false }}
+            />
+          ) : (
+            <Stack.Screen
+              name="AuthStack"
+              component={AuthStack}
+              options={{ headerShown: false }}
+            />
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </TimelineProvider>
   );
 };
 

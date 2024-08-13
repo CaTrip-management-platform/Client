@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,41 +8,41 @@ import {
   ImageBackground,
   Modal,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useFocusEffect } from "@react-navigation/native";
+import { TimelineContext } from "../context/timelineContext";
 import { useQuery } from "@apollo/client";
 import { GET_TRIPS_BY_CUSTOMER_ID } from "../queries/getTripsByCustomerId";
 
 const ActivityScreen = () => {
-  const [timeline, setTimeline] = useState([]);
+  const { timeline } = useContext(TimelineContext);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [tripsData, setTripsData] = useState([]);
 
   const { loading, error, data } = useQuery(GET_TRIPS_BY_CUSTOMER_ID);
-  console.log(data);
-  const dataToRender = data.getTripsByCustomerId;
 
-  const getData = async (key) => {
-    try {
-      const value = await AsyncStorage.getItem(key);
-      return value ? JSON.parse(value) : [];
-    } catch (error) {
-      console.error("Error retrieving data:", error);
-      return [];
+  useEffect(() => {
+    if (data) {
+      setTripsData(data.getTripsByCustomerId || []);
     }
-  };
+  }, [data]);
 
-  const fetchTimeline = useCallback(async () => {
-    const storedTimeline = await getData("timelineData");
-    setTimeline(storedTimeline);
-  }, []);
+  if (loading) {
+    return (
+      <ActivityIndicator size="large" color="blue" style={styles.loader} />
+    );
+  }
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchTimeline();
-    }, [fetchTimeline])
-  );
+  if (error) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Error loading data.</Text>
+      </View>
+    );
+  }
+
+  //============================================= HANDLE ===============================================//
 
   const handleOpenModal = (item) => {
     setSelectedItem(item);
@@ -53,6 +53,13 @@ const ActivityScreen = () => {
     setModalVisible(false);
     setSelectedItem(null);
   };
+
+  const handleAddToTrip = (trip) => {
+    console.log(trip._id);
+    console.log(selectedItem.id);
+  };
+
+  //============================================= HANDLE ===============================================//
 
   const keyExtractor = (item) =>
     item._id || item.id || `${item.title}-${item.date}`;
@@ -94,6 +101,7 @@ const ActivityScreen = () => {
                     <Text style={styles.timelineRating}>
                       Rating: {item.reviews?.[0]?.rating || "N/A"}
                     </Text>
+                    <Text>{item.name}</Text>
                   </View>
                 </View>
               </View>
@@ -110,15 +118,22 @@ const ActivityScreen = () => {
         <View style={styles.modalBackground}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>My Trip</Text>
-            <FlatList
-              data={dataToRender}
-              keyExtractor={(item) => item._id}
-              renderItem={({ item }) => (
-                <View style={styles.card}>
-                  <Text style={styles.cardText}>{item.destination}</Text>
-                </View>
-              )}
-            />
+            {selectedItem ? (
+              <FlatList
+                data={tripsData}
+                keyExtractor={(item) => item._id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    onPress={() => handleAddToTrip(item)} // Pass item to handler
+                    style={styles.card}
+                  >
+                    <Text style={styles.cardText}>{item.destination}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            ) : (
+              <Text>No trip details available.</Text>
+            )}
             <TouchableOpacity
               onPress={handleCloseModal}
               style={styles.closeButton}
@@ -236,6 +251,11 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#ddd",
     borderRadius: 5,
+  },
+  loader: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
