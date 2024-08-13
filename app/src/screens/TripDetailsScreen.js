@@ -46,6 +46,7 @@ export default function TripDetailsScreen({ route }) {
     variables: { tripId: route.params._id },
   });
   useEffect(() => {
+    // console.log(data, "<<<<<<<<<<<<<<<<");
     if (data && data.getTripById && data.getTripById.paymentStatus === "Paid") {
       setPaid(true);
     }
