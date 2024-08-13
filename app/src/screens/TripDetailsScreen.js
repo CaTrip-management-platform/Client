@@ -56,10 +56,10 @@ export default function TripDetailsScreen({ route }) {
                     source={{ uri: paymentUrl }}
                     onNavigationStateChange={(navState) => {
                         console.log(navState.url, "<==========navState.urlss")
-                        // if (!navState.url.includes('https://app.sandbox.midtrans.com/snap')) {
+                        if (!navState.url.includes('https://app.sandbox.midtrans.com/snap')) {
                         setModal(false);
                         setShowReviewModal(true);
-                        //   }
+                          }
                     }}
                 />
             )}
