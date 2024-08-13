@@ -23,7 +23,7 @@ import ReviewModal from "../components/ReviewModal";
 import { UPDATE_ACTIVITY_QUANTITY } from "../queries/updateQuantity";
 
 export default function TripDetailsScreen({ route }) {
-    const [count, setCount] = useState(1);
+    const [pressed, setPressed] = useState(0)
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [modal, setModal] = useState(false);
     const [showDateModal, setShowDateModal] = useState(false);
@@ -48,15 +48,22 @@ export default function TripDetailsScreen({ route }) {
         updateQuantityFn,
         { loading: loadingQuantity, error: errorQuantity, data: dataQuantity },
     ] = useMutation(UPDATE_ACTIVITY_QUANTITY);
-    const { loading, error, data } = useQuery(GET_TRIPS_BY_ID, {
+    const { loading, error, data, refetch } = useQuery(GET_TRIPS_BY_ID, {
         variables: { tripId: route.params._id },
     });
+
+
+
+
 
     useEffect(() => {
         if (data && data.getTripById && data.getTripById.paymentStatus === "Paid") {
             setPaid(true);
         }
-    }, [data, count]);
+    }, [data]);
+
+    const trip = data.getTripById;
+
 
     if (loading) {
         return (
@@ -69,7 +76,9 @@ export default function TripDetailsScreen({ route }) {
     if (error) {
         return <Text>Error while finding trip: {JSON.stringify(route.params._id)}</Text>;
     }
-    const trip = data.getTripById;
+
+
+
     const totalPrice = trip.activities.reduce(
         (sum, activity) => sum + activity.price,
         0
@@ -116,17 +125,17 @@ export default function TripDetailsScreen({ route }) {
         }
     };
 
-    const handleQuantity = async (newQuantity, tripId, activityId) =>{
-        try{
+    const handleQuantity = async (newQuantity, tripId, activityId) => {
+        try {
             const result = await updateQuantityFn({
                 variables: { newQuantity, tripId, activityId },
             });
             console.log(result)
+            await refetch();
         }
-        catch(err){
+        catch (err) {
             console.log(err)
         }
-      
     }
 
     return (
@@ -190,19 +199,22 @@ export default function TripDetailsScreen({ route }) {
                                             <View style={styles.quantityContainer}>
                                                 <TouchableOpacity
                                                     style={styles.quantityButton}
-                                                    onPress={() => {setCount(count > 1 ? count - 1 : 1)
-                                                        handleQuantity(count, route.params._id, activity.activityId)}
-                                                    }
-
+                                                    onPress={() => {
+                                                        if (activity.quantity > 1) {
+                                                            handleQuantity(activity.quantity - 1, route.params._id, activity.activityId)
+                                                            setPressed(pressed+1)
+                                                        }
+                                                    }}
                                                 >
                                                     <Text style={styles.quantityButtonText}>-</Text>
                                                 </TouchableOpacity>
-                                                <Text style={styles.quantityCountText}>{count}</Text>
+                                                <Text style={styles.quantityCountText}>{activity.quantity}</Text>
                                                 <TouchableOpacity
                                                     style={styles.quantityButton}
-                                                    onPress={() => {setCount(count + 1)
-                                                        handleQuantity(count, route.params._id, activity.id)}
-                                                    }
+                                                    onPress={() => {
+                                                        handleQuantity(activity.quantity + 1, route.params._id, activity.activityId)
+                                                        setPressed(pressed+1)
+                                                    }}
                                                 >
                                                     <Text style={styles.quantityButtonText}>+</Text>
                                                 </TouchableOpacity>
