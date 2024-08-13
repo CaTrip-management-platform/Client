@@ -66,7 +66,7 @@ export default function MainTab() {
             <View style={styles.addContainer}>
               <View style={styles.inputWrapper}>
                 <TextInput
-                  placeholder="Cari"
+                  placeholder="Search"
                   placeholderTextColor="black"
                   style={styles.input}
                   value={text}
