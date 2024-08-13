@@ -42,8 +42,6 @@ const HomeScreen = ({ searchResults, navigation }) => {
   const [deleteActivity, { loading: deleteLoading, error: deleteError }] =
     useMutation(DELETE_ACTIVITY);
 
-  // console.log(data);
-
   const sendMessage = async () => {
     try {
       const { data } = await client.query({
@@ -160,7 +158,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
         variables: { activityId: id },
       });
       setSelectedActivity(null);
-      console.log(result.data?.deleteActivityForSeller);
+      // console.log(result.data?.deleteActivityForSeller);
       refetch();
     } catch (err) {
       console.log(error);

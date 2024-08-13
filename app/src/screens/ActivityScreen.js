@@ -15,11 +15,14 @@ import { TimelineContext } from "../context/timelineContext";
 import { useQuery, useMutation } from "@apollo/client";
 import { GET_TRIPS_BY_CUSTOMER_ID } from "../queries/getTripsByCustomerId";
 import { ADD_ACTIVITY_TO_TRIP } from "../queries/addActivityToTrip";
+import * as SecureStore from "expo-secure-store";
+import { jwtDecode } from "jwt-decode";
 
 const ActivityScreen = () => {
   const { timeline } = useContext(TimelineContext);
   const [modalVisible, setModalVisible] = useState(false);
   const [calendarModalVisible, setCalendarModalVisible] = useState(false);
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [tripsData, setTripsData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -27,26 +30,20 @@ const ActivityScreen = () => {
 
   const { loading, error, data } = useQuery(GET_TRIPS_BY_CUSTOMER_ID);
   const [addActivityToTripFn] = useMutation(ADD_ACTIVITY_TO_TRIP);
+  const [user, setUser] = useState("");
 
   useEffect(() => {
-    if (data) {
-      setTripsData(data.getTripsByCustomerId || []);
+    const fetchTokenData = async () => {
+      const token = await SecureStore.getItemAsync("accessToken");
+      const id = jwtDecode(token)
+      setUser(id.id);
+    }
+    fetchTokenData()
+    if (data && data.getTripsByCustomerId) {
+      const filteredTrips = data.getTripsByCustomerId.filter(trip => trip.customerId === user && trip.paymentStatus === 'Pending');
+      setTripsData(filteredTrips);
     }
   }, [data]);
-
-  if (loading) {
-    return (
-      <ActivityIndicator size="large" color="blue" style={styles.loader} />
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.loadingContainer}>
-        <Text>Error loading data.</Text>
-      </View>
-    );
-  }
 
   const handleDateSelect = (day) => {
     setSelectedDate(day.dateString);
@@ -68,22 +65,27 @@ const ActivityScreen = () => {
 
   const handleAddToTrip = async (trip) => {
     if (!selectedDate) {
-      setDateError("Please select a date.");
+      setDateError("Please select a date first.");
       return;
     }
 
     try {
-      await addActivityToTripFn({
-        variables: {
-          activityInput: {
-            tripId: trip._id,
-            activityId: selectedItem.id,
-            quantity: 1,
-            activityDate: selectedDate
-          }
-        }
-      });
-      handleCloseModal();
+      //   await addActivityToTripFn({
+      //     variables: {
+      //       activityInput: {
+      //         tripId: trip._id,
+      //         activityId: selectedItem.id,
+      //         quantity: 1,
+      //         activityDate: selectedDate
+      //       }
+      //     }
+      //   });
+      setSuccessModalVisible(true);
+      setTimeout(() => {
+        setSuccessModalVisible(false);
+        handleCloseModal();
+      }, 2000);
+
     } catch (error) {
       console.error("Error adding activity to trip", error);
     }
@@ -91,6 +93,20 @@ const ActivityScreen = () => {
 
   const keyExtractor = (item) =>
     item._id || item.id || `${item.title}-${item.date}`;
+
+  if (loading) {
+    return (
+      <ActivityIndicator size="large" color="blue" style={styles.loader} />
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Error loading data.</Text>
+      </View>
+    );
+  }
 
   return (
     <ImageBackground
@@ -138,6 +154,19 @@ const ActivityScreen = () => {
         />
       )}
 
+      {/* Success Message Modal */}
+      <Modal
+        transparent={true}
+        visible={successModalVisible}
+        animationType="fade"
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.successModalContent}>
+            <Text style={styles.successText}>Activity added successfully!</Text>
+          </View>
+        </View>
+      </Modal>
+
       <Modal
         transparent={true}
         visible={modalVisible}
@@ -148,18 +177,6 @@ const ActivityScreen = () => {
             <Text style={styles.modalTitle}>My Trip</Text>
             {selectedItem ? (
               <>
-                <FlatList
-                  data={tripsData}
-                  keyExtractor={(item) => item._id}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      onPress={() => handleAddToTrip(item)} // Pass item to handler
-                      style={styles.card}
-                    >
-                      <Text style={styles.cardText}>{item.destination}</Text>
-                    </TouchableOpacity>
-                  )}
-                />
                 <TouchableOpacity
                   onPress={() => setCalendarModalVisible(true)}
                   style={styles.dateButton}
@@ -171,6 +188,22 @@ const ActivityScreen = () => {
                 {dateError ? (
                   <Text style={styles.errorText}>{dateError}</Text>
                 ) : null}
+                {tripsData.length > 0 ? (
+                  <FlatList
+                    data={tripsData}
+                    keyExtractor={(item) => item._id}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        onPress={() => handleAddToTrip(item)}
+                        style={styles.card}
+                      >
+                        <Text style={styles.cardText}>{item.destination}</Text>
+                      </TouchableOpacity>
+                    )}
+                  />
+                ) : (
+                  <Text>There's no trip available.</Text>
+                )}
                 <TouchableOpacity
                   onPress={handleCloseModal}
                   style={styles.closeButton}
@@ -356,6 +389,18 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 10,
     alignItems: "center",
+  },
+  successModalContent: {
+    width: "80%",
+    padding: 20,
+    backgroundColor: "green",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  successText: {
+    fontSize: 18,
+    color: "white",
+    fontWeight: "bold",
   },
 });
 
