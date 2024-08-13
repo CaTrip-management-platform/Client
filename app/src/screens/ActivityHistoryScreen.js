@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -13,17 +13,17 @@ import { StatusBar } from "expo-status-bar";
 import * as SecureStore from "expo-secure-store";
 import { jwtDecode } from "jwt-decode";
 import { GET_TRIPS_BY_CUSTOMER_ID } from "../queries/getTripsByCustomerId";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 function ActivityHistoryScreen() {
   const [userId, setUserId] = useState("");
   const navigation = useNavigation();
 
-  const { loading, error, data } = useQuery(GET_TRIPS_BY_CUSTOMER_ID, {
+  const { loading, error, data, refetch } = useQuery(GET_TRIPS_BY_CUSTOMER_ID, {
     variables: { id: userId },
     skip: !userId,
     fetchPolicy: "no-cache",
-    refetchOnWindowFocus: false, 
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
@@ -47,6 +47,12 @@ function ActivityHistoryScreen() {
 
     fetchTokenData();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
 
   if (loading) {
     return (
