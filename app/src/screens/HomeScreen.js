@@ -26,6 +26,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DELETE_ACTIVITY } from "../queries/delete";
 import Recommended from "../components/recommended";
 import { TimelineContext } from "../context/timelineContext";
+import Carousel from "../components/Carousel";
 
 const HomeScreen = ({ searchResults, navigation }) => {
   const navigate = useNavigation();
@@ -177,254 +178,264 @@ const HomeScreen = ({ searchResults, navigation }) => {
       }}
       style={styles.backgroundImage}
     >
-      <ListHeader />
-      <FlatList
-        data={activities}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.card}
-            onPress={() => {
-              setSelectedActivity(item);
-              setCurrentImageIndex(0);
-              setActivityModalVisible(true);
-            }}
-          >
-            <Image source={{ uri: item.image }} style={styles.cardImage} />
-            <View style={styles.cardDetails}>
-              <Text style={styles.cardTitle}>{item.name}</Text>
-              <Text style={styles.cardRating}>Rating: {item.rating}</Text>
-              <Text style={styles.cardLocation}>{item.location}</Text>
-              <Text style={styles.cardPrice}>{item.price}</Text>
-            </View>
-          </TouchableOpacity>
-        )}
-        keyExtractor={(item) => item.id}
-        ListHeaderComponent={<Text style={styles.sectionTitle}>Populer</Text>}
-        contentContainerStyle={styles.listContent}
-      />
+      <ScrollView>
+        <Carousel />
+        <FlatList
+          data={activities}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() => {
+                setSelectedActivity(item);
+                setCurrentImageIndex(0);
+                setActivityModalVisible(true);
+              }}
+            >
+              <Image source={{ uri: item.image }} style={styles.cardImage} />
+              <View style={styles.cardDetails}>
+                <Text style={styles.cardTitle}>{item.name}</Text>
+                <Text style={styles.cardRating}>Rating: {item.rating}</Text>
+                <Text style={styles.cardLocation}>{item.location}</Text>
+                <Text style={styles.cardPrice}>{item.price}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item) => item.id}
+          ListHeaderComponent={<Text style={styles.sectionTitle}>Populer</Text>}
+          contentContainerStyle={styles.listContent}
+        />
 
-      {/* Activity Detail Modal */}
-      {selectedActivity && (
-        <Modal
-          visible={activityModalVisible}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => setActivityModalVisible(false)}
-        >
-          <TouchableWithoutFeedback
-            onPress={() => setActivityModalVisible(false)}
+        {/* Activity Detail Modal */}
+        {selectedActivity && (
+          <Modal
+            visible={activityModalVisible}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => setActivityModalVisible(false)}
           >
-            <View style={styles.modalOverlay}>
-              <TouchableWithoutFeedback>
-                <View style={{ ...styles.modalContainer, borderRadius: 15 }}>
+            <TouchableWithoutFeedback
+              onPress={() => setActivityModalVisible(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <TouchableWithoutFeedback>
+                  <View style={{ ...styles.modalContainer, borderRadius: 15 }}>
+                    <View style={styles.headerContainer}>
+                      <TouchableOpacity
+                        style={styles.closeIcon}
+                        onPress={() => setActivityModalVisible(false)}
+                      >
+                        <Ionicons name="close" size={15} color="#fff" />
+                      </TouchableOpacity>
+                      <Text style={styles.headerText}>Activity Detail</Text>
+                    </View>
+                    <ScrollView
+                      contentContainerStyle={styles.scrollViewContent}
+                    >
+                      <TouchableOpacity
+                        onPress={() => setShowImageViewer(true)}
+                      >
+                        <Image
+                          source={{
+                            uri: selectedActivity.imgUrls[currentImageIndex],
+                          }}
+                          style={styles.selectedActivityImage}
+                        />
+                      </TouchableOpacity>
+                      <View style={styles.imageNavigationContainer}>
+                        <TouchableOpacity
+                          onPress={handlePrevImage}
+                          style={{
+                            ...styles.navButton,
+                            position: "absolute",
+                            top: 0,
+                          }}
+                        >
+                          <Text style={styles.navButtonText}>&lt;</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={handleNextImage}
+                          style={{
+                            ...styles.navButton,
+                            position: "absolute",
+                            top: 0,
+                            end: 0,
+                          }}
+                        >
+                          <Text style={styles.navButtonText}>&gt;</Text>
+                        </TouchableOpacity>
+                      </View>
+                      <View style={{ marginTop: 10 }}>
+                        <Text style={styles.selectedActivityTitle}>
+                          {selectedActivity.name}
+                        </Text>
+                        <View>
+                          <TouchableOpacity
+                            style={{
+                              flex: 1,
+                              flexDirection: "row",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              marginVertical: 5,
+                              gap: 10,
+                            }}
+                            onPress={() => {
+                              setSelectedActivity(null);
+                              navigate.push("Map", {
+                                name: selectedActivity.name,
+                                location: selectedActivity.location,
+                              });
+                            }}
+                          >
+                            <Text style={{ color: "gray" }}>
+                              {selectedActivity.location}
+                            </Text>
+                            <EvilIcons
+                              name="location"
+                              size={22}
+                              color="black"
+                            />
+                          </TouchableOpacity>
+                        </View>
+                        <Text style={styles.selectedActivityDescription}>
+                          {selectedActivity.description || "No Description"}
+                        </Text>
+                        <Text style={styles.selectedActivityRating}>
+                          Rating: {selectedActivity.rating}
+                        </Text>
+                        <Text style={styles.modalLabel}>Price:</Text>
+                        <Text style={styles.activityPrice}>
+                          {selectedActivity.price}
+                        </Text>
+                        <TouchableOpacity
+                          style={styles.addToTimelineButton}
+                          onPress={handleAddToTimeline}
+                        >
+                          <Text style={styles.addToTimelineButtonText}>
+                            Add to Timeline
+                          </Text>
+                        </TouchableOpacity>
+                        {/*  !! admin only */}
+                        <TouchableOpacity
+                          style={{
+                            ...styles.addToTimelineButton,
+                            backgroundColor: "red",
+                          }}
+                          onPress={() => handleDelete(selectedActivity.id)}
+                        >
+                          <Text style={styles.addToTimelineButtonText}>
+                            Delete Activity
+                          </Text>
+                        </TouchableOpacity>
+                        {/*  !! admin only */}
+                      </View>
+                    </ScrollView>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </TouchableWithoutFeedback>
+
+            {/* Image Viewer Modal */}
+            {showImageViewer && (
+              <Modal
+                visible={showImageViewer}
+                transparent={true}
+                onRequestClose={() => setShowImageViewer(false)}
+              >
+                <View style={styles.imageViewerContainer}>
+                  <ImageViewer
+                    imageUrls={selectedActivity.imgUrls.map((url) => ({ url }))}
+                    enableImageZoom={true}
+                    enableSwipeDown={true}
+                    onSwipeDown={() => setShowImageViewer(false)}
+                  />
+                </View>
+              </Modal>
+            )}
+          </Modal>
+        )}
+
+        {/* AI Modal */}
+        {modalVisible && (
+          <Modal
+            visible={modalVisible}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => setModalVisible(false)}
+            style={{ ...styles.modalContainer }}
+          >
+            <TouchableOpacity
+              style={{ ...styles.modalOverlay }}
+              activeOpacity={1}
+              onPressOut={() => setModalVisible(false)}
+            >
+              <View style={{ ...styles.modalContainer }}>
+                <ImageBackground
+                  source={{
+                    uri: "https://5.imimg.com/data5/SELLER/Default/2023/7/322745470/DM/IE/MR/127740382/whatsapp-image-2023-07-05-at-6-40-02-pm.jpeg",
+                  }}
+                  style={{ ...styles.backgroundImage, borderRadius: 15 }}
+                  onStartShouldSetResponder={() => true}
+                >
                   <View style={styles.headerContainer}>
                     <TouchableOpacity
                       style={styles.closeIcon}
-                      onPress={() => setActivityModalVisible(false)}
+                      onPress={() => setModalVisible(false)}
                     >
                       <Ionicons name="close" size={15} color="#fff" />
                     </TouchableOpacity>
-                    <Text style={styles.headerText}>Activity Detail</Text>
+                    <Text style={styles.headerText}>Ask Something?</Text>
                   </View>
-                  <ScrollView contentContainerStyle={styles.scrollViewContent}>
-                    <TouchableOpacity onPress={() => setShowImageViewer(true)}>
-                      <Image
-                        source={{
-                          uri: selectedActivity.imgUrls[currentImageIndex],
-                        }}
-                        style={styles.selectedActivityImage}
-                      />
-                    </TouchableOpacity>
-                    <View style={styles.imageNavigationContainer}>
-                      <TouchableOpacity
-                        onPress={handlePrevImage}
-                        style={{
-                          ...styles.navButton,
-                          position: "absolute",
-                          top: 0,
-                        }}
-                      >
-                        <Text style={styles.navButtonText}>&lt;</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={handleNextImage}
-                        style={{
-                          ...styles.navButton,
-                          position: "absolute",
-                          top: 0,
-                          end: 0,
-                        }}
-                      >
-                        <Text style={styles.navButtonText}>&gt;</Text>
-                      </TouchableOpacity>
-                    </View>
-                    <View style={{ marginTop: 10 }}>
-                      <Text style={styles.selectedActivityTitle}>
-                        {selectedActivity.name}
-                      </Text>
-                      <View>
-                        <TouchableOpacity
-                          style={{
-                            flex: 1,
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            marginVertical: 5,
-                            gap: 10,
-                          }}
-                          onPress={() => {
-                            setSelectedActivity(null);
-                            navigate.push("Map", {
-                              name: selectedActivity.name,
-                              location: selectedActivity.location,
-                            });
-                          }}
+                  <FlatList
+                    data={aiMessages}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity>
+                        <View
+                          style={
+                            item.type === "ai"
+                              ? styles.aiMessage
+                              : styles.userMessage
+                          }
                         >
-                          <Text style={{ color: "gray" }}>
-                            {selectedActivity.location}
-                          </Text>
-                          <EvilIcons name="location" size={22} color="black" />
-                        </TouchableOpacity>
-                      </View>
-                      <Text style={styles.selectedActivityDescription}>
-                        {selectedActivity.description || "No Description"}
-                      </Text>
-                      <Text style={styles.selectedActivityRating}>
-                        Rating: {selectedActivity.rating}
-                      </Text>
-                      <Text style={styles.modalLabel}>Price:</Text>
-                      <Text style={styles.activityPrice}>
-                        {selectedActivity.price}
-                      </Text>
-                      <TouchableOpacity
-                        style={styles.addToTimelineButton}
-                        onPress={handleAddToTimeline}
-                      >
-                        <Text style={styles.addToTimelineButtonText}>
-                          Add to Timeline
-                        </Text>
+                          <Text style={styles.messageText}>{item.text}</Text>
+                        </View>
                       </TouchableOpacity>
-                      {/*  !! admin only */}
-                      <TouchableOpacity
-                        style={{
-                          ...styles.addToTimelineButton,
-                          backgroundColor: "red",
-                        }}
-                        onPress={() => handleDelete(selectedActivity.id)}
-                      >
-                        <Text style={styles.addToTimelineButtonText}>
-                          Delete Activity
-                        </Text>
-                      </TouchableOpacity>
-                      {/*  !! admin only */}
-                    </View>
-                  </ScrollView>
-                </View>
-              </TouchableWithoutFeedback>
-            </View>
-          </TouchableWithoutFeedback>
-
-          {/* Image Viewer Modal */}
-          {showImageViewer && (
-            <Modal
-              visible={showImageViewer}
-              transparent={true}
-              onRequestClose={() => setShowImageViewer(false)}
-            >
-              <View style={styles.imageViewerContainer}>
-                <ImageViewer
-                  imageUrls={selectedActivity.imgUrls.map((url) => ({ url }))}
-                  enableImageZoom={true}
-                  enableSwipeDown={true}
-                  onSwipeDown={() => setShowImageViewer(false)}
-                />
-              </View>
-            </Modal>
-          )}
-        </Modal>
-      )}
-
-      {/* AI Modal */}
-      {modalVisible && (
-        <Modal
-          visible={modalVisible}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => setModalVisible(false)}
-          style={{ ...styles.modalContainer }}
-        >
-          <TouchableOpacity
-            style={{ ...styles.modalOverlay }}
-            activeOpacity={1}
-            onPressOut={() => setModalVisible(false)}
-          >
-            <View style={{ ...styles.modalContainer }}>
-              <ImageBackground
-                source={{
-                  uri: "https://5.imimg.com/data5/SELLER/Default/2023/7/322745470/DM/IE/MR/127740382/whatsapp-image-2023-07-05-at-6-40-02-pm.jpeg",
-                }}
-                style={{ ...styles.backgroundImage, borderRadius: 15 }}
-                onStartShouldSetResponder={() => true}
-              >
-                <View style={styles.headerContainer}>
-                  <TouchableOpacity
-                    style={styles.closeIcon}
-                    onPress={() => setModalVisible(false)}
-                  >
-                    <Ionicons name="close" size={15} color="#fff" />
-                  </TouchableOpacity>
-                  <Text style={styles.headerText}>Ask Something?</Text>
-                </View>
-                <FlatList
-                  data={aiMessages}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity>
-                      <View
-                        style={
-                          item.type === "ai"
-                            ? styles.aiMessage
-                            : styles.userMessage
-                        }
-                      >
-                        <Text style={styles.messageText}>{item.text}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  )}
-                  keyExtractor={(item, index) => index.toString()}
-                  style={styles.messagesList}
-                  contentContainerStyle={{
-                    flexGrow: 1,
-                    justifyContent: "flex-end",
-                  }}
-                />
-                <View style={styles.inputContainer}>
-                  <TextInput
-                    style={styles.textInput}
-                    value={userMessage}
-                    onChangeText={setUserMessage}
-                    placeholder="Type your message"
-                    placeholderTextColor="#888"
+                    )}
+                    keyExtractor={(item, index) => index.toString()}
+                    style={styles.messagesList}
+                    contentContainerStyle={{
+                      flexGrow: 1,
+                      justifyContent: "flex-end",
+                    }}
                   />
-                  <TouchableOpacity
-                    onPress={sendMessage}
-                    style={styles.sendButton}
-                  >
-                    <Text style={styles.sendButtonText}>Send</Text>
-                  </TouchableOpacity>
-                </View>
-              </ImageBackground>
-            </View>
-          </TouchableOpacity>
-        </Modal>
-      )}
+                  <View style={styles.inputContainer}>
+                    <TextInput
+                      style={styles.textInput}
+                      value={userMessage}
+                      onChangeText={setUserMessage}
+                      placeholder="Type your message"
+                      placeholderTextColor="#888"
+                    />
+                    <TouchableOpacity
+                      onPress={sendMessage}
+                      style={styles.sendButton}
+                    >
+                      <Text style={styles.sendButtonText}>Send</Text>
+                    </TouchableOpacity>
+                  </View>
+                </ImageBackground>
+              </View>
+            </TouchableOpacity>
+          </Modal>
+        )}
 
-      {/* Floating Action Button */}
-      <TouchableOpacity
-        style={styles.floatingButton}
-        onPress={() => setModalVisible(true)}
-      >
-        <FontAwesome5 name="github-alt" size={24} color="black" />
-      </TouchableOpacity>
+        {/* Floating Action Button */}
+        <TouchableOpacity
+          style={styles.floatingButton}
+          onPress={() => setModalVisible(true)}
+        >
+          <FontAwesome5 name="github-alt" size={24} color="black" />
+        </TouchableOpacity>
+      </ScrollView>
     </ImageBackground>
   );
 };
