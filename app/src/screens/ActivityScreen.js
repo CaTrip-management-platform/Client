@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import { Calendar } from 'react-native-calendars';
+import { Calendar } from "react-native-calendars";
 import { TimelineContext } from "../context/timelineContext";
 import { useQuery, useMutation } from "@apollo/client";
 import { GET_TRIPS_BY_CUSTOMER_ID } from "../queries/getTripsByCustomerId";
@@ -35,12 +35,14 @@ const ActivityScreen = () => {
   useEffect(() => {
     const fetchTokenData = async () => {
       const token = await SecureStore.getItemAsync("accessToken");
-      const id = jwtDecode(token)
+      const id = jwtDecode(token);
       setUser(id.id);
-    }
-    fetchTokenData()
+    };
+    fetchTokenData();
     if (data && data.getTripsByCustomerId) {
-      const filteredTrips = data.getTripsByCustomerId.filter(trip => trip.customerId === user && trip.paymentStatus === 'Pending');
+      const filteredTrips = data.getTripsByCustomerId.filter(
+        (trip) => trip.customerId === user && trip.paymentStatus === "Pending"
+      );
       setTripsData(filteredTrips);
     }
   }, [data]);
@@ -85,7 +87,6 @@ const ActivityScreen = () => {
         setSuccessModalVisible(false);
         handleCloseModal();
       }, 2000);
-
     } catch (error) {
       console.error("Error adding activity to trip", error);
     }
@@ -182,7 +183,9 @@ const ActivityScreen = () => {
                   style={styles.dateButton}
                 >
                   <Text style={styles.dateButtonText}>
-                    {selectedDate ? `Selected Date: ${selectedDate}` : "Select Date"}
+                    {selectedDate
+                      ? `Selected Date: ${selectedDate}`
+                      : "Select Date"}
                   </Text>
                 </TouchableOpacity>
                 {dateError ? (
@@ -231,14 +234,14 @@ const ActivityScreen = () => {
               markedDates={{
                 [selectedDate]: {
                   selected: true,
-                  selectedColor: '#134B70',
-                  selectedTextColor: '#FFFFFF',
+                  selectedColor: "#134B70",
+                  selectedTextColor: "#FFFFFF",
                 },
               }}
               theme={{
-                selectedDayBackgroundColor: '#134B70',
-                selectedDayTextColor: '#FFFFFF',
-                todayTextColor: '#134B70',
+                selectedDayBackgroundColor: "#134B70",
+                selectedDayTextColor: "#FFFFFF",
+                todayTextColor: "#134B70",
               }}
             />
             <TouchableOpacity
