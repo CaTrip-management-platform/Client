@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -13,14 +13,17 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
-import { useQuery, useApolloClient, gql } from "@apollo/client";
+import { useQuery, useApolloClient, gql, useMutation } from "@apollo/client";
 import { GET_Activity } from "../queries/getAllActivity";
 import { ActivityIndicator } from "react-native-paper";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ImageViewer from "react-native-image-zoom-viewer";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+// import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { DELETE_ACTIVITY } from "../queries/delete";
 
 const HomeScreen = ({ searchResults, navigation }) => {
   const navigate = useNavigation();
@@ -34,7 +37,11 @@ const HomeScreen = ({ searchResults, navigation }) => {
   const [isFirstVisit, setIsFirstVisit] = useState(true);
 
   const client = useApolloClient();
-  const { loading, error, data } = useQuery(GET_Activity);
+  const { loading, error, data, refetch } = useQuery(GET_Activity);
+  const [deleteActivity, { loading: deleteLoading, error: deleteError }] =
+    useMutation(DELETE_ACTIVITY);
+
+  // console.log(data);
 
   const sendMessage = async () => {
     try {
@@ -59,24 +66,13 @@ const HomeScreen = ({ searchResults, navigation }) => {
     }
   };
 
-  useEffect(() => {
-    // Check if this is the first visit
-    const checkFirstVisit = async () => {
-      try {
-        const firstVisit = await SecureStore.getItemAsync("firstVisit");
-        if (!firstVisit) {
-          setModalVisible(true);
-          await SecureStore.setItemAsync("firstVisit", "true");
-        }
-      } catch (error) {
-        console.error("Error checking first visit:", error);
-      }
-    };
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
 
-    checkFirstVisit();
-  }, []);
-
-  if (loading) {
+  if (loading || deleteLoading) {
     return (
       <View style={styles.containerLoading}>
         <ActivityIndicator size="large" />
@@ -144,6 +140,43 @@ const HomeScreen = ({ searchResults, navigation }) => {
     setCurrentImageIndex((prevIndex) =>
       prevIndex < selectedActivity.imgUrls.length - 1 ? prevIndex + 1 : 0
     );
+  };
+
+  const saveData = async (key, value) => {
+    try {
+      await AsyncStorage.setItem(key, value);
+    } catch (error) {
+      console.error("Error saving data:", error);
+    }
+  };
+  const handleAddToTimeline = async () => {
+    setTimelineData((timelineData) => {
+      const data = [...timelineData, selectedActivity];
+      return data;
+    });
+
+    try {
+      console.log(timelineData);
+
+      const timelineDataString = JSON.stringify(timelineData);
+      await saveData("timelineData", timelineDataString);
+      alert("Added to Timeline");
+    } catch (error) {
+      console.error("Error saving data:", error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      const result = await deleteActivity({
+        variables: { activityId: id },
+      });
+      setSelectedActivity(null);
+      console.log(result.data?.deleteActivityForSeller);
+      refetch();
+    } catch (err) {
+      console.log(error);
+    }
   };
 
   return (
@@ -271,6 +304,27 @@ const HomeScreen = ({ searchResults, navigation }) => {
                       <Text style={styles.activityPrice}>
                         {selectedActivity.price}
                       </Text>
+                      <TouchableOpacity
+                        style={styles.addToTimelineButton}
+                        onPress={handleAddToTimeline}
+                      >
+                        <Text style={styles.addToTimelineButtonText}>
+                          Add to Timeline
+                        </Text>
+                      </TouchableOpacity>
+                      {/*  !! admin only */}
+                      <TouchableOpacity
+                        style={{
+                          ...styles.addToTimelineButton,
+                          backgroundColor: "red",
+                        }}
+                        onPress={() => handleDelete(selectedActivity.id)}
+                      >
+                        <Text style={styles.addToTimelineButtonText}>
+                          Delete Activity
+                        </Text>
+                      </TouchableOpacity>
+                      {/*  !! admin only */}
                     </View>
                   </ScrollView>
                 </View>
@@ -361,6 +415,21 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "#000",
+    padding: 10,
+  },
+
+  headerText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    left: "45%",
+    transform: [{ translateX: -50 }],
   },
   errorText: {
     color: "red",
