@@ -1,32 +1,55 @@
-import React, { useState } from "react";
-import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Modal, Button } from "react-native";
 import { useMutation, useQuery } from "@apollo/client";
-import { ActivityIndicator } from "react-native-paper";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
+import {
+  CREATE_PAYMENT,
+  CREATE_REVIEW,
+  GET_TRIPS_BY_ID,
+} from "../queries/getTripById";
+import { ActivityIndicator, Button, Modal } from "react-native-paper";
 import { WebView } from "react-native-webview";
 import { UPDATE_DATE } from "../queries/updateDateTrip";
-import { CREATE_PAYMENT, GET_TRIPS_BY_ID } from "../queries/getTripById";
-import { Calendar } from 'react-native-calendars';
-import moment from 'moment'; // Ensure you have moment.js installed for date formatting
+import { Calendar } from "react-native-calendars";
+import moment from "moment";
+
+import ReviewModal from "../components/ReviewModal";
 
 export default function TripDetailsScreen({ route }) {
+  const [showReviewModal, setShowReviewModal] = useState(false);
   const [modal, setModal] = useState(false);
-  const [paymentUrl, setPaymentUrl] = useState("");
   const [showDateModal, setShowDateModal] = useState(false);
   const [showStartDateCalendar, setShowStartDateCalendar] = useState(false);
   const [showEndDateCalendar, setShowEndDateCalendar] = useState(false);
   const [newStartDate, setNewStartDate] = useState("");
   const [newEndDate, setNewEndDate] = useState("");
   const [dateType, setDateType] = useState("");
-
+  const [paid, setPaid] = useState(false);
+  const [paymentUrl, setPaymentUrl] = useState("");
+  const [activeCard, setActiveCard] = useState("");
   const [updateDate] = useMutation(UPDATE_DATE);
   const [
     paymentFn,
     { loading: loadingPayment, error: errorPayment, data: dataPayment },
   ] = useMutation(CREATE_PAYMENT);
-
+  const [
+    reviewFn,
+    { loading: loadingReview, error: errorReview, data: dataReview },
+  ] = useMutation(CREATE_REVIEW);
   const { loading, error, data } = useQuery(GET_TRIPS_BY_ID, {
     variables: { tripId: route.params._id },
   });
+  useEffect(() => {
+    if (data && data.getTripById && data.getTripById.paymentStatus === "Paid") {
+      setPaid(true);
+    }
+  }, [data]);
 
   if (loading) {
     return (
@@ -34,6 +57,10 @@ export default function TripDetailsScreen({ route }) {
         <ActivityIndicator size="large" />
       </View>
     );
+  }
+
+  if (error) {
+    return <Text>Error: {error.message}</Text>;
   }
 
   const trip = data.getTripById;
@@ -47,13 +74,13 @@ export default function TripDetailsScreen({ route }) {
       const result = await paymentFn({
         variables: { tripId: route.params._id, amount: totalPrice },
       });
-      setPaymentUrl(dataPayment.createPayment.redirectUrl);
+      setPaymentUrl(result.data.createPayment.redirectUrl);
       setModal(true);
+      setPaid(true);
     } catch (err) {
       console.log(err);
     }
   };
-
   const handleUpdateDate = async () => {
     try {
       await updateDate({
@@ -85,12 +112,27 @@ export default function TripDetailsScreen({ route }) {
 
   return (
     <>
-      {modal && <WebView style={styles.webview} source={{ uri: paymentUrl }} />}
+      {modal && (
+        <WebView
+          style={styles.webview}
+          source={{ uri: paymentUrl }}
+          onNavigationStateChange={(navState) => {
+            console.log(navState.url, "<==========navState.urlss");
+            if (
+              !navState.url.includes("https://app.sandbox.midtrans.com/snap")
+            ) {
+              setModal(false);
+              setShowReviewModal(true);
+            }
+          }}
+        />
+      )}
       {!modal && (
         <ScrollView style={styles.container}>
           <Text style={styles.title}>{trip.destination}</Text>
           <Text style={styles.dates}>
-            {moment(trip.startDate).format('DD MMM YYYY')} - {moment(trip.endDate).format('DD MMM YYYY')}
+            {moment(trip.startDate).format("DD MMM YYYY")} -{" "}
+            {moment(trip.endDate).format("DD MMM YYYY")}
           </Text>
 
           {trip.activities.map((activity, index) => (
@@ -103,6 +145,16 @@ export default function TripDetailsScreen({ route }) {
                 <Text style={styles.activityTitle}>
                   {activity.Activity.title}
                 </Text>
+                {paid && (
+                  <Button
+                    onPress={() => {
+                      setActiveCard(activity.activityId);
+                      setShowReviewModal(true);
+                    }}
+                  >
+                    Review
+                  </Button>
+                )}
                 <View style={styles.barisBawah}>
                   <Text style={styles.price}>Rp{activity.price}</Text>
                   <Text style={styles.quantity}>
@@ -114,15 +166,14 @@ export default function TripDetailsScreen({ route }) {
           ))}
 
           <View style={styles.totalContainer}>
-            <Text style={styles.totalPrice}>
-              Total Price: Rp{totalPrice}
-            </Text>
+            <Text style={styles.totalPrice}>Total Price: Rp{totalPrice}</Text>
           </View>
 
-          <TouchableOpacity style={styles.buyButton} onPress={handleBuy}>
-            <Text style={styles.buyButtonText}>Buy Now</Text>
-          </TouchableOpacity>
-
+          {!paid && (
+            <TouchableOpacity style={styles.buyButton} onPress={handleBuy}>
+              <Text style={styles.buyButtonText}>Buy Now</Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             style={styles.updateButton}
             onPress={() => setShowDateModal(true)}
@@ -132,6 +183,28 @@ export default function TripDetailsScreen({ route }) {
         </ScrollView>
       )}
 
+      <ReviewModal
+        visible={showReviewModal}
+        onClose={() => setShowReviewModal(false)}
+        onSubmit={async (reviewData) => {
+          let { rating, review } = reviewData;
+          // console.log(rating, review, activeCard)
+          try {
+            const result = await reviewFn({
+              variables: {
+                activityId: activeCard,
+                content: review,
+                rating: rating,
+              },
+            });
+            console.log("Review success!");
+          } catch (error) {
+            console.log("Error while reviewing:", error);
+          }
+
+          setActiveCard("");
+        }}
+      />
       {/* Update Date Modal */}
       <Modal
         transparent={true}
@@ -141,11 +214,29 @@ export default function TripDetailsScreen({ route }) {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Update Dates</Text>
-            <TouchableOpacity onPress={() => { setDateType("start"); setShowStartDateCalendar(true); }}>
-              <Text style={styles.input}>{newStartDate ? moment(newStartDate).format('DD MMM YYYY') : "Select Start Date"}</Text>
+            <TouchableOpacity
+              onPress={() => {
+                setDateType("start");
+                setShowStartDateCalendar(true);
+              }}
+            >
+              <Text style={styles.input}>
+                {newStartDate
+                  ? moment(newStartDate).format("DD MMM YYYY")
+                  : "Select Start Date"}
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => { setDateType("end"); setShowEndDateCalendar(true); }}>
-              <Text style={styles.input}>{newEndDate ? moment(newEndDate).format('DD MMM YYYY') : "Select End Date"}</Text>
+            <TouchableOpacity
+              onPress={() => {
+                setDateType("end");
+                setShowEndDateCalendar(true);
+              }}
+            >
+              <Text style={styles.input}>
+                {newEndDate
+                  ? moment(newEndDate).format("DD MMM YYYY")
+                  : "Select End Date"}
+              </Text>
             </TouchableOpacity>
             <View style={styles.modalButtons}>
               <Button title="Cancel" onPress={() => setShowDateModal(false)} />
@@ -165,14 +256,18 @@ export default function TripDetailsScreen({ route }) {
           <View style={styles.calendarContent}>
             <Calendar
               onDayPress={handleDateSelect}
-              markedDates={{ [newStartDate]: { selected: true, selectedColor: 'blue' } }}
+              markedDates={{
+                [newStartDate]: { selected: true, selectedColor: "blue" },
+              }}
               style={styles.calendar}
             />
-            <Button title="Close" onPress={() => setShowStartDateCalendar(false)} />
+            <Button
+              title="Close"
+              onPress={() => setShowStartDateCalendar(false)}
+            />
           </View>
         </View>
       </Modal>
-
       {/* End Date Calendar Modal */}
       <Modal
         transparent={true}
@@ -183,10 +278,15 @@ export default function TripDetailsScreen({ route }) {
           <View style={styles.calendarContent}>
             <Calendar
               onDayPress={handleDateSelect}
-              markedDates={{ [newEndDate]: { selected: true, selectedColor: 'blue' } }}
+              markedDates={{
+                [newEndDate]: { selected: true, selectedColor: "blue" },
+              }}
               style={styles.calendar}
             />
-            <Button title="Close" onPress={() => setShowEndDateCalendar(false)} />
+            <Button
+              title="Close"
+              onPress={() => setShowEndDateCalendar(false)}
+            />
           </View>
         </View>
       </Modal>
@@ -195,6 +295,12 @@ export default function TripDetailsScreen({ route }) {
 }
 
 const styles = StyleSheet.create({
+  reviewModalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    margin: 20,
+    borderRadius: 8,
+  },
   webview: {
     flex: 1,
     zIndex: 3,
@@ -239,6 +345,8 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 20,
     fontWeight: "bold",
+    marginBottom: 4,
+    // backgroundColor: 'green',
     color: "green",
   },
   quantity: {
@@ -278,14 +386,14 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
-    width: '80%',
+    width: "80%",
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
   },
   modalTitle: {
@@ -300,7 +408,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 10,
     paddingHorizontal: 8,
-    justifyContent: 'center',
+    justifyContent: "center",
     fontSize: 16,
   },
   modalButtons: {
@@ -309,19 +417,19 @@ const styles = StyleSheet.create({
   },
   calendarContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   calendarContent: {
-    width: '90%',
+    width: "90%",
     padding: 10,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   calendar: {
-    width: '100%',
+    width: "100%",
     height: 350,
   },
 });

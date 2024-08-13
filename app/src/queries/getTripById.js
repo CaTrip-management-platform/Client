@@ -39,3 +39,17 @@ mutation Mutation($tripId: String!, $amount: Float!) {
     token
   }
 }`;
+
+export const CREATE_REVIEW = gql`
+mutation Mutation($activityId: String, $content: String, $rating: Int) {
+  reviewActivity(activityId: $activityId, content: $content, rating: $rating) {
+    reviews {
+      content
+      createdAt
+      rating
+      updatedAt
+      username
+    }
+  }
+}
+`;
