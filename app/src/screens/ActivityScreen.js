@@ -78,9 +78,9 @@ const ActivityScreen = () => {
             tripId: trip._id,
             activityId: selectedItem.id,
             quantity: 1,
-            activityDate: selectedDate
-          }
-        }
+            activityDate: selectedDate,
+          },
+        },
       });
       setSuccessModalVisible(true);
       setTimeout(() => {
