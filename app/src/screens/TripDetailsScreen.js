@@ -114,7 +114,7 @@ export default function TripDetailsScreen({ route }) {
         },
       });
       alert("Activity deleted successfully!");
-      await refetch(); // Refetch data untuk memperbarui tampilan
+      await refetch();
     } catch (error) {
       console.log("Error deleting activity:", error);
       alert("Failed to delete activity.");
