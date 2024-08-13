@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,41 +8,50 @@ import {
   ImageBackground,
   Modal,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useFocusEffect } from "@react-navigation/native";
-import { useQuery } from "@apollo/client";
+import { Calendar } from "react-native-calendars";
+import { TimelineContext } from "../context/timelineContext";
+import { useQuery, useMutation } from "@apollo/client";
 import { GET_TRIPS_BY_CUSTOMER_ID } from "../queries/getTripsByCustomerId";
+import { ADD_ACTIVITY_TO_TRIP } from "../queries/addActivityToTrip";
+import * as SecureStore from "expo-secure-store";
+import { jwtDecode } from "jwt-decode";
 
 const ActivityScreen = () => {
-  const [timeline, setTimeline] = useState([]);
+  const { timeline } = useContext(TimelineContext);
   const [modalVisible, setModalVisible] = useState(false);
+  const [calendarModalVisible, setCalendarModalVisible] = useState(false);
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [tripsData, setTripsData] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [dateError, setDateError] = useState("");
 
   const { loading, error, data } = useQuery(GET_TRIPS_BY_CUSTOMER_ID);
-  console.log(data);
-  const dataToRender = data.getTripsByCustomerId;
+  const [addActivityToTripFn] = useMutation(ADD_ACTIVITY_TO_TRIP);
+  const [user, setUser] = useState("");
 
-  const getData = async (key) => {
-    try {
-      const value = await AsyncStorage.getItem(key);
-      return value ? JSON.parse(value) : [];
-    } catch (error) {
-      console.error("Error retrieving data:", error);
-      return [];
+  useEffect(() => {
+    const fetchTokenData = async () => {
+      const token = await SecureStore.getItemAsync("accessToken");
+      const id = jwtDecode(token);
+      setUser(id.id);
+    };
+    fetchTokenData();
+    if (data && data.getTripsByCustomerId) {
+      const filteredTrips = data.getTripsByCustomerId.filter(
+        (trip) => trip.customerId === user && trip.paymentStatus === "Pending"
+      );
+      setTripsData(filteredTrips);
     }
+  }, [data]);
+
+  const handleDateSelect = (day) => {
+    setSelectedDate(day.dateString);
+    setDateError("");
+    setCalendarModalVisible(false);
   };
-
-  const fetchTimeline = useCallback(async () => {
-    const storedTimeline = await getData("timelineData");
-    setTimeline(storedTimeline);
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchTimeline();
-    }, [fetchTimeline])
-  );
 
   const handleOpenModal = (item) => {
     setSelectedItem(item);
@@ -52,6 +61,35 @@ const ActivityScreen = () => {
   const handleCloseModal = () => {
     setModalVisible(false);
     setSelectedItem(null);
+    setSelectedDate(null);
+    setDateError("");
+  };
+
+  const handleAddToTrip = async (trip) => {
+    if (!selectedDate) {
+      setDateError("Please select a date first.");
+      return;
+    }
+
+    try {
+      //   await addActivityToTripFn({
+      //     variables: {
+      //       activityInput: {
+      //         tripId: trip._id,
+      //         activityId: selectedItem.id,
+      //         quantity: 1,
+      //         activityDate: selectedDate
+      //       }
+      //     }
+      //   });
+      setSuccessModalVisible(true);
+      setTimeout(() => {
+        setSuccessModalVisible(false);
+        handleCloseModal();
+      }, 2000);
+    } catch (error) {
+      console.error("Error adding activity to trip", error);
+    }
   };
 
   if (loading) {
@@ -62,6 +100,20 @@ const ActivityScreen = () => {
 
   const keyExtractor = (item) =>
     item._id || item.id || `${item.title}-${item.date}`;
+
+  if (loading) {
+    return (
+      <ActivityIndicator size="large" color="blue" style={styles.loader} />
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Error loading data.</Text>
+      </View>
+    );
+  }
 
   return (
     <ImageBackground
@@ -100,6 +152,7 @@ const ActivityScreen = () => {
                     <Text style={styles.timelineRating}>
                       Rating: {item.reviews?.[0]?.rating || "N/A"}
                     </Text>
+                    <Text>{item.name}</Text>
                   </View>
                 </View>
               </View>
@@ -107,6 +160,19 @@ const ActivityScreen = () => {
           )}
         />
       )}
+
+      {/* Success Message Modal */}
+      <Modal
+        transparent={true}
+        visible={successModalVisible}
+        animationType="fade"
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.successModalContent}>
+            <Text style={styles.successText}>Activity added successfully!</Text>
+          </View>
+        </View>
+      </Modal>
 
       <Modal
         transparent={true}
@@ -116,17 +182,76 @@ const ActivityScreen = () => {
         <View style={styles.modalBackground}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>My Trip</Text>
-            <FlatList
-              data={dataToRender}
-              keyExtractor={(item) => item._id}
-              renderItem={({ item }) => (
-                <View style={styles.card}>
-                  <Text style={styles.cardText}>{item.destination}</Text>
-                </View>
-              )}
+            {selectedItem ? (
+              <>
+                <TouchableOpacity
+                  onPress={() => setCalendarModalVisible(true)}
+                  style={styles.dateButton}
+                >
+                  <Text style={styles.dateButtonText}>
+                    {selectedDate
+                      ? `Selected Date: ${selectedDate}`
+                      : "Select Date"}
+                  </Text>
+                </TouchableOpacity>
+                {dateError ? (
+                  <Text style={styles.errorText}>{dateError}</Text>
+                ) : null}
+                {tripsData.length > 0 ? (
+                  <FlatList
+                    data={tripsData}
+                    keyExtractor={(item) => item._id}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        onPress={() => handleAddToTrip(item)}
+                        style={styles.card}
+                      >
+                        <Text style={styles.cardText}>{item.destination}</Text>
+                      </TouchableOpacity>
+                    )}
+                  />
+                ) : (
+                  <Text>There's no trip available.</Text>
+                )}
+                <TouchableOpacity
+                  onPress={handleCloseModal}
+                  style={styles.closeButton}
+                >
+                  <Text>Close</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <Text>No trip details available.</Text>
+            )}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Calendar Modal */}
+      <Modal
+        transparent={true}
+        visible={calendarModalVisible}
+        onRequestClose={() => setCalendarModalVisible(false)}
+      >
+        <View style={styles.calendarModalBackground}>
+          <View style={styles.calendarModalContent}>
+            <Calendar
+              onDayPress={handleDateSelect}
+              markedDates={{
+                [selectedDate]: {
+                  selected: true,
+                  selectedColor: "#134B70",
+                  selectedTextColor: "#FFFFFF",
+                },
+              }}
+              theme={{
+                selectedDayBackgroundColor: "#134B70",
+                selectedDayTextColor: "#FFFFFF",
+                todayTextColor: "#134B70",
+              }}
             />
             <TouchableOpacity
-              onPress={handleCloseModal}
+              onPress={() => setCalendarModalVisible(false)}
               style={styles.closeButton}
             >
               <Text>Close</Text>
@@ -242,6 +367,49 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#ddd",
     borderRadius: 5,
+  },
+  dateButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#134B70",
+    borderRadius: 5,
+  },
+  dateButtonText: {
+    color: "#FFFFFF",
+  },
+  errorText: {
+    color: "red",
+    marginTop: 5,
+  },
+  loader: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  calendarModalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  calendarModalContent: {
+    width: "80%",
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  successModalContent: {
+    width: "80%",
+    padding: 20,
+    backgroundColor: "green",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  successText: {
+    fontSize: 18,
+    color: "white",
+    fontWeight: "bold",
   },
 });
 

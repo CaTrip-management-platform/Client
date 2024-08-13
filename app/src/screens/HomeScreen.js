@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import {
   View,
   Text,
@@ -35,13 +35,12 @@ const HomeScreen = ({ searchResults, navigation }) => {
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showImageViewer, setShowImageViewer] = useState(false);
+  const { addToTimeline } = useContext(TimelineContext);
 
   const client = useApolloClient();
   const { loading, error, data, refetch } = useQuery(GET_Activity);
   const [deleteActivity, { loading: deleteLoading, error: deleteError }] =
     useMutation(DELETE_ACTIVITY);
-
-  // console.log(data);
 
   const sendMessage = async () => {
     try {
@@ -147,28 +146,14 @@ const HomeScreen = ({ searchResults, navigation }) => {
     );
   };
 
-  const saveData = async (key, value) => {
-    try {
-      await AsyncStorage.setItem(key, value);
-    } catch (error) {
-      console.error("Error saving data:", error);
-    }
+  const handleAddToTimeline = () => {
+    addToTimeline(selectedActivity);
+    alert("Activity added to your timeline!");
   };
-  const handleAddToTimeline = async () => {
-    setTimelineData((timelineData) => {
-      const data = [...timelineData, selectedActivity];
-      return data;
-    });
 
-    try {
-      console.log(timelineData);
-
-      const timelineDataString = JSON.stringify(timelineData);
-      await saveData("timelineData", timelineDataString);
-      alert("Added to Timeline");
-    } catch (error) {
-      console.error("Error saving data:", error);
-    }
+  const saveActivity = () => {
+    addToTimeline(selectedActivity);
+    Alert.alert("Success", "Activity added to your timeline!");
   };
 
   const handleDelete = async (id) => {
@@ -177,7 +162,7 @@ const HomeScreen = ({ searchResults, navigation }) => {
         variables: { activityId: id },
       });
       setSelectedActivity(null);
-      console.log(result.data?.deleteActivityForSeller);
+      // console.log(result.data?.deleteActivityForSeller);
       refetch();
     } catch (err) {
       console.log(error);
