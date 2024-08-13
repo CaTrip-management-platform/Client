@@ -36,6 +36,7 @@ export function LogoTitle() {
 }
 
 export default function MainTab() {
+  const [isFocused, setIsFocused] = useState(false);
   const navigation = useNavigation();
   const { setIsSignedIn } = useContext(AuthContext);
   const [text, setText] = useState("");
@@ -70,7 +71,9 @@ export default function MainTab() {
       <Tab.Navigator>
         <Tab.Screen
           name="Home"
-          children={() => <HomeScreen searchResults={searchResults} />}
+          children={() => (
+            <HomeScreen searchResults={searchResults} isFocused={isFocused} />
+          )}
           options={{
             tabBarLabel: () => null,
             tabBarStyle: { backgroundColor: "white" },
@@ -85,6 +88,12 @@ export default function MainTab() {
                     style={styles.input}
                     value={text}
                     onChangeText={setText}
+                    onFocus={() => {
+                      setIsFocused(true);
+                    }}
+                    onBlur={() => {
+                      setIsFocused(false);
+                    }}
                   />
                   <TouchableOpacity style={styles.iconWrapper}>
                     <Icon name="search" size={24} color="#aaa" />
@@ -103,27 +112,7 @@ export default function MainTab() {
             ),
           }}
         />
-        <Tab.Screen
-          name="TravelTips"
-          component={TravelTipsScreen}
-          options={{
-            tabBarLabel: () => null,
-            tabBarStyle: { backgroundColor: "white" },
-            headerStyle: { backgroundColor: "white" },
-            headerTitleAlign: "center",
-            headerTitle: () => <LogoTitle />,
-            tabBarIcon: ({ focused, color, size }) =>
-              focused ? (
-                <MaterialIcons name="luggage" size={25} color="black" />
-              ) : (
-                <FontAwesome6
-                  name="person-walking-luggage"
-                  size={24}
-                  color="black"
-                />
-              ),
-          }}
-        />
+
         <Tab.Screen
           name="Activity"
           component={ActivityScreen}
@@ -199,7 +188,7 @@ export default function MainTab() {
                   />
                 </View>
               );
-            }
+            },
           }}
         />
       </Tab.Navigator>
@@ -213,7 +202,9 @@ export default function MainTab() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Confirm Logout</Text>
-            <Text style={styles.modalMessage}>Are you sure you want to log out?</Text>
+            <Text style={styles.modalMessage}>
+              Are you sure you want to log out?
+            </Text>
             <View style={styles.modalButtons}>
               <Button title="Cancel" onPress={() => setIsModalVisible(false)} />
               <Button title="Logout" color="red" onPress={handleLogout} />

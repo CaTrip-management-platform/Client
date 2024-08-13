@@ -23,7 +23,7 @@ const carouselData = [
   {
     id: "3",
     img: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fHRyYXZlbHxlbnwwfHwwfHx8MA%3D%3D",
-    content: "Check Our Travel Tips",
+    content: "Travel Tips",
   },
 ];
 
