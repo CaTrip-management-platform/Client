@@ -54,6 +54,12 @@ const ActivityScreen = () => {
     setSelectedItem(null);
   };
 
+  if (loading) {
+    return (
+      <ActivityIndicator size="large" color="blue" style={styles.loader} />
+    );
+  }
+
   const keyExtractor = (item) =>
     item._id || item.id || `${item.title}-${item.date}`;
 

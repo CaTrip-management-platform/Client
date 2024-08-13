@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FontAwesome, Feather } from "@expo/vector-icons";
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import HomeScreen from "../screens/HomeScreen";
 import AddTripUserScreen from "../screens/AddTripUserScreen"; // Update import path if necessary
 import SettingsScreen from "../screens/ActivityHistoryScreen";
@@ -18,9 +18,9 @@ import { Icon } from "react-native-paper";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useQuery } from "@apollo/client";
 import { SEARCH_ACTIVITY } from "../queries/searchActivity.js";
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import ActivityScreen from "../screens/ActivityScreen.js";
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import TravelTipsScreen from "../screens/TravelTipsScreen.js";
 
 const Tab = createBottomTabNavigator();
@@ -51,7 +51,7 @@ export default function MainTab() {
     } else {
       setSearchResults([]);
     }
-  }, [text, refetch]); 
+  }, [text, refetch]);
 
   return (
     <Tab.Navigator>
@@ -67,7 +67,7 @@ export default function MainTab() {
             <View style={styles.addContainer}>
               <View style={styles.inputWrapper}>
                 <TextInput
-                  placeholder="Cari"
+                  placeholder="Search"
                   placeholderTextColor="black"
                   style={styles.input}
                   value={text}
@@ -79,63 +79,57 @@ export default function MainTab() {
               </View>
             </View>
           ),
-          headerLeft: () => <LogoTitle />,
-          // headerRight: () => (
-          //   <View style={styles.headerRightContainer}>
-          //     <MaterialIcons
-          //       name="luggage"
-          //       size={25}
-          //       color="black"
-          //       onPress={() => navigation.navigate("Activity")}
-          //     />
-          //     <Feather
-          //       name="menu"
-          //       size={27}
-          //       color={"black"}
-          //       onPress={() => navigation.getParent("RightDrawer").openDrawer()}
-          //       style={styles.headerIcon}
-          //     />
-          //   </View>
-          // ), 
+          headerRight: () => <LogoTitle />,
+          headerLeft: () => null,
           tabBarIcon: ({ focused, color, size }) => (
-            <MaterialCommunityIcons name={focused ? "home" : "home-outline"} size={24} color="black" />
-          ),
-        }}
-      /> 
-       <Tab.Screen
-         name="TravelTips"
-         component={TravelTipsScreen}
-        options={{
-          tabBarLabel: () => null,
-          tabBarStyle: { backgroundColor: "white" },
-          headerStyle: { backgroundColor: "white" },
-          headerTitleAlign: "center",
-          headerTitle: () => <LogoTitle />,
-          tabBarIcon: ({ focused, color, size }) => (
-           focused ? <MaterialIcons
-            name="luggage"
-            size={25}
-            color="black"
-          /> : <FontAwesome6 name="person-walking-luggage" size={24} color="black" />
+            <MaterialCommunityIcons
+              name={focused ? "home" : "home-outline"}
+              size={24}
+              color="black"
+            />
           ),
         }}
       />
       <Tab.Screen
-         name="Activity"
-         component={ActivityScreen}
+        name="TravelTips"
+        component={TravelTipsScreen}
         options={{
           tabBarLabel: () => null,
           tabBarStyle: { backgroundColor: "white" },
           headerStyle: { backgroundColor: "white" },
           headerTitleAlign: "center",
           headerTitle: () => <LogoTitle />,
-          tabBarIcon: ({ focused, color, size }) => (
-           focused ? <MaterialIcons
-            name="luggage"
-            size={25}
-            color="black"
-          /> : <FontAwesome6 name="person-walking-luggage" size={24} color="black" />
-          ),
+          tabBarIcon: ({ focused, color, size }) =>
+            focused ? (
+              <MaterialIcons name="luggage" size={25} color="black" />
+            ) : (
+              <FontAwesome6
+                name="person-walking-luggage"
+                size={24}
+                color="black"
+              />
+            ),
+        }}
+      />
+      <Tab.Screen
+        name="Activity"
+        component={ActivityScreen}
+        options={{
+          tabBarLabel: () => null,
+          tabBarStyle: { backgroundColor: "white" },
+          headerStyle: { backgroundColor: "white" },
+          headerTitleAlign: "center",
+          headerTitle: () => <LogoTitle />,
+          tabBarIcon: ({ focused, color, size }) =>
+            focused ? (
+              <MaterialIcons name="luggage" size={25} color="black" />
+            ) : (
+              <FontAwesome6
+                name="person-walking-luggage"
+                size={24}
+                color="black"
+              />
+            ),
         }}
       />
 
@@ -149,7 +143,11 @@ export default function MainTab() {
           headerTitleAlign: "center",
           headerTitle: () => <LogoTitle />,
           tabBarIcon: ({ focused, color, size }) => (
-            <MaterialIcons name={focused ? "add-location-alt" : "add-location"} size={24} color="black" />
+            <MaterialIcons
+              name={focused ? "add-location-alt" : "add-location"}
+              size={24}
+              color="black"
+            />
           ),
         }}
       />
@@ -171,7 +169,15 @@ export default function MainTab() {
         component={SettingsScreen}
         options={{
           tabBarLabel: () => null,
-          headerLeft: () => <FontAwesome5 name="plus-circle" size={24} color="black" style={styles.headerIcon} onPress={() => navigation.push("Add")} />,
+          headerLeft: () => (
+            <FontAwesome5
+              name="plus-circle"
+              size={24}
+              color="black"
+              style={styles.headerIcon}
+              onPress={() => navigation.push("Add")}
+            />
+          ),
           tabBarStyle: { backgroundColor: "white" },
           headerStyle: { backgroundColor: "white" },
           headerTitleAlign: "center",
@@ -201,12 +207,11 @@ const styles = StyleSheet.create({
   },
   inputWrapper: {
     flexDirection: "row",
-    alignItems: "center",
-    width: 250,
+    width: 310,
+    right: 30,
     height: 40,
     borderRadius: 20,
-    borderColor: "black",
-    backgroundColor: "#aaa",
+    backgroundColor: "silver",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
