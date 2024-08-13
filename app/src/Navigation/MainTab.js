@@ -5,6 +5,9 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  Modal,
+  Text,
+  Button,
 } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FontAwesome, Feather } from "@expo/vector-icons";
@@ -37,7 +40,8 @@ export default function MainTab() {
   const { setIsSignedIn } = useContext(AuthContext);
   const [text, setText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  console.log(searchResults, "<=====");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
   const { refetch } = useQuery(SEARCH_ACTIVITY, {
     variables: { searchTerm: text },
     skip: true,
@@ -54,160 +58,170 @@ export default function MainTab() {
     }
   }, [text, refetch]);
 
-  return (
-    <Tab.Navigator>
-      <Tab.Screen
-        name="Home"
-        children={() => <HomeScreen searchResults={searchResults} />}
-        options={{
-          tabBarLabel: () => null,
-          tabBarStyle: { backgroundColor: "white" },
-          headerStyle: { backgroundColor: "white" },
-          headerTitleAlign: "center",
-          headerTitle: () => (
-            <View style={styles.addContainer}>
-              <View style={styles.inputWrapper}>
-                <TextInput
-                  placeholder="Search"
-                  placeholderTextColor="black"
-                  style={styles.input}
-                  value={text}
-                  onChangeText={setText}
-                />
-                <TouchableOpacity style={styles.iconWrapper}>
-                  <Icon name="search" size={24} color="#aaa" />
-                </TouchableOpacity>
-              </View>
-            </View>
-          ),
-          headerRight: () => <LogoTitle />,
-          headerLeft: () => null,
-          tabBarIcon: ({ focused, color, size }) => (
-            <MaterialCommunityIcons
-              name={focused ? "home" : "home-outline"}
-              size={24}
-              color="black"
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="TravelTips"
-        component={TravelTipsScreen}
-        options={{
-          tabBarLabel: () => null,
-          tabBarStyle: { backgroundColor: "white" },
-          headerStyle: { backgroundColor: "white" },
-          headerTitleAlign: "center",
-          headerTitle: () => <LogoTitle />,
-          tabBarIcon: ({ focused, color, size }) =>
-            focused ? (
-              <MaterialIcons name="luggage" size={25} color="black" />
-            ) : (
-              <FontAwesome6
-                name="person-walking-luggage"
-                size={24}
-                color="black"
-              />
-            ),
-        }}
-      />
-      <Tab.Screen
-        name="Activity"
-        component={ActivityScreen}
-        options={{
-          tabBarLabel: () => null,
-          tabBarStyle: { backgroundColor: "white" },
-          headerStyle: { backgroundColor: "white" },
-          headerTitleAlign: "center",
-          headerTitle: () => <LogoTitle />,
-          tabBarIcon: ({ focused, color, size }) =>
-            focused ? (
-              <MaterialIcons name="luggage" size={25} color="black" />
-            ) : (
-              <FontAwesome6
-                name="person-walking-luggage"
-                size={24}
-                color="black"
-              />
-            ),
-        }}
-      />
+  const handleLogout = async () => {
+    await SecureStore.deleteItemAsync("accessToken");
+    await SecureStore.deleteItemAsync("role");
+    await SecureStore.deleteItemAsync("_id");
+    setIsSignedIn(false);
+  };
 
-      <Tab.Screen
-        name="AddTrip"
-        component={AddTripUserScreen}
-        options={{
-          tabBarLabel: () => null,
-          tabBarStyle: { backgroundColor: "white" },
-          headerStyle: { backgroundColor: "white" },
-          headerTitleAlign: "center",
-          headerTitle: () => <LogoTitle />,
-          tabBarIcon: ({ focused, color, size }) => (
-            <MaterialIcons
-              name={focused ? "add-location-alt" : "add-location"}
-              size={24}
-              color="black"
-            />
-          ),
-        }}
-      />
-      {/* <Tab.Screen
-        name="Add"
-        component={AddScreen}
-        options={{
-          tabBarLabel: () => null,
-          tabBarIcon: ({ focused, color, size }) => (
-            <MaterialIcons name={focused ? "add-location-alt" : "add-location"} size={24} color="black" />
-          ),
-          headerStyle: { backgroundColor: "white" },
-          headerTitleAlign: "center",
-          headerTitle: () => <LogoTitle />,
-        }}
-      /> */}
-      <Tab.Screen
-        name="Profile"
-        component={SettingsScreen}
-        options={{
-          tabBarLabel: () => null,
-          headerLeft: () => (
-            <FontAwesome5
-              name="plus-circle"
-              size={24}
-              color="black"
-              style={styles.headerIcon}
-              onPress={() => navigation.push("Add")}
-            />
-          ),
-          tabBarStyle: { backgroundColor: "white" },
-          headerStyle: { backgroundColor: "white" },
-          headerTitleAlign: "center",
-          headerTitle: () => <LogoTitle />,
-          tabBarIcon: ({ focused, color, size }) => (
-            <Feather
-              name={focused ? "user" : "users"}
-              size={size}
-              color={color}
-            />
-          ),
-          headerRight: () => {
-            return (
-              <View style={styles.headerRightContainer}>
-                <FontAwesome
-                  name="sign-out"
+  return (
+    <>
+      <Tab.Navigator>
+        <Tab.Screen
+          name="Home"
+          children={() => <HomeScreen searchResults={searchResults} />}
+          options={{
+            tabBarLabel: () => null,
+            tabBarStyle: { backgroundColor: "white" },
+            headerStyle: { backgroundColor: "white" },
+            headerTitleAlign: "center",
+            headerTitle: () => (
+              <View style={styles.addContainer}>
+                <View style={styles.inputWrapper}>
+                  <TextInput
+                    placeholder="Search"
+                    placeholderTextColor="black"
+                    style={styles.input}
+                    value={text}
+                    onChangeText={setText}
+                  />
+                  <TouchableOpacity style={styles.iconWrapper}>
+                    <Icon name="search" size={24} color="#aaa" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ),
+            headerRight: () => <LogoTitle />,
+            headerLeft: () => null,
+            tabBarIcon: ({ focused, color, size }) => (
+              <MaterialCommunityIcons
+                name={focused ? "home" : "home-outline"}
+                size={24}
+                color="black"
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="TravelTips"
+          component={TravelTipsScreen}
+          options={{
+            tabBarLabel: () => null,
+            tabBarStyle: { backgroundColor: "white" },
+            headerStyle: { backgroundColor: "white" },
+            headerTitleAlign: "center",
+            headerTitle: () => <LogoTitle />,
+            tabBarIcon: ({ focused, color, size }) =>
+              focused ? (
+                <MaterialIcons name="luggage" size={25} color="black" />
+              ) : (
+                <FontAwesome6
+                  name="person-walking-luggage"
                   size={24}
                   color="black"
-                  onPress={async () => {
-                    await SecureStore.deleteItemAsync("accessToken");
-                    setIsSignedIn(false);
-                  }}
                 />
-              </View>
-            );
-          }
-        }}
-      />
-    </Tab.Navigator>
+              ),
+          }}
+        />
+        <Tab.Screen
+          name="Activity"
+          component={ActivityScreen}
+          options={{
+            tabBarLabel: () => null,
+            tabBarStyle: { backgroundColor: "white" },
+            headerStyle: { backgroundColor: "white" },
+            headerTitleAlign: "center",
+            headerTitle: () => <LogoTitle />,
+            tabBarIcon: ({ focused, color, size }) =>
+              focused ? (
+                <MaterialIcons name="luggage" size={25} color="black" />
+              ) : (
+                <FontAwesome6
+                  name="person-walking-luggage"
+                  size={24}
+                  color="black"
+                />
+              ),
+          }}
+        />
+        <Tab.Screen
+          name="AddTrip"
+          component={AddTripUserScreen}
+          options={{
+            tabBarLabel: () => null,
+            tabBarStyle: { backgroundColor: "white" },
+            headerStyle: { backgroundColor: "white" },
+            headerTitleAlign: "center",
+            headerTitle: () => <LogoTitle />,
+            tabBarIcon: ({ focused, color, size }) => (
+              <MaterialIcons
+                name={focused ? "add-location-alt" : "add-location"}
+                size={24}
+                color="black"
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Profile"
+          component={SettingsScreen}
+          options={{
+            tabBarLabel: () => null,
+            headerLeft: () => (
+              <FontAwesome5
+                name="plus-circle"
+                size={24}
+                color="black"
+                style={styles.headerIcon}
+                onPress={() => navigation.push("Add")}
+              />
+            ),
+            tabBarStyle: { backgroundColor: "white" },
+            headerStyle: { backgroundColor: "white" },
+            headerTitleAlign: "center",
+            headerTitle: () => <LogoTitle />,
+            tabBarIcon: ({ focused, color, size }) => (
+              <Feather
+                name={focused ? "user" : "users"}
+                size={size}
+                color={color}
+              />
+            ),
+            headerRight: () => {
+              return (
+                <View style={styles.headerRightContainer}>
+                  <FontAwesome
+                    name="sign-out"
+                    size={24}
+                    color="black"
+                    onPress={() => setIsModalVisible(true)}
+                  />
+                </View>
+              );
+            }
+          }}
+        />
+      </Tab.Navigator>
+
+      <Modal
+        transparent={true}
+        visible={isModalVisible}
+        animationType="slide"
+        onRequestClose={() => setIsModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Confirm Logout</Text>
+            <Text style={styles.modalMessage}>Are you sure you want to log out?</Text>
+            <View style={styles.modalButtons}>
+              <Button title="Cancel" onPress={() => setIsModalVisible(false)} />
+              <Button title="Logout" color="red" onPress={handleLogout} />
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </>
   );
 }
 
@@ -249,5 +263,32 @@ const styles = StyleSheet.create({
   },
   headerIcon: {
     marginLeft: 15,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContainer: {
+    width: 300,
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  modalMessage: {
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
   },
 });

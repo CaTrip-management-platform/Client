@@ -16,7 +16,6 @@ import { useQuery, useMutation } from "@apollo/client";
 import { GET_TRIPS_BY_CUSTOMER_ID } from "../queries/getTripsByCustomerId";
 import { ADD_ACTIVITY_TO_TRIP } from "../queries/addActivityToTrip";
 import * as SecureStore from "expo-secure-store";
-import { jwtDecode } from "jwt-decode";
 
 const ActivityScreen = () => {
   const { timeline } = useContext(TimelineContext);
@@ -33,12 +32,11 @@ const ActivityScreen = () => {
   const [user, setUser] = useState("");
 
   useEffect(() => {
-    const fetchTokenData = async () => {
-      const token = await SecureStore.getItemAsync("accessToken");
-      const id = jwtDecode(token);
-      setUser(id.id);
-    };
-    fetchTokenData();
+    const fetchUserData = async () => {
+      const user = await SecureStore.getItemAsync("_id");
+      setUser(user);
+    }
+    fetchUserData()
     if (data && data.getTripsByCustomerId) {
       const filteredTrips = data.getTripsByCustomerId.filter(
         (trip) => trip.customerId == user && trip.paymentStatus === "Pending"

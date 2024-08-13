@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -13,13 +13,13 @@ import { StatusBar } from "expo-status-bar";
 import * as SecureStore from "expo-secure-store";
 import { jwtDecode } from "jwt-decode";
 import { GET_TRIPS_BY_CUSTOMER_ID } from "../queries/getTripsByCustomerId";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 
 function ActivityHistoryScreen() {
   const [userId, setUserId] = useState("");
   const navigation = useNavigation();
 
-  const { loading, error, data, refetch } = useQuery(GET_TRIPS_BY_CUSTOMER_ID, {
+  const { loading, error, data } = useQuery(GET_TRIPS_BY_CUSTOMER_ID, {
     variables: { id: userId },
     skip: !userId,
     fetchPolicy: "no-cache",
@@ -29,17 +29,8 @@ function ActivityHistoryScreen() {
   useEffect(() => {
     const fetchTokenData = async () => {
       try {
-        const token = await SecureStore.getItemAsync("accessToken");
-        if (token) {
-          try {
-            const decoded = jwtDecode(token);
-            setUserId(decoded.id);
-          } catch (decodeError) {
-            console.error("Error decoding token:", decodeError);
-          }
-        } else {
-          console.log("No token found");
-        }
+        const user = await SecureStore.getItemAsync("_id");
+        setUserId(user);
       } catch (error) {
         console.error("Error fetching token data:", error);
       }
@@ -47,12 +38,6 @@ function ActivityHistoryScreen() {
 
     fetchTokenData();
   }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      refetch();
-    }, [])
-  );
 
   if (loading) {
     return (
