@@ -25,6 +25,7 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DELETE_ACTIVITY } from "../queries/delete";
 import Recommended from "../components/recommended";
+import { TimelineContext } from "../context/timelineContext";
 
 const HomeScreen = ({ searchResults, navigation }) => {
   const navigate = useNavigation();
