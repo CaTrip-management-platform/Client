@@ -1,24 +1,29 @@
-import { useMutation, useQuery } from "@apollo/client";
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
-import { CREATE_PAYMENT, GET_TRIPS_BY_ID } from "../queries/getTripById";
-import { ActivityIndicator, Modal } from "react-native-paper";
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Modal, Button } from "react-native";
+import { useMutation, useQuery } from "@apollo/client";
+import { ActivityIndicator } from "react-native-paper";
 import { WebView } from "react-native-webview";
+import { UPDATE_DATE } from "../queries/updateDateTrip";
+import { CREATE_PAYMENT, GET_TRIPS_BY_ID } from "../queries/getTripById";
+import { Calendar } from 'react-native-calendars';
+import moment from 'moment'; // Ensure you have moment.js installed for date formatting
 
 export default function TripDetailsScreen({ route }) {
   const [modal, setModal] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState("");
+  const [showDateModal, setShowDateModal] = useState(false);
+  const [showStartDateCalendar, setShowStartDateCalendar] = useState(false);
+  const [showEndDateCalendar, setShowEndDateCalendar] = useState(false);
+  const [newStartDate, setNewStartDate] = useState("");
+  const [newEndDate, setNewEndDate] = useState("");
+  const [dateType, setDateType] = useState("");
+
+  const [updateDate] = useMutation(UPDATE_DATE);
   const [
     paymentFn,
     { loading: loadingPayment, error: errorPayment, data: dataPayment },
   ] = useMutation(CREATE_PAYMENT);
+
   const { loading, error, data } = useQuery(GET_TRIPS_BY_ID, {
     variables: { tripId: route.params._id },
   });
@@ -36,41 +41,6 @@ export default function TripDetailsScreen({ route }) {
     (sum, activity) => sum + activity.price,
     0
   );
-  // const trip = {
-  //         "_id": "66b990c42a1d478f78d13793",
-  //         "destination": "Jerman",
-  //         "activities": [
-  //           {
-  //             "activityId": "66b3358a46eb1f01dc034abf",
-  //             "quantity": 3,
-  //             "activityDate": "2020-01-01T00:00:00.000Z",
-  //             "price": 1317000,
-  //             "Activity": {
-  //               "_id": "66b3358a46eb1f01dc034abf",
-  //               "title": "Kintamani Cafe Sunrise 4WD Jeep Adventure with Photographer",
-  //               "price": 439000,
-  //               "imgUrls": [
-  //                 "https://res.klook.com/image/upload/c_fill,w_627,h_470/q_80/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/asux7hp1vajezcmzrla3.webp",
-  //                 "https://res.klook.com/image/upload/c_fill,w_1265,h_712/q_80/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/jmukn3diynnhnvdxywjt.webp",
-  //                 "https://res.klook.com/image/upload/c_fill,w_1265,h_712/q_80/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/jmukn3diynnhnvdxywjt.webp"
-  //               ],
-  //               "description": "Explore Mt Batur with 4WD Jeep and feel offroad sensation. Visit Kintamani cafe (EL Lago Bali) after Explore Mt Batur and enjoy a panoramic views of the volcano and the lake Batur. Take the best photo with sunrise in front of you as Background. You will be accompanied by a professional photographer who is experienced in capturing the best moments and scenes",
-  //               "tags": [
-  //                 "Hotel pick up",
-  //                 "English/Bahasa Indonesia"
-  //               ],
-  //               "location": "Bali"
-  //             }
-  //           }
-  //         ],
-  //         "totalPrice": 1317000,
-  //         "paymentStatus": "Pending",
-  //         "customerId": "66b1ab1a1f8a522270a599d2",
-  //         "startDate": "2024-10-31T17:00:00.000Z",
-  //         "endDate": "2024-11-30T17:00:00.000Z",
-  //         "createdAt": "2024-08-12T04:34:12.084Z",
-  //         "updatedAt": "2024-08-12T04:34:12.084Z"
-  //       }
 
   const handleBuy = async () => {
     try {
@@ -80,7 +50,36 @@ export default function TripDetailsScreen({ route }) {
       setPaymentUrl(dataPayment.createPayment.redirectUrl);
       setModal(true);
     } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleUpdateDate = async () => {
+    try {
+      await updateDate({
+        variables: {
+          dateInput: {
+            startDate: newStartDate,
+            endDate: newEndDate,
+          },
+          tripId: route.params._id,
+        },
+      });
+      alert("Trip dates updated successfully!");
+      setShowDateModal(false);
+    } catch (error) {
       console.log(error);
+      alert("Failed to update trip dates.");
+    }
+  };
+
+  const handleDateSelect = (date) => {
+    if (dateType === "start") {
+      setNewStartDate(date.dateString);
+      setShowStartDateCalendar(false);
+    } else if (dateType === "end") {
+      setNewEndDate(date.dateString);
+      setShowEndDateCalendar(false);
     }
   };
 
@@ -91,7 +90,7 @@ export default function TripDetailsScreen({ route }) {
         <ScrollView style={styles.container}>
           <Text style={styles.title}>{trip.destination}</Text>
           <Text style={styles.dates}>
-            {trip.startDate} - {trip.endDate}
+            {moment(trip.startDate).format('DD MMM YYYY')} - {moment(trip.endDate).format('DD MMM YYYY')}
           </Text>
 
           {trip.activities.map((activity, index) => (
@@ -116,15 +115,81 @@ export default function TripDetailsScreen({ route }) {
 
           <View style={styles.totalContainer}>
             <Text style={styles.totalPrice}>
-              Total Price: Rp{trip.totalPrice}
+              Total Price: Rp{totalPrice}
             </Text>
           </View>
 
           <TouchableOpacity style={styles.buyButton} onPress={handleBuy}>
             <Text style={styles.buyButtonText}>Buy Now</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.updateButton}
+            onPress={() => setShowDateModal(true)}
+          >
+            <Text style={styles.updateButtonText}>Update Dates</Text>
+          </TouchableOpacity>
         </ScrollView>
       )}
+
+      {/* Update Date Modal */}
+      <Modal
+        transparent={true}
+        visible={showDateModal}
+        onRequestClose={() => setShowDateModal(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Update Dates</Text>
+            <TouchableOpacity onPress={() => { setDateType("start"); setShowStartDateCalendar(true); }}>
+              <Text style={styles.input}>{newStartDate ? moment(newStartDate).format('DD MMM YYYY') : "Select Start Date"}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => { setDateType("end"); setShowEndDateCalendar(true); }}>
+              <Text style={styles.input}>{newEndDate ? moment(newEndDate).format('DD MMM YYYY') : "Select End Date"}</Text>
+            </TouchableOpacity>
+            <View style={styles.modalButtons}>
+              <Button title="Cancel" onPress={() => setShowDateModal(false)} />
+              <Button title="Update" onPress={handleUpdateDate} />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Start Date Calendar Modal */}
+      <Modal
+        transparent={true}
+        visible={showStartDateCalendar}
+        onRequestClose={() => setShowStartDateCalendar(false)}
+      >
+        <View style={styles.calendarContainer}>
+          <View style={styles.calendarContent}>
+            <Calendar
+              onDayPress={handleDateSelect}
+              markedDates={{ [newStartDate]: { selected: true, selectedColor: 'blue' } }}
+              style={styles.calendar}
+            />
+            <Button title="Close" onPress={() => setShowStartDateCalendar(false)} />
+          </View>
+        </View>
+      </Modal>
+
+      {/* End Date Calendar Modal */}
+      <Modal
+        transparent={true}
+        visible={showEndDateCalendar}
+        onRequestClose={() => setShowEndDateCalendar(false)}
+      >
+        <View style={styles.calendarContainer}>
+          <View style={styles.calendarContent}>
+            <Calendar
+              onDayPress={handleDateSelect}
+              markedDates={{ [newEndDate]: { selected: true, selectedColor: 'blue' } }}
+              style={styles.calendar}
+            />
+            <Button title="Close" onPress={() => setShowEndDateCalendar(false)} />
+          </View>
+        </View>
+      </Modal>
     </>
   );
 }
@@ -171,23 +236,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  description: {
-    fontSize: 14,
-    marginBottom: 8,
-  },
   price: {
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 4,
-    // backgroundColor: 'green',
     color: "green",
   },
   quantity: {
     fontSize: 16,
     marginBottom: 4,
-  },
-  date: {
-    fontSize: 14,
   },
   totalContainer: {
     marginTop: 16,
@@ -207,5 +263,65 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  updateButton: {
+    backgroundColor: "#4CAF50",
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 16,
+  },
+  updateButtonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  input: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 10,
+    paddingHorizontal: 8,
+    justifyContent: 'center',
+    fontSize: 16,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  calendarContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  calendarContent: {
+    width: '90%',
+    padding: 10,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  calendar: {
+    width: '100%',
+    height: 350,
   },
 });

@@ -23,7 +23,7 @@ function ActivityHistoryScreen() {
     variables: { id: userId },
     skip: !userId,
     fetchPolicy: "no-cache",
-    refetchOnWindowFocus: false, // Prevents refetching when the window regains focus
+    refetchOnWindowFocus: false, 
   });
 
   useEffect(() => {
