@@ -233,7 +233,11 @@ const HomeScreen = ({ searchResults, isFocused, navigation }) => {
           >
             <View style={styles.modalOverlay}>
               <TouchableWithoutFeedback>
-                <View style={{ ...styles.modalContainer, borderRadius: 15 }}>
+                <View
+                  style={{
+                    ...styles.modalContainer,
+                  }}
+                >
                   <View style={styles.headerContainer}>
                     <TouchableOpacity
                       style={styles.closeIcon}
@@ -243,7 +247,11 @@ const HomeScreen = ({ searchResults, isFocused, navigation }) => {
                     </TouchableOpacity>
                     <Text style={styles.headerText}>Activity Detail</Text>
                   </View>
-                  <ScrollView contentContainerStyle={styles.scrollViewContent}>
+                  <ScrollView
+                    contentContainerStyle={{
+                      ...styles.scrollViewContent,
+                    }}
+                  >
                     <TouchableOpacity onPress={() => setShowImageViewer(true)}>
                       <Image
                         source={{
@@ -261,18 +269,31 @@ const HomeScreen = ({ searchResults, isFocused, navigation }) => {
                           top: 0,
                         }}
                       >
-                        <Text style={styles.navButtonText}>&lt;</Text>
+                        <Text
+                          style={{
+                            ...styles.navButtonText,
+                            transform: [{ rotate: "90deg" }],
+                          }}
+                        >
+                          ▼
+                        </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         onPress={handleNextImage}
                         style={{
                           ...styles.navButton,
                           position: "absolute",
-                          top: 0,
                           end: 0,
                         }}
                       >
-                        <Text style={styles.navButtonText}>&gt;</Text>
+                        <Text
+                          style={{
+                            ...styles.navButtonText,
+                            transform: [{ rotate: "-90deg" }],
+                          }}
+                        >
+                          ▼
+                        </Text>
                       </TouchableOpacity>
                     </View>
                     <View style={{ marginTop: 10 }}>
@@ -450,14 +471,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  headerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#000",
-    padding: 10,
-  },
 
   headerText: {
     fontSize: 20,
@@ -517,13 +530,9 @@ const styles = StyleSheet.create({
   headerContainer: {
     alignItems: "center",
     justifyContent: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#000",
     padding: 15,
     backgroundColor: "#fff",
     elevation: 3,
-    borderRadius: 15,
-    marginBottom: 8,
   },
   headerContent: {
     flexDirection: "row",
@@ -571,21 +580,23 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   navButton: {
-    backgroundColor: "#000",
-    borderRadius: 20,
-    padding: 10,
+    borderRadius: 30,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
   },
   navButtonText: {
-    color: "#fff",
-    fontSize: 20,
+    color: "black",
+    fontSize: 34,
   },
   selectedActivityTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "bold",
+    textAlign: "center",
   },
   selectedActivityDescription: {
     fontSize: 16,
     marginVertical: 10,
+    textAlign: "justify",
   },
   selectedActivityRating: {
     fontSize: 16,
@@ -603,15 +614,15 @@ const styles = StyleSheet.create({
     color: "green",
   },
   addToTimelineButton: {
-    backgroundColor: "#4CAF50",
-    borderRadius: 5,
-    padding: 10,
+    backgroundColor: "#7ec8e3",
+    borderRadius: 25,
+    paddingVertical: 12,
     alignItems: "center",
     marginVertical: 10,
   },
   addToTimelineButtonText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
   },
   buttonContainer: {
@@ -737,7 +748,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   sendButton: {
-    backgroundColor: "#007bff",
+    backgroundColor: "#7ec8e3",
     borderRadius: 20,
     padding: 10,
   },
