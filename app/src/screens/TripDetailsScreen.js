@@ -54,19 +54,19 @@ export default function TripDetailsScreen({ route, navigation }) {
   const { loading, error, data, refetch } = useQuery(GET_TRIPS_BY_ID, {
     variables: { tripId: route.params._id },
   });
+
   useEffect(() => {
     if (data && data.getTripById && data.getTripById.paymentStatus === "Paid") {
       setPaid(true);
     }
   }, [data]);
 
-  console.log(data);
-
   useFocusEffect(
     useCallback(() => {
       refetch();
     }, [])
   );
+
   if (loading) {
     return (
       <View style={styles.containerLoading}>
@@ -97,6 +97,7 @@ export default function TripDetailsScreen({ route, navigation }) {
       console.log(err);
     }
   };
+
   const handleUpdateDate = async () => {
     try {
       await updateDate({
@@ -121,6 +122,10 @@ export default function TripDetailsScreen({ route, navigation }) {
       setNewStartDate(date.dateString);
       setShowStartDateCalendar(false);
     } else if (dateType === "end") {
+      if (newStartDate && date.dateString < newStartDate) {
+        alert("End date cannot be before start date.");
+        return;
+      }
       setNewEndDate(date.dateString);
       setShowEndDateCalendar(false);
     }
@@ -333,90 +338,84 @@ export default function TripDetailsScreen({ route, navigation }) {
         />
         {/* Update Date Modal */}
         <Modal
-          transparent={true}
           visible={showDateModal}
-          onRequestClose={() => setShowDateModal(false)}
+          onDismiss={() => setShowDateModal(false)}
+          contentContainerStyle={styles.modalContent}
         >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Update Dates</Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setDateType("start");
-                  setShowStartDateCalendar(true);
-                }}
-              >
-                <Text style={styles.input}>
-                  {newStartDate
-                    ? moment(newStartDate).format("DD MMM YYYY")
-                    : "Select Start Date"}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  setDateType("end");
-                  setShowEndDateCalendar(true);
-                }}
-              >
-                <Text style={styles.input}>
-                  {newEndDate
-                    ? moment(newEndDate).format("DD MMM YYYY")
-                    : "Select End Date"}
-                </Text>
-              </TouchableOpacity>
-              <View style={styles.modalButtons}>
-                <Button
-                  title="Cancel"
-                  onPress={() => setShowDateModal(false)}
-                />
-                <Button title="Update" onPress={handleUpdateDate} />
-              </View>
-            </View>
+          <Text style={styles.modalTitle}>Update Dates</Text>
+          <TouchableOpacity
+            onPress={() => {
+              setDateType("start");
+              setShowStartDateCalendar(true);
+            }}
+          >
+            <Text style={styles.input}>
+              {newStartDate
+                ? moment(newStartDate).format("DD MMM YYYY")
+                : "Select Start Date"}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setDateType("end");
+              setShowEndDateCalendar(true);
+            }}
+          >
+            <Text style={styles.input}>
+              {newEndDate
+                ? moment(newEndDate).format("DD MMM YYYY")
+                : "Select End Date"}
+            </Text>
+          </TouchableOpacity>
+          <View style={styles.modalButtons}>
+            <Button mode="contained" onPress={() => setShowDateModal(false)}>
+              Cancel
+            </Button>
+            <Button mode="contained" onPress={handleUpdateDate}>
+              Update
+            </Button>
           </View>
         </Modal>
+
         {/* Start Date Calendar Modal */}
         <Modal
-          transparent={true}
           visible={showStartDateCalendar}
-          onRequestClose={() => setShowStartDateCalendar(false)}
+          onDismiss={() => setShowStartDateCalendar(false)}
+          contentContainerStyle={styles.calendarContent}
         >
-          <View style={styles.calendarContainer}>
-            <View style={styles.calendarContent}>
-              <Calendar
-                onDayPress={handleDateSelect}
-                markedDates={{
-                  [newStartDate]: { selected: true, selectedColor: "blue" },
-                }}
-                style={styles.calendar}
-              />
-              <Button
-                title="Close"
-                onPress={() => setShowStartDateCalendar(false)}
-              />
-            </View>
-          </View>
+          <Calendar
+            onDayPress={handleDateSelect}
+            markedDates={{
+              [newStartDate]: { selected: true, selectedColor: "blue" },
+            }}
+            style={styles.calendar}
+          />
+          <Button
+            mode="contained"
+            onPress={() => setShowStartDateCalendar(false)}
+          >
+            Close
+          </Button>
         </Modal>
         {/* End Date Calendar Modal */}
         <Modal
-          transparent={true}
           visible={showEndDateCalendar}
-          onRequestClose={() => setShowEndDateCalendar(false)}
+          onDismiss={() => setShowEndDateCalendar(false)}
+          contentContainerStyle={styles.calendarContent}
         >
-          <View style={styles.calendarContainer}>
-            <View style={styles.calendarContent}>
-              <Calendar
-                onDayPress={handleDateSelect}
-                markedDates={{
-                  [newEndDate]: { selected: true, selectedColor: "blue" },
-                }}
-                style={styles.calendar}
-              />
-              <Button
-                title="Close"
-                onPress={() => setShowEndDateCalendar(false)}
-              />
-            </View>
-          </View>
+          <Calendar
+            onDayPress={handleDateSelect}
+            markedDates={{
+              [newEndDate]: { selected: true, selectedColor: "blue" },
+            }}
+            style={styles.calendar}
+          />
+          <Button
+            mode="contained"
+            onPress={() => setShowEndDateCalendar(false)}
+          >
+            Close
+          </Button>
         </Modal>
       </>
     );
@@ -434,6 +433,7 @@ const styles = StyleSheet.create({
     width: "auto",
     left: 5,
   },
+
   reviewModalContent: {
     backgroundColor: "white",
     padding: 20,
@@ -444,6 +444,16 @@ const styles = StyleSheet.create({
     flex: 1,
     zIndex: 3,
     elevation: 3,
+  },
+  modalContent: {
+    width: "80%",
+    maxWidth: 400,
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+    marginTop: "auto",
+    marginBottom: "auto",
+    alignSelf: "center",
   },
   container: {
     flex: 1,
@@ -537,12 +547,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
   },
-  modalContent: {
-    width: "80%",
-    padding: 20,
-    backgroundColor: "white",
-    borderRadius: 10,
-  },
+
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
