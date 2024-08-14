@@ -165,7 +165,10 @@ const AddActivityScreen = ({ navigation }) => {
             }}
             placeholder={`Image URL ${index + 1}`}
           />
-          <TouchableOpacity onPress={() => handleRemoveImageUrl(index)}>
+          <TouchableOpacity
+            style={{}}
+            onPress={() => handleRemoveImageUrl(index)}
+          >
             <Text style={styles.removeButton}>Remove</Text>
           </TouchableOpacity>
         </View>
@@ -284,13 +287,9 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 0,
   },
   urlContainer: {
-    flexDirection: "row",
-    alignItems: "center",
     marginBottom: 8,
   },
   tagContainer: {
-    flexDirection: "row",
-    alignItems: "center",
     marginBottom: 8,
   },
   addButton: {
