@@ -17,6 +17,7 @@ import { GET_TRIPS_BY_CUSTOMER_ID } from "../queries/getTripsByCustomerId";
 import { ADD_ACTIVITY_TO_TRIP } from "../queries/addActivityToTrip";
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
+import ActivityStar from "../components/ActivityStar";
 
 const ActivityScreen = () => {
   const { timeline } = useContext(TimelineContext);
@@ -155,9 +156,7 @@ const ActivityScreen = () => {
                       </View>
                     )}
                     <Text style={styles.timelineTitle}>{item.title}</Text>
-                    <Text style={styles.timelineRating}>
-                      Rating: {item.reviews?.[0]?.rating || "N/A"}
-                    </Text>
+                    <ActivityStar rating={item.rating} />
                     <Text>{item.name}</Text>
                   </View>
                 </View>
