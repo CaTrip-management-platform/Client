@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   ImageBackground,
+  Alert,
 } from "react-native";
 import { useState } from "react";
 import { useMutation } from "@apollo/client";
@@ -36,6 +37,7 @@ function RegisterScreen() {
       });
     } catch (err) {
       console.log(err);
+      Alert.alert("Error", err.message);
     }
   };
 
@@ -89,21 +91,7 @@ function RegisterScreen() {
           onChangeText={setPassword}
         />
       </View>
-
-      {/* <View style={styles.roleContainer}>
-        <TouchableOpacity
-          style={[styles.roleButton, role === 'Seller' && styles.selectedRole]}
-          onPress={() => setRole('Seller')}>
-          <Text style={[styles.roleText, role === 'Seller' && styles.selectedRoleText]}>Seller</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.roleButton, role === 'Customer' && styles.selectedRole]}
-          onPress={() => setRole('Customer')}>
-          <Text style={[styles.roleText, role === 'Customer' && styles.selectedRoleText]}>Customer</Text>
-        </TouchableOpacity>
-      </View> */}
-
-      <View style={styles.btnContainer}>
+      <View>
         <TouchableOpacity style={styles.registerBtn} onPress={handleRegister}>
           <Text style={styles.registerText}>Register</Text>
         </TouchableOpacity>

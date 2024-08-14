@@ -69,7 +69,10 @@ const AddTripScreen = () => {
         navigation.navigate("Profile");
       }
     } catch (err) {
-      Alert.alert("Error", err.message);
+      Alert.alert(
+        "Error",
+        "Destination, Start Date, and End Date are required"
+      );
     }
   };
 
@@ -155,7 +158,6 @@ const AddTripScreen = () => {
               </Text>
             </TouchableOpacity>
           </View>
-          {error && <Text style={styles.error}>Error: {error.message}</Text>}
 
           {/* Calendar Modals */}
           <Modal

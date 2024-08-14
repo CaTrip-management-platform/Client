@@ -10,6 +10,7 @@ import {
   Image,
   ActivityIndicator,
   ImageBackground,
+  Alert,
 } from "react-native";
 import { LOGIN_USER } from "../queries/users";
 import { useContext, useState } from "react";
@@ -48,6 +49,7 @@ function LoginScreen({ navigation }) {
     } catch (err) {
       console.error("Login Error:", err);
       setLoginError("Login failed. Please try again.");
+      Alert.alert("Error", err.message);
     }
   };
 
@@ -79,12 +81,6 @@ function LoginScreen({ navigation }) {
           onChangeText={setPassword}
         />
       </View>
-
-      {loginError && (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{loginError}</Text>
-        </View>
-      )}
 
       {loading ? (
         <View style={styles.loadingContainer}>
