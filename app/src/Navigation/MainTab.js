@@ -227,7 +227,7 @@ export default function MainTab() {
             </Text>
             <View style={styles.modalButtons}>
               <TouchableOpacity
-                style={styles.button}
+                style={{ ...styles.button, backgroundColor: "#7ec8e3" }}
                 onPress={() => setIsModalVisible(false)}
               >
                 <Text>Cancel</Text>
