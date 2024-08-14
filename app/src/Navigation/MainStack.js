@@ -68,7 +68,7 @@ const AppStack = () => (
     <Stack.Screen
       name="TripDetailScreen"
       component={TripDetailsScreen}
-      options={{ headerShown: true }}
+      options={{ headerShown: true, headerTitle: "Trip Details" }}
     />
     <Stack.Screen
       name="Activity"

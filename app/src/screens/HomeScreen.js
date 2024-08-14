@@ -109,7 +109,11 @@ const HomeScreen = ({ searchResults, isFocused, navigation }) => {
           name: activity.title,
           rating:
             activity.reviews && activity.reviews.length > 0
-              ? activity.reviews[0].rating
+              ? Math.round(
+                  activity.reviews
+                    .map((review) => review.rating)
+                    .reduce((a, b) => a + b) / activity.reviews.length
+                )
               : "N/A",
           location: activity.location || "Unknown Location",
           price: formatPrice(activity.price),
