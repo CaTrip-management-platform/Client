@@ -132,74 +132,108 @@ const AddActivityScreen = ({ navigation }) => {
       contentContainerStyle={styles.container}
     >
       <Text style={styles.label}>Title:</Text>
-      <TextInput style={styles.input} value={title} onChangeText={setTitle} />
+      <TextInput
+        style={styles.input}
+        value={title}
+        onChangeText={setTitle}
+        placeholder="Activity Title"
+      />
       <Text style={styles.label}>Price:</Text>
       <TextInput
         style={styles.input}
         value={price}
         keyboardType="numeric"
         onChangeText={setPrice}
+        placeholder="Activity Price"
       />
       <Text style={styles.label}>Description:</Text>
       <TextInput
         style={styles.input}
         value={description}
         onChangeText={setDescription}
+        placeholder="Activity Description"
       />
       <Text style={styles.label}>Location:</Text>
       <TextInput
         style={styles.input}
         value={location}
         onChangeText={setLocation}
+        placeholder="Activity Location"
       />
       <Text style={styles.label}>Image URLs:</Text>
       {imgUrls.map((url, index) => (
         <View key={index} style={styles.urlContainer}>
-          <TextInput
-            style={styles.input}
-            value={url}
-            onChangeText={(text) => {
-              const newUrls = [...imgUrls];
-              newUrls[index] = text;
-              setImgUrls(newUrls);
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginBottom: 10,
             }}
-            placeholder={`Image URL ${index + 1}`}
-          />
-          <TouchableOpacity
-            style={{}}
-            onPress={() => handleRemoveImageUrl(index)}
           >
-            <Text style={styles.removeButton}>Remove</Text>
-          </TouchableOpacity>
+            <TextInput
+              style={{
+                ...styles.input,
+                width: "80%",
+                borderBottomRightRadius: 0,
+                borderTopRightRadius: 0,
+              }}
+              value={url}
+              onChangeText={(text) => {
+                const newUrls = [...imgUrls];
+                newUrls[index] = text;
+                setImgUrls(newUrls);
+              }}
+              placeholder={`Image URL ${index + 1}`}
+            />
+            <TouchableOpacity
+              style={{}}
+              onPress={() => handleRemoveImageUrl(index)}
+            >
+              <Text style={styles.removeButton}>Remove</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       ))}
-      <TouchableOpacity onPress={handleAddImageUrl}>
-        <Text style={styles.addButton}>Add Another Image URL</Text>
+      <TouchableOpacity style={styles.addButton} onPress={handleAddImageUrl}>
+        <Text style={{ color: "white" }}>Add Another Image URL</Text>
       </TouchableOpacity>
       <Text style={styles.label}>Tags:</Text>
       {tags.map((tag, index) => (
         <View key={index} style={styles.tagContainer}>
-          <TextInput
-            style={styles.input}
-            value={tag}
-            onChangeText={(text) => {
-              const newTags = [...tags];
-              newTags[index] = text;
-              setTags(newTags);
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginBottom: 10,
             }}
-            placeholder={`Tag ${index + 1}`}
-          />
-          <TouchableOpacity onPress={() => handleRemoveTag(index)}>
-            <Text style={styles.removeButton}>Remove</Text>
-          </TouchableOpacity>
+          >
+            <TextInput
+              style={{
+                ...styles.input,
+                width: "80%",
+                borderBottomRightRadius: 0,
+                borderTopRightRadius: 0,
+              }}
+              value={tag}
+              onChangeText={(text) => {
+                const newTags = [...tags];
+                newTags[index] = text;
+                setTags(newTags);
+              }}
+              placeholder={`Tag ${index + 1}`}
+            />
+            <TouchableOpacity onPress={() => handleRemoveTag(index)}>
+              <Text style={styles.removeButton}>Remove</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       ))}
-      <TouchableOpacity onPress={handleAddTag}>
-        <Text style={styles.addButton}>Add Another Tag</Text>
+      <TouchableOpacity style={styles.addButton} onPress={handleAddTag}>
+        <Text style={{ color: "white" }}>Add Another Tag</Text>
       </TouchableOpacity>
       <View>
         <View
-          style={{ position: "absolute", width: "100%", zIndex: 1, top: 27 }}
+          style={{ position: "absolute", width: "100%", zIndex: 1, top: 29 }}
         >
           <GooglePlacesAutocomplete
             placeholder="Search for a location"
@@ -250,7 +284,22 @@ const AddActivityScreen = ({ navigation }) => {
           </TouchableOpacity>
         )}
       </View>
-      <Button title="Submit" onPress={handleSubmit} />
+      <TouchableOpacity
+        style={{
+          backgroundColor: "#7ec8e3",
+          borderRadius: 25,
+          paddingVertical: 12,
+          alignItems: "center",
+          marginVertical: 10,
+          marginBottom: 20,
+        }}
+        onPress={handleSubmit}
+        disabled={loading}
+      >
+        <Text style={{ color: "#fff", fontSize: 18, fontWeight: "bold" }}>
+          {loading ? "Loading..." : "Create New Activity"}
+        </Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -258,12 +307,15 @@ const AddActivityScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
+    backgroundColor: "white",
   },
   label: {
     fontWeight: "bold",
     marginBottom: 8,
+    fontSize: 16,
   },
   input: {
+    backgroundColor: "#f9f9f9",
     height: 50,
     borderColor: "gray",
     borderWidth: 1,
@@ -293,12 +345,23 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   addButton: {
-    color: "blue",
     marginBottom: 16,
+    backgroundColor: "#7ec8e3",
+    padding: 8,
+    width: "50%",
+    alignItems: "center",
+    borderRadius: 10,
+    alignSelf: "center",
   },
   removeButton: {
-    color: "red",
-    marginLeft: 8,
+    color: "white",
+    backgroundColor: "red",
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    borderTopRightRadius: 5,
+    borderBottomRightRadius: 5,
+    alignSelf: "center",
+    bottom: 6,
   },
   mapContainer: {
     width: "100%",
@@ -327,6 +390,7 @@ const styles = StyleSheet.create({
   removeMarkerButtonText: {
     color: "white",
     fontWeight: "bold",
+    fontSize: 12,
   },
 });
 
