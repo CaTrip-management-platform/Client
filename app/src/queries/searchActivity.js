@@ -17,6 +17,10 @@ query Query($searchTerm: String) {
       updatedAt
     }
     tags
+    coords {
+      latitude
+      longitude
+    }
   }
 }
 `;

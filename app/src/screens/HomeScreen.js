@@ -122,7 +122,7 @@ const HomeScreen = ({ searchResults, isFocused, navigation }) => {
               ? activity.imgUrls[0]
               : "https://via.placeholder.com/150",
           description: activity.description,
-          types: activity.types,
+          coords: activity.coords,
           imgUrls: activity.imgUrls || [],
         }))
       : data.getAllActivity.map((activity) => ({
@@ -141,7 +141,7 @@ const HomeScreen = ({ searchResults, isFocused, navigation }) => {
               ? activity.imgUrls[0]
               : "https://via.placeholder.com/150",
           description: activity.description,
-          types: activity.types,
+          coords: activity.coords,
           imgUrls: activity.imgUrls || [],
         }));
 
@@ -335,6 +335,7 @@ const HomeScreen = ({ searchResults, isFocused, navigation }) => {
                             navigate.push("Map", {
                               name: selectedActivity.name,
                               location: selectedActivity.location,
+                              coords: selectedActivity.coords,
                             });
                           }}
                         >

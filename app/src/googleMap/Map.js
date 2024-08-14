@@ -5,6 +5,7 @@ import * as Location from "expo-location";
 
 export default function Map({ route, navigation }) {
   const { name, location, coords } = route.params;
+  console.log(name, location, coords, "<<<<<<<<<<<");
   const [mapLocation, setMapLocation] = useState(null);
   const [deniedMessage, setDeniedMessage] = useState(null);
   const mapRef = useRef(null);
@@ -20,7 +21,6 @@ export default function Map({ route, navigation }) {
       let location = await Location.getCurrentPositionAsync({});
       setMapLocation(location);
     })();
-    console.log(name, location, coords, "<<<");
   }, []);
 
   const centerOnTarget = () => {
