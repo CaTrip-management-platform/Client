@@ -28,6 +28,7 @@ import * as SecureStore from "expo-secure-store";
 import Recommended from "../components/recommended";
 import { TimelineContext } from "../context/timelineContext";
 import Carousel from "../components/Carousel";
+import ActivityStar from "../components/ActivityStar";
 
 const HomeScreen = ({ searchResults, isFocused, navigation }) => {
   const navigate = useNavigation();
@@ -109,11 +110,9 @@ const HomeScreen = ({ searchResults, isFocused, navigation }) => {
           name: activity.title,
           rating:
             activity.reviews && activity.reviews.length > 0
-              ? Math.round(
-                  activity.reviews
-                    .map((review) => review.rating)
-                    .reduce((a, b) => a + b) / activity.reviews.length
-                )
+              ? activity.reviews
+                  .map((review) => review.rating)
+                  .reduce((a, b) => a + b) / activity.reviews.length
               : "N/A",
           location: activity.location || "Unknown Location",
           price: formatPrice(activity.price),
@@ -130,7 +129,9 @@ const HomeScreen = ({ searchResults, isFocused, navigation }) => {
           name: activity.title,
           rating:
             activity.reviews && activity.reviews.length > 0
-              ? activity.reviews[0].rating
+              ? activity.reviews
+                  .map((review) => review.rating)
+                  .reduce((a, b) => a + b) / activity.reviews.length
               : "N/A",
           location: activity.location || "Unknown Location",
           price: formatPrice(activity.price),
@@ -232,7 +233,7 @@ const HomeScreen = ({ searchResults, isFocused, navigation }) => {
               <Image source={{ uri: item.image }} style={styles.cardImage} />
               <View style={styles.cardDetails}>
                 <Text style={styles.cardTitle}>{item.name}</Text>
-                <Text style={styles.cardRating}>Rating: {item.rating}</Text>
+                <ActivityStar rating={item.rating} />
                 <Text style={styles.cardLocation}>{item.location}</Text>
                 <Text style={styles.cardPrice}>{item.price}</Text>
               </View>
@@ -349,9 +350,10 @@ const HomeScreen = ({ searchResults, isFocused, navigation }) => {
                       <Text style={styles.selectedActivityDescription}>
                         {selectedActivity.description || "No Description"}
                       </Text>
-                      <Text style={styles.selectedActivityRating}>
-                        Rating: {selectedActivity.rating}
-                      </Text>
+                      <Text style={styles.selectedActivityRating}>Rating:</Text>
+                      <View style={{ alignItems: "center", right: 55 }}>
+                        <ActivityStar rating={selectedActivity.rating} />
+                      </View>
                       <Text style={styles.modalLabel}>Price:</Text>
                       <Text style={styles.activityPrice}>
                         {selectedActivity.price}
@@ -541,6 +543,7 @@ const styles = StyleSheet.create({
   cardLocation: {
     fontSize: 16,
     color: "#888",
+    marginBottom: 5,
   },
   cardPrice: {
     fontSize: 16,
