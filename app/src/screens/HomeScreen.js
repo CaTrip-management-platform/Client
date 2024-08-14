@@ -29,6 +29,7 @@ import Recommended from "../components/recommended";
 import { TimelineContext } from "../context/timelineContext";
 import Carousel from "../components/Carousel";
 import ActivityStar from "../components/ActivityStar";
+import DetailCarousel from "../components/DetailCarousel";
 
 const HomeScreen = ({ searchResults, isFocused, navigation }) => {
   const navigate = useNavigation();
@@ -275,15 +276,11 @@ const HomeScreen = ({ searchResults, isFocused, navigation }) => {
                       ...styles.scrollViewContent,
                     }}
                   >
-                    <TouchableOpacity onPress={() => setShowImageViewer(true)}>
-                      <Image
-                        source={{
-                          uri: selectedActivity.imgUrls[currentImageIndex],
-                        }}
-                        style={styles.selectedActivityImage}
-                      />
-                    </TouchableOpacity>
-                    <View style={styles.imageNavigationContainer}>
+                    {/* <TouchableOpacity
+                      onPress={() => setShowImageViewer(true)}
+                    ></TouchableOpacity> */}
+                    <DetailCarousel data={selectedActivity} />
+                    {/* <View style={styles.imageNavigationContainer}>
                       <TouchableOpacity
                         onPress={handlePrevImage}
                         style={{
@@ -318,7 +315,7 @@ const HomeScreen = ({ searchResults, isFocused, navigation }) => {
                           ▼
                         </Text>
                       </TouchableOpacity>
-                    </View>
+                    </View> */}
                     <View style={{ marginTop: 10 }}>
                       <Text style={styles.selectedActivityTitle}>
                         {selectedActivity.name}

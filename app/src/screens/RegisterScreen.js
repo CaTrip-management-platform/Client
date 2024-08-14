@@ -35,6 +35,9 @@ function RegisterScreen() {
       const result = await registerUser({
         variables: { username, phoneNumber, email, password },
       });
+      if (result) {
+        Alert.alert("Success", "User registered successfully");
+      }
     } catch (err) {
       console.log(err);
       Alert.alert("Error", err.message);

@@ -110,6 +110,7 @@ export default function TripDetailsScreen({ route, navigation }) {
         },
       });
       alert("Trip dates updated successfully!");
+      refetch();
       setShowDateModal(false);
     } catch (error) {
       console.log(error);

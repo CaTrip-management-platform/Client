@@ -12,9 +12,14 @@ import { useQuery } from "@apollo/client";
 import { StatusBar } from "expo-status-bar";
 import * as SecureStore from "expo-secure-store";
 import { GET_TRIPS_BY_CUSTOMER_ID } from "../queries/getTripsByCustomerId";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useIsFocused,
+  useNavigation,
+} from "@react-navigation/native";
 
 function ActivityHistoryScreen() {
+  const isFocused = useIsFocused();
   const [tripsId, setTripsId] = useState([]);
   const navigation = useNavigation();
 
@@ -49,8 +54,10 @@ function ActivityHistoryScreen() {
   );
 
   useEffect(() => {
-    refetch();
-  }, []);
+    if (isFocused) {
+      refetch();
+    }
+  }, [isFocused]);
 
   if (loading) {
     return (
