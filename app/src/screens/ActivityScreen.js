@@ -38,6 +38,7 @@ const ActivityScreen = () => {
       setUser(user);
     };
     fetchUserData();
+    console.log(data);
     if (data && data.getTripsByCustomerId) {
       const filteredTrips = data.getTripsByCustomerId.filter(
         (trip) => trip.customerId == user && trip.paymentStatus === "Pending"

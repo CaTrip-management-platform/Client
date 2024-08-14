@@ -166,6 +166,7 @@ const HomeScreen = ({ searchResults, isFocused, navigation }) => {
   };
 
   const handleAddToTimeline = () => {
+    setActivityModalVisible(false);
     addToTimeline(selectedActivity);
     alert("Activity added to your timeline!");
   };

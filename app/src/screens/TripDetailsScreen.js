@@ -18,12 +18,13 @@ import { WebView } from "react-native-webview";
 import { UPDATE_DATE } from "../queries/updateDateTrip";
 import { Calendar } from "react-native-calendars";
 import moment from "moment";
+import Feather from "@expo/vector-icons/Feather";
 
 import ReviewModal from "../components/ReviewModal";
 import { UPDATE_ACTIVITY_QUANTITY } from "../queries/updateQuantity";
 import { useFocusEffect } from "@react-navigation/native";
 
-export default function TripDetailsScreen({ route }) {
+export default function TripDetailsScreen({ route, navigation }) {
   console.log(route.params._id);
   const [pressed, setPressed] = useState(0);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -84,7 +85,6 @@ export default function TripDetailsScreen({ route }) {
     (sum, activity) => sum + activity.price,
     0
   );
-
   const handleBuy = async () => {
     try {
       const result = await paymentFn({
@@ -157,102 +157,158 @@ export default function TripDetailsScreen({ route }) {
           />
         )}
         {!modal && (
-          <ScrollView style={styles.container}>
-            <Text style={styles.title}>{data.getTripById.destination}</Text>
-            <Text style={styles.dates}>
-              {moment(data.getTripById.startDate).format("DD MMM YYYY")} -{" "}
-              {moment(data.getTripById.endDate).format("DD MMM YYYY")}
-            </Text>
-
-            {data.getTripById.activities.map((activity, index) => (
-              <View key={index} style={styles.card}>
-                <Image
-                  source={{ uri: activity.Activity.imgUrls[0] }}
-                  style={styles.image}
-                />
-                <View style={styles.cardContent}>
-                  <Text style={styles.activityTitle}>
-                    {activity.Activity.title}
-                  </Text>
-                  {paid && (
-                    <Button
-                      onPress={() => {
-                        setActiveCard(activity.activityId);
-                        setShowReviewModal(true);
-                      }}
-                    >
-                      Review
-                    </Button>
-                  )}
-                  <View style={styles.barisBawah}>
-                    <View style={styles.underContainer}>
-                      <Text style={styles.subTitle}>Price:</Text>
-                      <Text style={styles.price}>Rp{activity.price}</Text>
-                    </View>
+          <>
+            <ScrollView style={styles.container}>
+              <Text style={styles.title}>
+                Destination: {data.getTripById.destination}
+              </Text>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Text style={styles.dates}>
+                  {moment(data.getTripById.startDate).format("DD MMM YYYY")} -{" "}
+                  {moment(data.getTripById.endDate).format("DD MMM YYYY")}
+                </Text>
+                <TouchableOpacity
+                  style={{ marginLeft: 10, marginBottom: 15 }}
+                  onPress={() => setShowDateModal(true)}
+                >
+                  <Feather name="edit" size={18} color="black" />
+                </TouchableOpacity>
+              </View>
+              {data.getTripById.activities.map((activity, index) => (
+                <View key={index} style={styles.card}>
+                  <Image
+                    source={{ uri: activity.Activity.imgUrls[0] }}
+                    style={styles.image}
+                  />
+                  <View style={styles.cardContent}>
+                    <Text style={styles.activityTitle}>
+                      {activity.Activity.title}
+                    </Text>
                     {paid && (
-                      <Text style={styles.quantity}>
-                        Tickets: {activity.quantity}
-                      </Text>
+                      <Button
+                        onPress={() => {
+                          setActiveCard(activity.activityId);
+                          setShowReviewModal(true);
+                        }}
+                      >
+                        Review
+                      </Button>
                     )}
-                    {!paid && (
+                    <View style={styles.barisBawah}>
                       <View style={styles.underContainer}>
-                        <Text style={styles.subTitle}>Tickets: </Text>
-                        <View style={styles.quantityContainer}>
-                          <TouchableOpacity
-                            style={styles.quantityButton}
-                            onPress={() => {
-                              if (activity.quantity > 1) {
-                                handleQuantity(
-                                  activity.quantity - 1,
-                                  route.params._id,
-                                  activity.activityId
-                                );
-                                setPressed(pressed + 1);
-                              }
-                            }}
-                          >
-                            <Text style={styles.quantityButtonText}>-</Text>
-                          </TouchableOpacity>
-                          <Text style={styles.quantityCountText}>
+                        <Text style={styles.price}>
+                          Rp. {activity.price.toLocaleString()}
+                        </Text>
+                        {paid && (
+                          <Text style={styles.quantity}>
                             {activity.quantity}
                           </Text>
-                          <TouchableOpacity
-                            style={styles.quantityButton}
-                            onPress={() => {
-                              handleQuantity(
-                                activity.quantity + 1,
-                                route.params._id,
-                                activity.activityId
-                              );
-                              setPressed(pressed + 1);
-                            }}
-                          >
-                            <Text style={styles.quantityButtonText}>+</Text>
-                          </TouchableOpacity>
-                        </View>
+                        )}
+                        {!paid && (
+                          <View style={styles.underContainer}>
+                            <View style={styles.quantityContainer}>
+                              <TouchableOpacity
+                                style={styles.quantityButton}
+                                onPress={() => {
+                                  if (activity.quantity > 1) {
+                                    handleQuantity(
+                                      activity.quantity - 1,
+                                      route.params._id,
+                                      activity.activityId
+                                    );
+                                    setPressed(pressed + 1);
+                                  }
+                                }}
+                              >
+                                <Text style={styles.quantityButtonText}>-</Text>
+                              </TouchableOpacity>
+                              <Text style={styles.quantityCountText}>
+                                {activity.quantity}
+                              </Text>
+                              <TouchableOpacity
+                                style={styles.quantityButton}
+                                onPress={() => {
+                                  handleQuantity(
+                                    activity.quantity + 1,
+                                    route.params._id,
+                                    activity.activityId
+                                  );
+                                  setPressed(pressed + 1);
+                                }}
+                              >
+                                <Text style={styles.quantityButtonText}>+</Text>
+                              </TouchableOpacity>
+                            </View>
+                          </View>
+                        )}
                       </View>
-                    )}
+                    </View>
                   </View>
                 </View>
+              ))}
+              {data.getTripById.activities.length < 1 && (
+                <View>
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      marginVertical: 40,
+                      fontSize: 20,
+                    }}
+                  >
+                    No activities Added Yet
+                  </Text>
+                </View>
+              )}
+              {!paid && (
+                <TouchableOpacity
+                  style={{
+                    borderWidth: 1,
+                    borderRadius: 25,
+                    paddingVertical: 12,
+                    alignItems: "center",
+                    marginVertical: 10,
+                  }}
+                  onPress={() => {
+                    // console.log(navigation);
+                    navigation.push("MainTab");
+                  }}
+                  disabled={loading}
+                >
+                  <Text
+                    style={{ color: "#000", fontSize: 18, fontWeight: "bold" }}
+                  >
+                    Add new activity
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </ScrollView>
+            {data.getTripById.activities.length > 0 && (
+              <View
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  backgroundColor: "white",
+                  padding: 15,
+                  elevation: 5,
+                  width: "100%",
+                }}
+              >
+                <View style={styles.totalContainer}>
+                  <Text style={styles.totalPrice}>
+                    Total Price: Rp. {totalPrice.toLocaleString()}
+                  </Text>
+                </View>
+                {!paid && (
+                  <TouchableOpacity
+                    style={styles.buyButton}
+                    onPress={handleBuy}
+                  >
+                    <Text style={styles.buyButtonText}>Pay Now</Text>
+                  </TouchableOpacity>
+                )}
               </View>
-            ))}
-
-            <View style={styles.totalContainer}>
-              <Text style={styles.totalPrice}>Total Price: Rp{totalPrice}</Text>
-            </View>
-
-            {!paid && (
-              <TouchableOpacity style={styles.buyButton} onPress={handleBuy}>
-                <Text style={styles.buyButtonText}>Buy Now</Text>
-              </TouchableOpacity>
             )}
-            <TouchableOpacity
-              style={styles.updateButton}
-              onPress={() => setShowDateModal(true)}
-            >
-              <Text style={styles.updateButtonText}>Update Dates</Text>
-            </TouchableOpacity>
-          </ScrollView>
+          </>
         )}
 
         <ReviewModal
@@ -260,7 +316,6 @@ export default function TripDetailsScreen({ route }) {
           onClose={() => setShowReviewModal(false)}
           onSubmit={async (reviewData) => {
             let { rating, review } = reviewData;
-            // console.log(rating, review, activeCard)
             try {
               const result = await reviewFn({
                 variables: {
@@ -273,7 +328,6 @@ export default function TripDetailsScreen({ route }) {
             } catch (error) {
               console.log("Error while reviewing:", error);
             }
-
             setActiveCard("");
           }}
         />
@@ -320,7 +374,6 @@ export default function TripDetailsScreen({ route }) {
             </View>
           </View>
         </Modal>
-
         {/* Start Date Calendar Modal */}
         <Modal
           transparent={true}
@@ -376,7 +429,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   underContainer: {
-    flexDirection: "column",
+    flexDirection: "row",
+    gap: 10,
+    width: "auto",
+    left: 5,
   },
   reviewModalContent: {
     backgroundColor: "white",
@@ -392,6 +448,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: "white",
   },
   title: {
     fontSize: 24,
@@ -408,29 +465,36 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     overflow: "hidden",
     elevation: 3,
+    flexDirection: "row",
+    height: 120,
   },
   image: {
-    width: "100%",
-    height: 200,
+    width: "35%",
+    height: "auto",
+    aspectRatio: 1,
   },
   cardContent: {
-    padding: 16,
+    padding: 10,
   },
   activityTitle: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: "bold",
+    height: 40,
     marginBottom: 8,
+    width: 250,
   },
   barisBawah: {
     flexDirection: "row",
     justifyContent: "space-around",
+    marginHorizontal: 10,
   },
   price: {
-    fontSize: 24,
+    fontSize: 15,
     fontWeight: "bold",
     marginBottom: 4,
-    // backgroundColor: 'green',
     color: "green",
+    right: 20,
+    top: 25,
   },
   quantity: {
     fontSize: 16,
@@ -445,9 +509,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   buyButton: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#7ec8e3",
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 30,
     alignItems: "center",
   },
   buyButtonText: {
@@ -519,27 +583,28 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#F1F1F1",
+    backgroundColor: "#FFFFFF",
     marginTop: 3,
     borderRadius: 5,
-    padding: 1,
+    alignSelf: "flex-end",
+    top: 20,
   },
   quantityButton: {
-    // backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderWidth: 1,
     borderColor: "#E0E0E0",
-    borderRadius: 10,
-    paddingVertical: 9,
-    paddingHorizontal: 9,
+    borderRadius: 5,
+    paddingVertical: 3,
+    paddingHorizontal: 8,
     marginHorizontal: 5,
   },
   quantityButtonText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     color: "#000",
   },
   quantityCountText: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: "bold",
     marginHorizontal: 10,
   },

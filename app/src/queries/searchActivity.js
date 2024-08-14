@@ -1,8 +1,9 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const SEARCH_ACTIVITY = gql`
 query Query($searchTerm: String) {
   searchActivity(searchTerm: $searchTerm) {
+    _id
     title
     location
     imgUrls
@@ -19,4 +20,3 @@ query Query($searchTerm: String) {
   }
 }
 `;
-  

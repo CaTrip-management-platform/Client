@@ -30,7 +30,7 @@ function ActivityHistoryScreen() {
 
   const { loading, error, data, refetch } = useQuery(GET_TRIPS_BY_CUSTOMER_ID, {
     fetchPolicy: "no-cache",
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
     onCompleted: async (data) => {
       const userId = await fetchUserId();
       if (userId && data?.getTripsByCustomerId) {
@@ -47,6 +47,10 @@ function ActivityHistoryScreen() {
       refetch();
     }, [])
   );
+
+  useEffect(() => {
+    refetch();
+  }, []);
 
   if (loading) {
     return (

@@ -25,7 +25,7 @@ const AddTripScreen = () => {
   const [showEndDateCalendar, setShowEndDateCalendar] = useState(false);
   const [dateType, setDateType] = useState("");
   const [showTravelTipsModal, setShowTravelTipsModal] = useState(false);
-  
+
   const tips = [
     "Make sure your phone and other devices are fully charged",
     "Carry a portable charger or power bank",
@@ -54,7 +54,7 @@ const AddTripScreen = () => {
 
   const handleSubmit = async () => {
     try {
-      await addTrip({
+      const data = await addTrip({
         variables: {
           tripInput: {
             destination: destination || null,
@@ -63,8 +63,9 @@ const AddTripScreen = () => {
           },
         },
       });
+
       if (data) {
-        Alert.alert("Success", data.addTrip.message);
+        Alert.alert("Success", data.addTrip);
         navigation.navigate("Profile");
       }
     } catch (err) {
