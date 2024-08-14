@@ -24,7 +24,7 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 // import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DELETE_ACTIVITY } from "../queries/delete";
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from "expo-secure-store";
 import Recommended from "../components/recommended";
 import { TimelineContext } from "../context/timelineContext";
 import Carousel from "../components/Carousel";
@@ -45,20 +45,19 @@ const HomeScreen = ({ searchResults, isFocused, navigation }) => {
   const [deleteActivity, { loading: deleteLoading, error: deleteError }] =
     useMutation(DELETE_ACTIVITY);
 
-   useEffect(() => {
-  const fetchRole = async () => {
-    try {
-      const storedRole = await SecureStore.getItemAsync("role");
-      console.log("role", storedRole);
-      setRole(storedRole); 
-    } catch (error) {
-      console.error("Failed to fetch role", error);
-    }
-  };
+  useEffect(() => {
+    const fetchRole = async () => {
+      try {
+        const storedRole = await SecureStore.getItemAsync("role");
+        console.log("role", storedRole);
+        setRole(storedRole);
+      } catch (error) {
+        console.error("Failed to fetch role", error);
+      }
+    };
 
-  fetchRole();
-}, []);
-
+    fetchRole();
+  }, []);
 
   const sendMessage = async () => {
     try {
@@ -119,6 +118,8 @@ const HomeScreen = ({ searchResults, isFocused, navigation }) => {
               ? activity.imgUrls[0]
               : "https://via.placeholder.com/150",
           description: activity.description,
+          types: activity.types,
+          imgUrls: activity.imgUrls || [],
         }))
       : data.getAllActivity.map((activity) => ({
           id: activity._id,
@@ -358,20 +359,20 @@ const HomeScreen = ({ searchResults, isFocused, navigation }) => {
                           Add to Timeline
                         </Text>
                       </TouchableOpacity>
-                       {/* !! admin only */}
-                       {role === 'admin' && (
-  <TouchableOpacity
-    style={{
-      ...styles.addToTimelineButton,
-      backgroundColor: "red",
-    }}
-    onPress={() => handleDelete(selectedActivity.id)}
-  >
-    <Text style={styles.addToTimelineButtonText}>
-      Delete Activity
-    </Text>
-  </TouchableOpacity>
-)}
+                      {/* !! admin only */}
+                      {role === "admin" && (
+                        <TouchableOpacity
+                          style={{
+                            ...styles.addToTimelineButton,
+                            backgroundColor: "red",
+                          }}
+                          onPress={() => handleDelete(selectedActivity.id)}
+                        >
+                          <Text style={styles.addToTimelineButtonText}>
+                            Delete Activity
+                          </Text>
+                        </TouchableOpacity>
+                      )}
                       {/*  !! admin only */}
                     </View>
                   </ScrollView>
