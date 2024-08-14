@@ -14,7 +14,6 @@ import Map from "../googleMap/Map";
 import HomeScreen from "../screens/HomeScreen";
 import AddScreen from "../screens/AddScreen";
 import TripDetailsScreen from "../screens/TripDetailsScreen";
-import TravelTipsScreen from "../screens/TravelTipsScreen";
 import { TimelineProvider } from "../context/timelineContext";
 const Stack = createNativeStackNavigator();
 
@@ -81,11 +80,6 @@ const AppStack = () => (
       name="Home"
       component={HomeScreen}
       options={{ headerShown: true }}
-    />
-    <Stack.Screen
-      name="TravelTips"
-      component={TravelTipsScreen}
-      options={{ headerShown: true, title: "Travel Tips" }}
     />
   </Stack.Navigator>
 );

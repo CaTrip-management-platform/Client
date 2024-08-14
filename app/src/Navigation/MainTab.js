@@ -24,7 +24,6 @@ import { SEARCH_ACTIVITY } from "../queries/searchActivity.js";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import ActivityScreen from "../screens/ActivityScreen.js";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import TravelTipsScreen from "../screens/TravelTipsScreen.js";
 import * as SecureStore from "expo-secure-store";
 
 const Tab = createBottomTabNavigator();
