@@ -27,12 +27,15 @@ function LoginScreen({ navigation }) {
       const result = await loginFn({ variables: { password, username } });
       console.log(result, "<==");
 
-     
       const token = result?.data?.login?.access_token;
- 
-      if (typeof token === 'string') {
+      const role = result?.data?.login?.role;
+      const _id = result?.data?.login?.id;
+
+      if (typeof token === 'string' && typeof role === 'string' && typeof _id === 'string') {
         await SecureStore.setItemAsync("accessToken", token);
-        console.log("Stored Token:", await SecureStore.getItemAsync("accessToken"));
+        await SecureStore.setItemAsync("role", role);
+        await SecureStore.setItemAsync("_id", _id);
+
         setIsSignedIn(true);
       } else {
         console.error("Token is not a string or is undefined");

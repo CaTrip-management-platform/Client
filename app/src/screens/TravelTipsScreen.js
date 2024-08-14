@@ -45,13 +45,13 @@ const styles = StyleSheet.create({
   tipWrapper: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   tipNumber: {
     fontSize: 18,
     fontWeight: '600',
     color: '#007bff',
-    marginRight: 8,
+    marginRight: 12,
   },
   tipText: {
     fontSize: 16,
