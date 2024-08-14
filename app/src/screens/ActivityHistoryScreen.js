@@ -3,45 +3,50 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import { useQuery } from "@apollo/client";
 import { StatusBar } from "expo-status-bar";
 import * as SecureStore from "expo-secure-store";
-import { jwtDecode } from "jwt-decode";
 import { GET_TRIPS_BY_CUSTOMER_ID } from "../queries/getTripsByCustomerId";
 import { useNavigation } from "@react-navigation/native";
 
 function ActivityHistoryScreen() {
-  const [userId, setUserId] = useState("");
+  const [tripsId, setTripsId] = useState([]);
   const navigation = useNavigation();
 
+  const fetchUserId = async () => {
+    try {
+      const userId = await SecureStore.getItemAsync("_id");
+      return userId;
+    } catch (error) {
+      console.error("Error fetching user ID:", error);
+      return null;
+    }
+  };
+
   const { loading, error, data } = useQuery(GET_TRIPS_BY_CUSTOMER_ID, {
-    variables: { id: userId },
-    skip: !userId,
     fetchPolicy: "no-cache",
     refetchOnWindowFocus: false,
-  });
-
-  useEffect(() => {
-    const fetchTokenData = async () => {
-      try {
-        const user = await SecureStore.getItemAsync("_id");
-        setUserId(user);
-      } catch (error) {
-        console.error("Error fetching token data:", error);
+    onCompleted: async (data) => {
+      const userId = await fetchUserId();
+      if (userId && data?.getTripsByCustomerId) {
+        const filteredTrips = data.getTripsByCustomerId.filter(
+          (trip) => trip.customerId === userId
+        );
+        setTripsId(filteredTrips);
       }
-    };
-
-    fetchTokenData();
-  }, []);
+    },
+  });
 
   if (loading) {
     return (
-      <ActivityIndicator size="large" color="blue" style={styles.loader} />
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#007bff" />
+      </View>
     );
   }
 
@@ -49,19 +54,11 @@ function ActivityHistoryScreen() {
     return <Text style={styles.errorText}>Error! {error.message}</Text>;
   }
 
-  const trips = data?.getTripsByCustomerId || [];
-
-  const handlePress = (tripId) => {
-    navigation.navigate("TripDetailScreen", { tripId });
-  };
-
   const renderTrip = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
       onPress={() => {
-        navigation.navigate("TripDetailScreen", {
-          _id: item._id,
-        });
+        navigation.navigate("TripDetailScreen", { _id: item._id });
       }}
     >
       <View style={styles.cardContent}>
@@ -71,10 +68,19 @@ function ActivityHistoryScreen() {
           {new Date(item.endDate).toLocaleDateString()}
         </Text>
         <Text style={styles.cardDescription}>
-          Total Price: {item.totalPrice}
+          Total Price: {item.totalPrice.toLocaleString()}
         </Text>
         <Text style={styles.cardStatus}>
-          Payment Status: {item.paymentStatus}
+          Payment Status:{" "}
+          <Text
+            style={
+              item.paymentStatus === "Paid"
+                ? styles.paidStatus
+                : styles.pendingStatus
+            }
+          >
+            {item.paymentStatus}
+          </Text>
         </Text>
       </View>
     </TouchableOpacity>
@@ -84,7 +90,7 @@ function ActivityHistoryScreen() {
     <View style={styles.container}>
       <StatusBar style="dark" />
       <FlatList
-        data={trips}
+        data={tripsId}
         keyExtractor={(item) => item._id}
         renderItem={renderTrip}
         ListEmptyComponent={
@@ -99,40 +105,57 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f4f4f4",
-    padding: 20,
+    padding: 15,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f4f4f4",
   },
   card: {
     backgroundColor: "#fff",
-    borderRadius: 15,
+    borderRadius: 10,
     overflow: "hidden",
-    marginBottom: 20,
-    elevation: 3,
+    marginBottom: 15,
+    elevation: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+  },
+  cardImage: {
+    width: "100%",
+    height: 200,
+    resizeMode: "cover",
   },
   cardContent: {
     padding: 15,
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
     marginBottom: 5,
   },
   cardDate: {
     fontSize: 14,
-    color: "#888",
+    color: "#777",
     marginBottom: 10,
   },
   cardDescription: {
-    fontSize: 14,
-    color: "#555",
+    fontSize: 16,
+    color: "#444",
     marginBottom: 10,
   },
   cardStatus: {
-    fontSize: 12,
-    color: "#aaa",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  paidStatus: {
+    color: "#28a745",
+  },
+  pendingStatus: {
+    color: "#dc3545",
   },
   loader: {
     flex: 1,

@@ -41,6 +41,8 @@ export default function MainTab() {
   const { setIsSignedIn } = useContext(AuthContext);
   const [text, setText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [userRole, setUserRole] = useState(null);
+
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const { refetch } = useQuery(SEARCH_ACTIVITY, {
@@ -58,6 +60,36 @@ export default function MainTab() {
       setSearchResults([]);
     }
   }, [text, refetch]);
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      try {
+        const role = await SecureStore.getItemAsync("role");
+        if (role) {
+          setUserRole(role);
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+      }
+    };
+
+    fetchUserRole();
+  }, []);
+
+  const renderHeaderLeft = () => {
+    if (userRole === "admin") {
+      return (
+        <FontAwesome5
+          name="plus-circle"
+          size={24}
+          color="black"
+          style={styles.headerIcon}
+          onPress={() => navigation.push("Add")}
+        />
+      );
+    }
+    return null;
+  };
 
   const handleLogout = async () => {
     await SecureStore.deleteItemAsync("accessToken");
@@ -154,15 +186,7 @@ export default function MainTab() {
           component={SettingsScreen}
           options={{
             tabBarLabel: () => null,
-            headerLeft: () => (
-              <FontAwesome5
-                name="plus-circle"
-                size={24}
-                color="black"
-                style={styles.headerIcon}
-                onPress={() => navigation.push("Add")}
-              />
-            ),
+            headerLeft: () => renderHeaderLeft(),
             tabBarStyle: { backgroundColor: "white" },
             headerStyle: { backgroundColor: "white" },
             headerTitleAlign: "center",
@@ -229,7 +253,7 @@ const styles = StyleSheet.create({
     right: 30,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#D0D2D7",
+    backgroundColor: "silver",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,

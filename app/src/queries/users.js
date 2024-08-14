@@ -1,14 +1,14 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const LOGIN_USER = gql`
 mutation Mutation($username: String, $password: String) {
   login(username: $username, password: $password) {
     access_token
-    id
     role
+    id
   }
 }
-`
+`;
 export const GET_USER = gql`
 query FindUserById($userId: String!) {
   findUserById(userId: $userId) {
@@ -20,7 +20,7 @@ query FindUserById($userId: String!) {
   }
 }
 
-  `
+  `;
 
 export const REGISTER_USER = gql`
  mutation CreateUser($phoneNumber: String, $username: String, $email: String, $password: String) {
@@ -32,7 +32,7 @@ export const REGISTER_USER = gql`
     phoneNumber
   }
 }
-  `
+  `;
 export const GET_USER_BY_ID = gql`
 query Query($userId: String!) {
   findUserById(userId: $userId) {
@@ -43,4 +43,4 @@ query Query($userId: String!) {
     username
   }
 }
-`  
+`;

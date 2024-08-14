@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -24,6 +24,7 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 // import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DELETE_ACTIVITY } from "../queries/delete";
+import * as SecureStore from 'expo-secure-store';
 import Recommended from "../components/recommended";
 import { TimelineContext } from "../context/timelineContext";
 import Carousel from "../components/Carousel";
@@ -38,11 +39,26 @@ const HomeScreen = ({ searchResults, isFocused, navigation }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showImageViewer, setShowImageViewer] = useState(false);
   const { addToTimeline } = useContext(TimelineContext);
-
+  const [role, setRole] = useState("customer");
   const client = useApolloClient();
   const { loading, error, data, refetch } = useQuery(GET_Activity);
   const [deleteActivity, { loading: deleteLoading, error: deleteError }] =
     useMutation(DELETE_ACTIVITY);
+
+   useEffect(() => {
+  const fetchRole = async () => {
+    try {
+      const storedRole = await SecureStore.getItemAsync("role");
+      console.log("role", storedRole);
+      setRole(storedRole); 
+    } catch (error) {
+      console.error("Failed to fetch role", error);
+    }
+  };
+
+  fetchRole();
+}, []);
+
 
   const sendMessage = async () => {
     try {
@@ -342,18 +358,20 @@ const HomeScreen = ({ searchResults, isFocused, navigation }) => {
                           Add to Timeline
                         </Text>
                       </TouchableOpacity>
-                      {/*  !! admin only */}
-                      <TouchableOpacity
-                        style={{
-                          ...styles.addToTimelineButton,
-                          backgroundColor: "red",
-                        }}
-                        onPress={() => handleDelete(selectedActivity.id)}
-                      >
-                        <Text style={styles.addToTimelineButtonText}>
-                          Delete Activity
-                        </Text>
-                      </TouchableOpacity>
+                       {/* !! admin only */}
+                       {role === 'admin' && (
+  <TouchableOpacity
+    style={{
+      ...styles.addToTimelineButton,
+      backgroundColor: "red",
+    }}
+    onPress={() => handleDelete(selectedActivity.id)}
+  >
+    <Text style={styles.addToTimelineButtonText}>
+      Delete Activity
+    </Text>
+  </TouchableOpacity>
+)}
                       {/*  !! admin only */}
                     </View>
                   </ScrollView>
