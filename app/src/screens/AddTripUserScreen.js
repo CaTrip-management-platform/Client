@@ -8,6 +8,8 @@ import {
   Modal,
   TouchableOpacity,
   TextInput,
+  ImageBackground,
+  Image,
 } from "react-native";
 import { useMutation } from "@apollo/client";
 import { ADD_TRIP_USER } from "../queries/addTrip";
@@ -57,117 +59,182 @@ const AddTripScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Add New Trip</Text>
-      <View>
-        <Text style={{ fontSize: 16, marginBottom: 5 }}>
-          Set Your Destination
-        </Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Destination"
-          value={destination}
-          onChangeText={setDestination}
-        />
-      </View>
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <View style={{ flex: 1, marginRight: 10 }}>
-          <Text style={{ textAlign: "center", fontSize: 16 }}>
-            Start Trip Date
-          </Text>
-          <TouchableOpacity
-            style={{ flex: 1, marginTop: 5 }}
-            onPress={() => {
-              setDateType("start");
-              setShowStartDateCalendar(true);
-            }}
-          >
-            <Text
-              style={[styles.input, { textAlign: "center", paddingTop: 15 }]}
-            >
-              {startDate || "YYYY-MM-DD"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <View style={{ flex: 1, marginLeft: 10 }}>
-          <Text style={{ textAlign: "center", fontSize: 16 }}>
-            End Trip Date
-          </Text>
-          <TouchableOpacity
-            style={{ flex: 1, marginTop: 5 }}
-            onPress={() => {
-              setDateType("end");
-              setShowEndDateCalendar(true);
-            }}
-          >
-            <Text
-              style={[styles.input, { textAlign: "center", paddingTop: 15 }]}
-            >
-              {endDate || "YYYY-MM-DD"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View style={{ marginTop: 60 }}>
-        <TouchableOpacity
+      <ImageBackground
+        source={{
+          uri: "https://marketplace.canva.com/EAGD_Vn7lkQ/1/0/900w/canva-blue-and-white-modern-watercolor-background-instagram-story-L-nceizV6kA.jpg",
+        }}
+        style={{
+          backgroundColor: "black",
+          height: "100%",
+          zIndex: 1,
+        }}
+      >
+        <Image
           style={{
-            backgroundColor: "#7ec8e3",
-            borderRadius: 25,
-            paddingVertical: 12,
-            alignItems: "center",
-            marginVertical: 10,
+            position: "absolute",
+            zIndex: 2,
+            width: 400,
+            height: 280,
+            top: 30,
+            alignSelf: "center",
+            opacity: 0.5,
           }}
-          onPress={handleSubmit}
-          disabled={loading}
+          source={require("../../assets/travel.png")}
+        />
+        <View
+          style={{
+            backgroundColor: "white",
+            padding: 20,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            zIndex: 3,
+            top: "37%",
+            height: "70%",
+            shadowColor: "gray",
+            elevation: 5,
+          }}
         >
-          <Text style={{ color: "#fff", fontSize: 18, fontWeight: "bold" }}>
-            {loading ? "Submitting..." : "Submit"}
-          </Text>
-        </TouchableOpacity>
-      </View>
-      {error && <Text style={styles.error}>Error: {error.message}</Text>}
-
-      {/* Calendar Modals */}
-      <Modal
-        transparent={true}
-        visible={showStartDateCalendar}
-        onRequestClose={() => setShowStartDateCalendar(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Calendar
-              onDayPress={handleDateSelect}
-              markedDates={{
-                [startDate]: { selected: true, selectedColor: "blue" },
-              }}
-            />
-            <Button
-              title="Close"
-              onPress={() => setShowStartDateCalendar(false)}
+          <Text style={styles.title}>Create New Trip</Text>
+          <View>
+            <Text style={{ fontSize: 16, marginBottom: 5 }}>
+              Set Your Destination
+            </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Destination"
+              value={destination}
+              onChangeText={setDestination}
             />
           </View>
-        </View>
-      </Modal>
-
-      <Modal
-        transparent={true}
-        visible={showEndDateCalendar}
-        onRequestClose={() => setShowEndDateCalendar(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Calendar
-              onDayPress={handleDateSelect}
-              markedDates={{
-                [endDate]: { selected: true, selectedColor: "blue" },
-              }}
-            />
-            <Button
-              title="Close"
-              onPress={() => setShowEndDateCalendar(false)}
-            />
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
+          >
+            <View style={{ flex: 1, marginRight: 10 }}>
+              <Text style={{ fontSize: 16 }}>Start Trip Date</Text>
+              <TouchableOpacity
+                style={{ flex: 1, marginTop: 5 }}
+                onPress={() => {
+                  setDateType("start");
+                  setShowStartDateCalendar(true);
+                }}
+              >
+                <Text
+                  style={[
+                    styles.input,
+                    { textAlign: "center", paddingTop: 15 },
+                  ]}
+                >
+                  {startDate || "YYYY-MM-DD"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{ flex: 1, marginLeft: 10 }}>
+              <Text style={{ fontSize: 16 }}>End Trip Date</Text>
+              <TouchableOpacity
+                style={{ flex: 1, marginTop: 5 }}
+                onPress={() => {
+                  setDateType("end");
+                  setShowEndDateCalendar(true);
+                }}
+              >
+                <Text
+                  style={[
+                    styles.input,
+                    { textAlign: "center", paddingTop: 15 },
+                  ]}
+                >
+                  {endDate || "YYYY-MM-DD"}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
+          <View style={{ marginTop: 8, marginTop: 70 }}>
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#7ec8e3",
+                borderRadius: 25,
+                paddingVertical: 12,
+                alignItems: "center",
+                marginVertical: 10,
+              }}
+              onPress={handleSubmit}
+              disabled={loading}
+            >
+              <Text style={{ color: "#fff", fontSize: 18, fontWeight: "bold" }}>
+                {loading ? "Submitting..." : "Create New Trip"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          {error && <Text style={styles.error}>Error: {error.message}</Text>}
+
+          {/* Calendar Modals */}
+          <Modal
+            transparent={true}
+            visible={showStartDateCalendar}
+            onRequestClose={() => setShowStartDateCalendar(false)}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Calendar
+                  onDayPress={handleDateSelect}
+                  markedDates={{
+                    [startDate]: { selected: true, selectedColor: "#7ec8e3" },
+                  }}
+                />
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: "#7ec8e3",
+                    borderRadius: 25,
+                    paddingVertical: 12,
+                    alignItems: "center",
+                    marginVertical: 10,
+                  }}
+                  onPress={() => setShowStartDateCalendar(false)}
+                >
+                  <Text
+                    style={{ color: "#fff", fontSize: 18, fontWeight: "bold" }}
+                  >
+                    Close
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+
+          <Modal
+            transparent={true}
+            visible={showEndDateCalendar}
+            onRequestClose={() => setShowEndDateCalendar(false)}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Calendar
+                  onDayPress={handleDateSelect}
+                  markedDates={{
+                    [endDate]: { selected: true, selectedColor: "blue" },
+                  }}
+                />
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: "#7ec8e3",
+                    borderRadius: 25,
+                    paddingVertical: 12,
+                    alignItems: "center",
+                    marginVertical: 10,
+                  }}
+                  onPress={() => setShowEndDateCalendar(false)}
+                >
+                  <Text
+                    style={{ color: "#fff", fontSize: 18, fontWeight: "bold" }}
+                  >
+                    Close
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
         </View>
-      </Modal>
+      </ImageBackground>
     </View>
   );
 };
@@ -175,13 +242,13 @@ const AddTripScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
     justifyContent: "center",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 16,
+    marginTop: 20,
+    marginBottom: 50,
     textAlign: "center",
   },
   input: {
@@ -189,9 +256,10 @@ const styles = StyleSheet.create({
     borderColor: "gray",
     borderWidth: 1,
     marginBottom: 12,
-    paddingHorizontal: 8,
+    paddingHorizontal: 16,
     justifyContent: "center",
     borderRadius: 10,
+    fontSize: 16,
   },
   error: {
     color: "red",

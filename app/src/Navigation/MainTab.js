@@ -139,10 +139,7 @@ export default function MainTab() {
           component={AddTripUserScreen}
           options={{
             tabBarLabel: () => null,
-            tabBarStyle: { backgroundColor: "white" },
-            headerStyle: { backgroundColor: "white" },
-            headerTitleAlign: "center",
-            headerTitle: () => <LogoTitle />,
+            headerShown: false,
             tabBarIcon: ({ focused, color, size }) => (
               <MaterialIcons
                 name={focused ? "add-location-alt" : "add-location"}
