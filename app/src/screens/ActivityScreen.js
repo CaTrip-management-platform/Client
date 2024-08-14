@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -16,6 +16,7 @@ import { useQuery, useMutation } from "@apollo/client";
 import { GET_TRIPS_BY_CUSTOMER_ID } from "../queries/getTripsByCustomerId";
 import { ADD_ACTIVITY_TO_TRIP } from "../queries/addActivityToTrip";
 import * as SecureStore from "expo-secure-store";
+import { useFocusEffect } from "@react-navigation/native";
 
 const ActivityScreen = () => {
   const { timeline } = useContext(TimelineContext);
@@ -27,7 +28,7 @@ const ActivityScreen = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [dateError, setDateError] = useState("");
 
-  const { loading, error, data } = useQuery(GET_TRIPS_BY_CUSTOMER_ID);
+  const { loading, error, data, refetch } = useQuery(GET_TRIPS_BY_CUSTOMER_ID);
   const [addActivityToTripFn] = useMutation(ADD_ACTIVITY_TO_TRIP);
   const [user, setUser] = useState("");
 
@@ -35,8 +36,8 @@ const ActivityScreen = () => {
     const fetchUserData = async () => {
       const user = await SecureStore.getItemAsync("_id");
       setUser(user);
-    }
-    fetchUserData()
+    };
+    fetchUserData();
     if (data && data.getTripsByCustomerId) {
       const filteredTrips = data.getTripsByCustomerId.filter(
         (trip) => trip.customerId == user && trip.paymentStatus === "Pending"
@@ -44,6 +45,12 @@ const ActivityScreen = () => {
       setTripsData(filteredTrips);
     }
   }, [data]);
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
 
   const handleDateSelect = (day) => {
     setSelectedDate(day.dateString);
