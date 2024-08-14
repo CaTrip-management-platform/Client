@@ -1,23 +1,30 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, ImageBackground } from 'react-native';
-import { useState } from 'react';
-import { useMutation } from '@apollo/client';
-import { REGISTER_USER } from '../queries/users.js';
-import { useNavigation } from '@react-navigation/native';
+import { StatusBar } from "expo-status-bar";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  ImageBackground,
+} from "react-native";
+import { useState } from "react";
+import { useMutation } from "@apollo/client";
+import { REGISTER_USER } from "../queries/users.js";
+import { useNavigation } from "@react-navigation/native";
 // import { GET_POST } from '../queries/posts.js';
 
-
 function RegisterScreen() {
-  const [username, setUsername] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   const [registerUser, { loading, error, data }] = useMutation(REGISTER_USER, {
     onCompleted: () => {
-      navigation.navigate('Login');
+      navigation.navigate("Login");
     },
     // refetchQueries:[GET_POST]
   });
@@ -27,21 +34,21 @@ function RegisterScreen() {
       const result = await registerUser({
         variables: { username, phoneNumber, email, password },
       });
-  
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
   };
 
   return (
     <ImageBackground
       src="https://marketplace.canva.com/EAGD_Vn7lkQ/1/0/900w/canva-blue-and-white-modern-watercolor-background-instagram-story-L-nceizV6kA.jpg"
-      style={styles.container}>
+      style={styles.container}
+    >
       <StatusBar style="dark" />
       <View style={styles.logoContainer}>
         <Image
           style={styles.logo}
-          source={require('../../assets/Catrip.png')}
+          source={require("../../assets/Catrip.png")}
         />
       </View>
       <View style={styles.inputView}>
@@ -96,25 +103,20 @@ function RegisterScreen() {
         </TouchableOpacity>
       </View> */}
 
-
       <View style={styles.btnContainer}>
         <TouchableOpacity style={styles.registerBtn} onPress={handleRegister}>
           <Text style={styles.registerText}>Register</Text>
         </TouchableOpacity>
-        <Image style={styles.car} source={require('../../assets/car.png')} />
-        <View style={styles.roadContainer}>
-          <View style={styles.road} />
-          <View style={styles.road} />
-          <View style={styles.road} />
-          <View style={styles.road} />
-          <View style={styles.road} />
-        </View>
+
         <TouchableOpacity style={styles.regis} onPress={handleRegister}>
-          <Text style={styles.registerText}
+          <Text
+            style={{ fontSize: 17 }}
             onPress={() => {
               navigation.navigate("Login");
             }}
-          >To Login</Text>
+          >
+            Already have an account? Login
+          </Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -124,13 +126,13 @@ function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "white",
+    alignItems: "center",
+    justifyContent: "center",
   },
   logoContainer: {
     marginBottom: 40,
-    alignItems: 'center',
+    alignItems: "center",
   },
   logo: {
     width: 200,
@@ -138,22 +140,22 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   inputView: {
-    width: '80%',
-    backgroundColor: '#f2f2f2',
+    width: "80%",
+    backgroundColor: "#f2f2f2",
     borderRadius: 25,
     height: 50,
     marginBottom: 20,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: 20,
   },
   inputText: {
     height: 50,
-    color: 'black',
+    color: "black",
   },
   roadContainer: {
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "space-between",
     marginVertical: 0,
     backgroundColor: "#134B70",
   },
@@ -164,80 +166,78 @@ const styles = StyleSheet.create({
     marginHorizontal: 7,
   },
   registerBtn: {
-    // width: '100%',
-    backgroundColor: "#134B70",
-    // borderRadius: 25,
-    height: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 40,
-    // marginBottom: 10,
-  },
-  role: {
-    width: '50%',
-    backgroundColor: "white",
-    borderRadius: 25,
-    height: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginHorizontal: 7
-    // marginTop: 40,
-    // marginBottom: 10,
-  },
-  roleText: {
-    color: 'black',
-  },
-  regis: {
-    // width: "100%",
     backgroundColor: "#134B70",
     height: 50,
     alignItems: "center",
     justifyContent: "center",
-    // marginTop: 3,
+    marginTop: 10,
+    marginBottom: 40,
+    borderRadius: 25,
+    width: 320,
+  },
+  role: {
+    width: "50%",
+    backgroundColor: "white",
+    borderRadius: 25,
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 7,
+    // marginTop: 40,
+    // marginBottom: 10,
+  },
+  roleText: {
+    color: "black",
+  },
+  regis: {
+    borderWidth: 2,
+    borderColor: "#134B70",
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 10,
+    borderRadius: 25,
   },
   registerText: {
-    color: 'white',
+    color: "white",
+    fontSize: 17,
   },
   car: {
-    position: 'absolute',
-    top: '30.5%',
-    left: '15%',
+    position: "absolute",
+    top: "30.5%",
+    left: "15%",
     width: 130,
     height: 65,
-    // transform: [{ rotate: '90deg' }],
-    zIndex: 1, // Make sure car is on top of other elements
-    marginLeft: -32.5, // Adjust position to center the car
-    marginTop: 10, // Adjust position to be on top of the button
+
+    zIndex: 1,
+    marginLeft: -32.5,
+    marginTop: 10,
   },
-  btnContainer: {
-    // flex: 1
-    // backgroundColor: 'black'
-  },
+
   roleContainer: {
-    flexDirection: 'row',
-    width: '80%',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    width: "80%",
+    justifyContent: "space-between",
     marginBottom: 20,
   },
   roleButton: {
     flex: 1,
-    backgroundColor: '#f2f2f2',
+    backgroundColor: "#f2f2f2",
     borderRadius: 25,
     height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginHorizontal: 5,
   },
   selectedRole: {
-    backgroundColor: '#134B70',
+    backgroundColor: "#134B70",
   },
   roleText: {
-    color: '#003f5c',
+    color: "#003f5c",
     fontSize: 16,
   },
   selectedRoleText: {
-    color: 'white',
+    color: "white",
   },
 });
 

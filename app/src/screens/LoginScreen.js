@@ -31,7 +31,11 @@ function LoginScreen({ navigation }) {
       const role = result?.data?.login?.role;
       const _id = result?.data?.login?.id;
 
-      if (typeof token === 'string' && typeof role === 'string' && typeof _id === 'string') {
+      if (
+        typeof token === "string" &&
+        typeof role === "string" &&
+        typeof _id === "string"
+      ) {
         await SecureStore.setItemAsync("accessToken", token);
         await SecureStore.setItemAsync("role", role);
         await SecureStore.setItemAsync("_id", _id);
@@ -49,7 +53,9 @@ function LoginScreen({ navigation }) {
 
   return (
     <ImageBackground
-      source={{ uri: "https://marketplace.canva.com/EAGD_Vn7lkQ/1/0/900w/canva-blue-and-white-modern-watercolor-background-instagram-story-L-nceizV6kA.jpg" }}
+      source={{
+        uri: "https://marketplace.canva.com/EAGD_Vn7lkQ/1/0/900w/canva-blue-and-white-modern-watercolor-background-instagram-story-L-nceizV6kA.jpg",
+      }}
       style={styles.container}
     >
       <StatusBar style="dark" />
@@ -86,26 +92,15 @@ function LoginScreen({ navigation }) {
         </View>
       ) : (
         <View style={styles.btnContainer}>
-          <TouchableOpacity
-            style={styles.loginBtn}
-            onPress={handleLogin}
-          >
+          <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
             <Text style={styles.loginText}>Login</Text>
           </TouchableOpacity>
-          <Image style={styles.car} source={require("../../assets/car.png")} />
-          <View style={styles.roadContainer}>
-            <View style={styles.road} />
-            <View style={styles.road} />
-            <View style={styles.road} />
-            <View style={styles.road} />
-            <View style={styles.road} />
-          </View>
 
           <TouchableOpacity
             style={styles.regis}
             onPress={() => navigation.navigate("Register")}
           >
-            <Text style={styles.loginText}>To Register</Text>
+            <Text style={{ fontSize: 17 }}>Create an account</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -143,8 +138,10 @@ const styles = StyleSheet.create({
     height: 50,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 40,
-    marginBottom: -1,
+    marginTop: 10,
+    marginBottom: 40,
+    borderRadius: 25,
+    width: 320,
   },
   roadContainer: {
     flexDirection: "row",
@@ -160,11 +157,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 7,
   },
   regis: {
-    backgroundColor: "#134B70",
+    borderWidth: 2,
+    borderColor: "#134B70",
     height: 50,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 10,
+    borderRadius: 25,
   },
   loginText: {
     color: "white",
