@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import { useQuery } from "@apollo/client";
 import { StatusBar } from "expo-status-bar";
 import * as SecureStore from "expo-secure-store";
 import { GET_TRIPS_BY_CUSTOMER_ID } from "../queries/getTripsByCustomerId";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 function ActivityHistoryScreen() {
   const [tripsId, setTripsId] = useState([]);
@@ -28,7 +28,7 @@ function ActivityHistoryScreen() {
     }
   };
 
-  const { loading, error, data } = useQuery(GET_TRIPS_BY_CUSTOMER_ID, {
+  const { loading, error, data, refetch } = useQuery(GET_TRIPS_BY_CUSTOMER_ID, {
     fetchPolicy: "no-cache",
     refetchOnWindowFocus: false,
     onCompleted: async (data) => {
@@ -41,6 +41,12 @@ function ActivityHistoryScreen() {
       }
     },
   });
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
 
   if (loading) {
     return (
