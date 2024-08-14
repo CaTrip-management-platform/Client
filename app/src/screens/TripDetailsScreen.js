@@ -190,14 +190,22 @@ export default function TripDetailsScreen({ route, navigation }) {
                       {activity.Activity.title}
                     </Text>
                     {paid && (
-                      <Button
+                      <TouchableOpacity
+                        style={{
+                          alignSelf: "baseline",
+                          position: "absolute",
+                          left: 80,
+                          top: 45,
+                        }}
                         onPress={() => {
                           setActiveCard(activity.activityId);
                           setShowReviewModal(true);
                         }}
                       >
-                        Review
-                      </Button>
+                        <Text style={{ color: "purple", fontSize: 18 }}>
+                          Review
+                        </Text>
+                      </TouchableOpacity>
                     )}
                     <View style={styles.barisBawah}>
                       <View style={styles.underContainer}>
@@ -343,30 +351,34 @@ export default function TripDetailsScreen({ route, navigation }) {
           contentContainerStyle={styles.modalContent}
         >
           <Text style={styles.modalTitle}>Update Dates</Text>
-          <TouchableOpacity
-            onPress={() => {
-              setDateType("start");
-              setShowStartDateCalendar(true);
-            }}
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            <Text style={styles.input}>
-              {newStartDate
-                ? moment(newStartDate).format("DD MMM YYYY")
-                : "Select Start Date"}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setDateType("end");
-              setShowEndDateCalendar(true);
-            }}
-          >
-            <Text style={styles.input}>
-              {newEndDate
-                ? moment(newEndDate).format("DD MMM YYYY")
-                : "Select End Date"}
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setDateType("start");
+                setShowStartDateCalendar(true);
+              }}
+            >
+              <Text style={styles.input}>
+                {newStartDate
+                  ? moment(newStartDate).format("DD MMM YYYY")
+                  : "Select Start Date"}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setDateType("end");
+                setShowEndDateCalendar(true);
+              }}
+            >
+              <Text style={styles.input}>
+                {newEndDate
+                  ? moment(newEndDate).format("DD MMM YYYY")
+                  : "Select End Date"}
+              </Text>
+            </TouchableOpacity>
+          </View>
           <View style={styles.modalButtons}>
             <Button mode="contained" onPress={() => setShowDateModal(false)}>
               Cancel
@@ -509,6 +521,8 @@ const styles = StyleSheet.create({
   quantity: {
     fontSize: 16,
     marginBottom: 4,
+    left: 25,
+    top: 25,
   },
   totalContainer: {
     marginTop: 16,
@@ -551,7 +565,8 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 20,
+    textAlign: "center",
   },
   input: {
     height: 40,
@@ -562,6 +577,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     justifyContent: "center",
     fontSize: 16,
+    alignSelf: "stretch",
   },
   modalButtons: {
     flexDirection: "row",
