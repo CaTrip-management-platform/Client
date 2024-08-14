@@ -190,7 +190,7 @@ const AddActivityScreen = ({ navigation }) => {
             <Text style={styles.removeButton}>Remove</Text>
           </TouchableOpacity>
         </View>
-      ))} 
+      ))}
       <TouchableOpacity onPress={handleAddTag}>
         <Text style={styles.addButton}>Add Another Tag</Text>
       </TouchableOpacity>
@@ -212,24 +212,26 @@ const AddActivityScreen = ({ navigation }) => {
             }}
             onFail={(error) => console.error(error)}
             styles={{
-              textInput: { ...styles.input, marginBottom: 0 },
+              textInput: { ...styles.mapInput, marginBottom: 0 },
             }}
           />
         </View>
         <Text style={styles.label}>Add location on map:</Text>
-        <MapView
-          ref={mapRef}
-          style={styles.map}
-          region={mapRegion}
-          onPress={(e) => {
-            const { latitude, longitude } = e.nativeEvent.coordinate;
-            updateLocation(latitude, longitude);
-          }}
-        >
-          {markerPresent && coords.latitude && coords.longitude && (
-            <Marker coordinate={coords} />
-          )}
-        </MapView>
+        <View style={styles.mapContainer}>
+          <MapView
+            ref={mapRef}
+            style={styles.map}
+            region={mapRegion}
+            onPress={(e) => {
+              const { latitude, longitude } = e.nativeEvent.coordinate;
+              updateLocation(latitude, longitude);
+            }}
+          >
+            {markerPresent && coords.latitude && coords.longitude && (
+              <Marker coordinate={coords} />
+            )}
+          </MapView>
+        </View>
         {markerPresent && (
           <TouchableOpacity
             onPress={removeMarker}
@@ -259,11 +261,27 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
+    height: 50,
+    borderColor: "gray",
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
-    padding: 8,
-    marginBottom: 16,
+    marginBottom: 12,
+    paddingHorizontal: 16,
+    justifyContent: "center",
+    borderRadius: 10,
+    fontSize: 16,
+  },
+  mapInput: {
+    height: 50,
+    borderWidth: 1,
+    borderColor: "gray",
+    marginBottom: 12,
+    paddingHorizontal: 16,
+    justifyContent: "center",
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    fontSize: 16,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
   },
   urlContainer: {
     flexDirection: "row",
@@ -283,11 +301,22 @@ const styles = StyleSheet.create({
     color: "red",
     marginLeft: 8,
   },
+  mapContainer: {
+    width: "100%",
+    height: 300,
+    marginBottom: 16,
+    borderRadius: 10,
+    overflow: "hidden",
+    borderColor: "gray",
+    borderWidth: 1,
+  },
   map: {
     width: "100%",
     height: 300,
     marginBottom: 16,
     zIndex: 0,
+    borderRadius: 10,
+    overflow: "hidden",
   },
   removeMarkerButton: {
     backgroundColor: "red",
