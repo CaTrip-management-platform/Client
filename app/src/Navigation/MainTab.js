@@ -226,8 +226,15 @@ export default function MainTab() {
               Are you sure you want to log out?
             </Text>
             <View style={styles.modalButtons}>
-              <Button title="Cancel" onPress={() => setIsModalVisible(false)} />
-              <Button title="Logout" color="red" onPress={handleLogout} />
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => setIsModalVisible(false)}
+              >
+                <Text>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleLogout}>
+                <Text>Logout</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -246,6 +253,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  button: {},
   inputWrapper: {
     flexDirection: "row",
     width: 310,
