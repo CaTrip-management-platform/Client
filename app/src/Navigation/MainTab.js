@@ -230,10 +230,17 @@ export default function MainTab() {
                 style={{ ...styles.button, backgroundColor: "#7ec8e3" }}
                 onPress={() => setIsModalVisible(false)}
               >
-                <Text>Cancel</Text>
+                <Text style={{ color: "white", fontWeight: "bold" }}>
+                  Cancel
+                </Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={handleLogout}>
-                <Text>Logout</Text>
+              <TouchableOpacity
+                style={{ ...styles.button, backgroundColor: "red" }}
+                onPress={handleLogout}
+              >
+                <Text style={{ color: "white", fontWeight: "bold" }}>
+                  Logout
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -253,7 +260,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  button: {},
+  button: {
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 5,
+  },
   inputWrapper: {
     flexDirection: "row",
     width: 310,
