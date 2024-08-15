@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "white",
     borderRadius: 10,
-    alignItems: "center",
+    alignSelf: "center",
   },
   calendar: {
     width: "100%",
